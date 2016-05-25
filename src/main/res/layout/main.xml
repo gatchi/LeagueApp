@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="top|center"
+	android:orientation="vertical">
+
+	<TextView
+		android:text="League App"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"/>
+
+	<EditText
+		android:layout_height="wrap_content"
+		android:ems="10"
+		android:layout_width="wrap_content"
+		android:maxLines="1"
+		android:imeOptions="actionSearch"
+		android:inputType="text"
+		android:id="@+id/search"
+		android:gravity="center_horizontal"
+		android:hint="search"
+		android:layout_gravity="center"/>
+
+	<View
+		android:layout_height="1dp"
+		android:background="?android:attr/dividerVertical"
+		android:layout_width="match_parent"/>
+
+	<LinearLayout
+		android:layout_height="match_parent"
+		android:layout_width="match_parent"
+		android:orientation="horizontal"
+		android:gravity="center_horizontal"
+		android:id="@+id/button_layout">
+
+		<!-- old button xml
+		<ImageButton
+			android:layout_height="87dp"
+			android:layout_width="87dp"
+			android:src="@drawable/aatrox_icon"
+			android:adjustViewBounds="true"
+			android:cropToPadding="false"
+			android:scaleType="fitCenter"
+			android:padding="0dp"
+			android:onClick="tapChamp"
+			android:id="@+id/champbutton1"
+			android:layout_margin="2dp"/>
+
+		<ImageButton
+			android:layout_height="87dp"
+			android:layout_width="87dp"
+			android:src="@drawable/ahri_icon"
+			android:adjustViewBounds="true"
+			android:cropToPadding="false"
+			android:scaleType="fitCenter"
+			android:padding="0dp"
+			android:onClick="tapChamp"
+			android:id="@+id/champbutton2"
+			android:layout_margin="2dp"/>
+
+		<ImageButton
+			android:layout_height="87dp"
+			android:layout_width="87dp"
+			android:src="@drawable/akali_icon"
+			android:adjustViewBounds="true"
+			android:cropToPadding="false"
+			android:scaleType="fitCenter"
+			android:padding="0dp"
+			android:onClick="tapChamp"
+			android:id="@+id/champbutton3"
+			android:layout_margin="2dp"/>
+
+		<ImageButton
+			android:layout_height="87dp"
+			android:layout_width="87dp"
+			android:src="@drawable/alistar_icon"
+			android:adjustViewBounds="true"
+			android:cropToPadding="false"
+			android:scaleType="fitCenter"
+			android:padding="0dp"
+			android:onClick="tapChamp"
+			android:id="@+id/champbutton4"
+			android:layout_margin="2dp"/>
+			-->
+
+	</LinearLayout>
+
+</LinearLayout>
+
