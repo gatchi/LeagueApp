@@ -52,6 +52,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	Resources res;
 	int champId;
 	String champName;
+	String parType;
 	double hpBase;
 	double hpPerLevel;
 	double mpBase;
@@ -111,10 +112,9 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		TextView champNameView = (TextView) findViewById(R.id.champ_name);
 		champNameView.setText(champName);
 		
-		// + JSON Work +
 		// Load the JSON data.
 		// (JSON files are stored in the "raw" resource directory.)
-		String path = "com.gatchipatchi.LeagueApp:raw/";
+		//loadJson();
 		String resourceName = champs[champId];
 		resourceName = resourceName.toLowerCase();
 		toast(resourceName);
@@ -138,6 +138,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			JSONObject champStats = champ.getJSONObject("stats");
 			
 			// get stats
+			parType = champ.getString("partype");
 			hpBase = champStats.getDouble("hp");
 			hpPerLevel = champStats.getDouble("hpperlevel");
 			mpBase = champStats.getDouble("mp");
@@ -160,13 +161,13 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			// update screen
 			
 			// test json import
-/* 			if (hpBase != 0) {
-				Toast t = Toast.makeText(this, Double.toString(hpBase), Toast.LENGTH_SHORT);
-				t.show();
-			} else {
-				Toast t = Toast.makeText(this, "hpBase is empty", Toast.LENGTH_SHORT);
-				t.show();
-			} */
+			// if (hpBase != 0) {
+				// Toast t = Toast.makeText(this, Double.toString(hpBase), Toast.LENGTH_SHORT);
+				// t.show();
+			// } else {
+				// Toast t = Toast.makeText(this, "hpBase is empty", Toast.LENGTH_SHORT);
+				// t.show();
+			// }
 			
 		} catch (UnsupportedEncodingException e) {
 			toast("UnsupportedEncodingException", Toast.LENGTH_LONG);
@@ -189,34 +190,40 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		int champId = bundle.getInt("button id");
 		champName.setText(map.get(Integer.toString(champId))); */
 		
-		// Initialize a few statistics.  Don't remember why.
-		// I think they act like default values?
-		// ANYWAY REPLACE WITH JSON.
+		// These dont change with levels, but are linked to which champ is selected
 
 		// resource type
-		String[] resourceType = res.getStringArray(R.array.champ_resource_type);
 		TextView resourceTypeText = (TextView) findViewById(R.id.champ_resource_type);
-		resourceTypeText.setText(resourceType[champId]);
+		TextView resourceRegenTypeText = (TextView) findViewById(R.id.resource_regen_type);
+		if (parType.equals("MP")) {
+			resourceTypeText.setText("mana");
+			resourceRegenTypeText.setText("mana regen");
+		} else {
+			resourceTypeText.setText("lol fix dis");
+		}
 		
 		// resource regen type
-		String[] resourceRegenType = res.getStringArray(R.array.champ_resource_regen_type);
-		TextView resourceRegenTypeText = (TextView) findViewById(R.id.resource_regen_type);
-		resourceRegenTypeText.setText(resourceRegenType[champId]);
+		//String[] resourceRegenType = res.getStringArray(R.array.champ_resource_regen_type);
+		//resourceRegenTypeText.setText(resourceRegenType[champId]);
 
 		// range type
-		String[] rangeType = res.getStringArray(R.array.champ_range_type);
+		//String[] rangeType = res.getStringArray(R.array.champ_range_type);
 		TextView rangeTypeText = (TextView) findViewById(R.id.range_type);
-		rangeTypeText.setText(rangeType[champId]);
+		TextView rangeText = (TextView) findViewById(R.id.range);
+		if (attackRange < 300) {
+			rangeTypeText.setText("melee");
+		} else if (attackRange >= 300) {
+			rangeTypeText.setText("ranged");
+		}
+		rangeText.setText(Double.toString(attackRange));
 		
 		// range
-		String[] range = res.getStringArray(R.array.champ_range);
-		TextView rangeText = (TextView) findViewById(R.id.range);
-		rangeText.setText(range[champId]);
+		//String[] range = res.getStringArray(R.array.champ_range);
 		
 		// movespeed
-		String[] movespeed = res.getStringArray(R.array.champ_movespeed);
+		//String[] movespeed = res.getStringArray(R.array.champ_movespeed);
 		TextView movespeedText = (TextView) findViewById(R.id.movespeed);
-		movespeedText.setText(movespeed[champId]);
+		movespeedText.setText(Double.toString(moveSpeed));
 		
 	}
 
@@ -311,12 +318,14 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				text.setText(baseValue[champId] + " (+" + growthValue[champId] + ")");
 			} else if (valueType == PERCENT) {
 				text.setText(baseValue[champId] + " (+" + growthValue[champId] + "%)");
+			} else {
+				toast("whoops wrong function");
 			}
 		}
 	}
 	
 	void setPerLevel(TextView text, int valueType, double baseValue, double growthValue) {
-		if ((baseValue != 0) && (growthValue !=0)) {
+		if ((baseValue != 0)) {
 			if (valueType == LARGE) {
 				text.setText(String.format("%.1f (+%.0f)", baseValue, growthValue));
 			} else if (valueType == SMALL) {
@@ -350,12 +359,14 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	void setCurrentLevel(double base, double growth, int valueType, String level, TextView view) {
 		double levelValue = Double.parseDouble(level);
 		double stat = base + growth * (levelValue - 1);
-		if (valueType == LARGE) {
-			view.setText(String.format("%.1f", stat));
-		} else if (valueType == SMALL) {
-			view.setText(String.format("%.2f", stat));
-		} else if (valueType == PERCENT) {
-			view.setText(String.format("%.3f (+%.0f%%)", base, (growth * (levelValue - 1))));
+		if (stat != 0) {
+			if (valueType == LARGE) {
+				view.setText(String.format("%.1f", stat));
+			} else if (valueType == SMALL) {
+				view.setText(String.format("%.2f", stat));
+			} else if (valueType == PERCENT) {
+				view.setText(String.format("%.3f (+%.0f%%)", base, (growth * (levelValue - 1))));
+			}
 		}
 	}
 	
@@ -374,17 +385,89 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	}
 	
 	void setRange(double base, double growth, int rangeType, TextView view) {
-		if ((base != 0) && (growth != 0)) {
+		if ((base != 0)) {
 			if (rangeType == LARGE) {
-				view.setText(String.format("%.1f – %.0f", base, (base + 17 * growth)));
+				view.setText(String.format("%.1f – %.1f", base, (base + 17 * growth)));
 			} else if (rangeType == SMALL) {
-				view.setText(String.format("%.2f – %.1f", base, (base + 17 * growth)));
+				view.setText(String.format("%.2f – %.2f", base, (base + 17 * growth)));
 			} else if (rangeType == PERCENT) {
 				view.setText(String.format("%.3f (+0%% – +%.0f%%)", base, (growth * 17)));
 			}
 		}
 	}
 	
+	
+	/*
+	 * JSON Loading
+	 * 
+	 */
+	
+	/* void loadJson() {
+		String resourceName = champs[champId];
+		resourceName = resourceName.toLowerCase();
+		toast(resourceName);
+		int jsonId = res.getIdentifier(resourceName, "raw", getPackageName());
+		InputStream in = getResources().openRawResource(jsonId);
+		JSONObject json = null;
+		try {
+			// Convert input stream to a string for older APIs.
+			// (Newer JSON libraries dont need this step.)
+			BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+			StringBuilder responseStrBuilder = new StringBuilder();
+			String inputStr;
+			
+			while ((inputStr = streamReader.readLine()) != null) {
+				responseStrBuilder.append(inputStr);
+			}
+			
+			json = new JSONObject(responseStrBuilder.toString());
+			JSONObject champData = json.getJSONObject("data");
+			JSONObject champ = champData.getJSONObject(champs[champId]);
+			JSONObject champStats = champ.getJSONObject("stats");
+			
+			// get stats
+			hpBase = champStats.getDouble("hp");
+			hpPerLevel = champStats.getDouble("hpperlevel");
+			mpBase = champStats.getDouble("mp");
+			mpPerLevel = champStats.getDouble("mpperlevel");
+			moveSpeed = champStats.getDouble("movespeed");
+			armorBase = champStats.getDouble("armor");
+			armorPerLevel = champStats.getDouble("armorperlevel");
+			mrBase = champStats.getDouble("spellblock");
+			mrPerLevel = champStats.getDouble("spellblockperlevel");
+			attackRange = champStats.getDouble("attackrange");
+			hpRegenBase = champStats.getDouble("hpregen");
+			hpRegenPerLevel = champStats.getDouble("hpregenperlevel");
+			mpRegenBase = champStats.getDouble("mpregen");
+			mpRegenPerLevel = champStats.getDouble("mpregenperlevel");
+			adBase = champStats.getDouble("attackdamage");
+			adPerLevel = champStats.getDouble("attackdamageperlevel");
+			asOffset = champStats.getDouble("attackspeedoffset");
+			asPerLevel = champStats.getDouble("attackspeedperlevel");
+			
+			// update screen
+			
+			// test json import
+			// if (hpBase != 0) {
+				// Toast t = Toast.makeText(this, Double.toString(hpBase), Toast.LENGTH_SHORT);
+				// t.show();
+			// } else {
+				// Toast t = Toast.makeText(this, "hpBase is empty", Toast.LENGTH_SHORT);
+				// t.show();
+			// }
+			
+		} catch (UnsupportedEncodingException e) {
+			toast("UnsupportedEncodingException", Toast.LENGTH_LONG);
+			showError(e);
+		} catch (JSONException e) {
+			toast("JSONException", Toast.LENGTH_LONG);
+			showError(e);
+		} catch (IOException e) {
+			toast("IOException", Toast.LENGTH_LONG);
+			showError(e);
+		}
+	} */
+		
 	void aestheticSetup()
 	{
 		ActionBar actionBar = getActionBar();

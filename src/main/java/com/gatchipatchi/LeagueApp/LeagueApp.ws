@@ -12,6 +12,9 @@
             <Folder name="layout-port">
                 <File name="C:\Users\toshiba\Dropbox\Documents\apps\LeagueApp\src\main\res\layout-port\champinfo.xml" />
             </Folder>
+            <Folder name="values">
+                <File name="C:\Users\toshiba\Dropbox\Documents\apps\LeagueApp\src\main\res\values\strings.xml" />
+            </Folder>
         </Folder>
         <File name="C:\Users\toshiba\Dropbox\Documents\apps\LeagueApp\src\main\AndroidManifest.xml" />
     </Project>
