@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	When adding champs, three things:
+
+	1. add to maps
+	2. add an ImageButton in main
+	3. set the OnClickListener in main
+-->
+<map linked="false">
+	<entry key="0">Aatrox</entry>
+	<entry key="1">Ahri</entry>
+	<entry key="2131230724">Akali</entry>
+	<entry key="2131230725">Alistar</entry>
+</map>
+

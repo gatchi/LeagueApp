@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Landscape Version -->
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent"
+	android:orientation="vertical"
+	android:gravity="top|center">
+
+	<TextView
+		android:layout_height="wrap_content"
+		android:text="champ_name"
+		android:layout_width="wrap_content"
+		android:gravity="center"
+		android:id="@+id/champ_name"
+		android:textSize="20sp"
+		android:textIsSelectable="true"/>
+
+	<View
+		android:layout_height="1dp"
+		android:background="?android:attr/dividerVertical"
+		android:layout_width="match_parent"/>
+
+	<ScrollView
+		android:layout_height="match_parent"
+		android:layout_width="match_parent"
+		android:gravity="center_horizontal">
+
+		<LinearLayout
+			android:layout_height="match_parent"
+			android:layout_width="match_parent"
+			android:gravity="center|top"
+			android:orientation="vertical">
+
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="Statistics"
+				android:textSize="16sp"/>
+
+			<Spinner
+				android:layout_height="wrap_content"
+				android:layout_width="90sp"
+				android:id="@+id/level"/>
+
+			<TableLayout
+				android:layout_height="wrap_content"
+				android:layout_width="400sp"
+				android:padding="10dp"
+				android:stretchColumns="*"
+				android:textSize="30sp">
+
+				<TableRow
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content"
+					android:textSize="16sp">
+
+					<TextView
+						android:text="health"/>
+
+					<TextView
+						android:id="@+id/health"
+						android:text="uninitialized"
+						android:gravity="center"/>
+						
+					<TextView />
+
+					<TextView
+						android:text="attack damage"/>
+
+					<TextView
+						android:id="@+id/attack_damage"
+						android:text="uninitialized"
+						android:gravity="center"/>
+
+				</TableRow>
+
+				<TableRow
+					android:layout_height="wrap_content"
+					android:layout_width="wrap_content">
+
+					<TextView
+						android:text="health regen"/>
+
+					<TextView
+						android:id="@+id/health_regen"
+						android:text="uninitialized"
+						android:gravity="center"/>
+						
+					<TextView />
+
+					<TextView
+						android:text="attack speed"/>
+
+					<TextView
+						android:id="@+id/attack_speed"
+						android:text="uninitialized"
+						android:gravity="center"/>
+
+				</TableRow>
+
+				<TableRow>
+
+					<TextView
+						android:id="@+id/champ_resource_type"
+						android:text="uses health"/>
+
+					<TextView
+						android:id="@+id/resource_points"
+						android:gravity="center"/>
+						
+					<TextView />
+
+					<TextView
+						android:text="armor"/>
+
+					<TextView
+						android:id="@+id/armor"
+						android:text="uninitialized"
+						android:gravity="center"/>
+
+				</TableRow>
+
+				<TableRow>
+
+					<TextView
+						android:id="@+id/resource_regen_type"/>
+
+					<TextView
+						android:id="@+id/resource_regen"
+						android:gravity="center"/>
+						
+					<TextView />
+
+					<TextView
+						android:text="magic resist"/>
+
+					<TextView
+						android:id="@+id/magic_resist"
+						android:text="uninitialized"
+						android:gravity="center"/>
+
+				</TableRow>
+
+				<TableRow>
+
+					<TextView
+						android:id="@+id/range_type"
+						android:text="melee"/>
+
+					<TextView
+						android:id="@+id/range"
+						android:text="uninitialized"
+						android:gravity="center"/>
+
+					<TextView />
+						
+					<TextView
+						android:text="movespeed"/>
+
+					<TextView
+						android:id="@+id/movespeed"
+						android:text="uninitialized"
+						android:gravity="center"/>
+
+				</TableRow>
+
+			</TableLayout>
+
+		</LinearLayout>
+
+	</ScrollView>
+
+</LinearLayout>
+
