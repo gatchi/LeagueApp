@@ -1,0 +1,893 @@
+[
+    {
+        "outputFile": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\build\\intermediates\\res\\merged\\release\\values\\values.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endLine": 25,
+                    "endColumn": 16,
+                    "endOffset": 560
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 26,
+                    "startColumn": 4,
+                    "startOffset": 565,
+                    "endLine": 49,
+                    "endColumn": 16,
+                    "endOffset": 1034
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 50,
+                    "startColumn": 4,
+                    "startOffset": 1039,
+                    "endLine": 73,
+                    "endColumn": 16,
+                    "endOffset": 1551
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 74,
+                    "startColumn": 4,
+                    "startOffset": 1556,
+                    "endLine": 97,
+                    "endColumn": 16,
+                    "endOffset": 2030
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 98,
+                    "startColumn": 4,
+                    "startOffset": 2035,
+                    "endLine": 121,
+                    "endColumn": 16,
+                    "endOffset": 2507
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 122,
+                    "startColumn": 4,
+                    "startOffset": 2512,
+                    "endLine": 145,
+                    "endColumn": 16,
+                    "endOffset": 2971
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 146,
+                    "startColumn": 4,
+                    "startOffset": 2976,
+                    "endLine": 169,
+                    "endColumn": 16,
+                    "endOffset": 3482
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 170,
+                    "startColumn": 4,
+                    "startOffset": 3487,
+                    "endLine": 193,
+                    "endColumn": 16,
+                    "endOffset": 3956
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 194,
+                    "startColumn": 4,
+                    "startOffset": 3961,
+                    "endLine": 217,
+                    "endColumn": 16,
+                    "endOffset": 4453
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 218,
+                    "startColumn": 4,
+                    "startOffset": 4458,
+                    "endLine": 241,
+                    "endColumn": 16,
+                    "endOffset": 4920
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 242,
+                    "startColumn": 4,
+                    "startOffset": 4925,
+                    "endLine": 265,
+                    "endColumn": 16,
+                    "endOffset": 5415
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 266,
+                    "startColumn": 4,
+                    "startOffset": 5420,
+                    "endLine": 289,
+                    "endColumn": 16,
+                    "endOffset": 5902
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 290,
+                    "startColumn": 4,
+                    "startOffset": 5907,
+                    "endLine": 295,
+                    "endColumn": 16,
+                    "endOffset": 6103
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 296,
+                    "startColumn": 4,
+                    "startOffset": 6108,
+                    "endLine": 317,
+                    "endColumn": 16,
+                    "endOffset": 6519
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 318,
+                    "startColumn": 4,
+                    "startOffset": 6524,
+                    "endLine": 341,
+                    "endColumn": 16,
+                    "endOffset": 6992
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 342,
+                    "startColumn": 4,
+                    "startOffset": 6997,
+                    "endLine": 363,
+                    "endColumn": 16,
+                    "endOffset": 7493
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 364,
+                    "startColumn": 4,
+                    "startOffset": 7498,
+                    "endLine": 387,
+                    "endColumn": 16,
+                    "endOffset": 7962
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 388,
+                    "startColumn": 4,
+                    "startOffset": 7967,
+                    "endLine": 411,
+                    "endColumn": 16,
+                    "endOffset": 8487
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 412,
+                    "startColumn": 4,
+                    "startOffset": 8492,
+                    "endLine": 435,
+                    "endColumn": 16,
+                    "endOffset": 8974
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 436,
+                    "startColumn": 4,
+                    "startOffset": 8979,
+                    "endLine": 459,
+                    "endColumn": 16,
+                    "endOffset": 9430
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 460,
+                    "startColumn": 4,
+                    "startOffset": 9435,
+                    "endLine": 483,
+                    "endColumn": 16,
+                    "endOffset": 10039
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 484,
+                    "startColumn": 4,
+                    "startOffset": 10044,
+                    "endLine": 507,
+                    "endColumn": 16,
+                    "endOffset": 10545
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 508,
+                    "startColumn": 4,
+                    "startOffset": 10550,
+                    "endLine": 531,
+                    "endColumn": 16,
+                    "endOffset": 11015
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 532,
+                    "startColumn": 4,
+                    "startOffset": 11020,
+                    "endLine": 555,
+                    "endColumn": 16,
+                    "endOffset": 11486
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 556,
+                    "startColumn": 4,
+                    "startOffset": 11491,
+                    "endColumn": 46,
+                    "endOffset": 11533
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml"
+                }
+            },
+            {
+                "to": {
+                    "startLine": 557,
+                    "startColumn": 4,
+                    "startOffset": 11538,
+                    "endLine": 558,
+                    "endColumn": 9,
+                    "endOffset": 11612
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\work\\apps\\LeagueApp\\src\\main\\res\\values\\styles.xml"
+                }
+            }
+        ]
+    },
+    {
+        "outputFile": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\build\\intermediates\\res\\merged\\release\\values\\values.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 2,
+                    "startColumn": 4,
+                    "startOffset": 55,
+                    "endLine": 25,
+                    "endColumn": 16,
+                    "endOffset": 560
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 356,
+                        "startColumn": 1,
+                        "startOffset": 6951,
+                        "endLine": 379,
+                        "endColumn": 16,
+                        "endOffset": 7456
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 26,
+                    "startColumn": 4,
+                    "startOffset": 565,
+                    "endLine": 49,
+                    "endColumn": 16,
+                    "endOffset": 1034
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 381,
+                        "startColumn": 1,
+                        "startOffset": 7460,
+                        "endLine": 404,
+                        "endColumn": 16,
+                        "endOffset": 7929
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 50,
+                    "startColumn": 4,
+                    "startOffset": 1039,
+                    "endLine": 73,
+                    "endColumn": 16,
+                    "endOffset": 1551
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 413,
+                        "startColumn": 1,
+                        "startOffset": 8049,
+                        "endLine": 436,
+                        "endColumn": 16,
+                        "endOffset": 8561
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 74,
+                    "startColumn": 4,
+                    "startOffset": 1556,
+                    "endLine": 97,
+                    "endColumn": 16,
+                    "endOffset": 2030
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 439,
+                        "startColumn": 1,
+                        "startOffset": 8606,
+                        "endLine": 462,
+                        "endColumn": 16,
+                        "endOffset": 9080
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 98,
+                    "startColumn": 4,
+                    "startOffset": 2035,
+                    "endLine": 121,
+                    "endColumn": 16,
+                    "endOffset": 2507
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 528,
+                        "startColumn": 1,
+                        "startOffset": 10336,
+                        "endLine": 551,
+                        "endColumn": 16,
+                        "endOffset": 10808
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 122,
+                    "startColumn": 4,
+                    "startOffset": 2512,
+                    "endLine": 145,
+                    "endColumn": 16,
+                    "endOffset": 2971
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 553,
+                        "startColumn": 1,
+                        "startOffset": 10812,
+                        "endLine": 576,
+                        "endColumn": 16,
+                        "endOffset": 11271
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 146,
+                    "startColumn": 4,
+                    "startOffset": 2976,
+                    "endLine": 169,
+                    "endColumn": 16,
+                    "endOffset": 3482
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 471,
+                        "startColumn": 1,
+                        "startOffset": 9228,
+                        "endLine": 494,
+                        "endColumn": 16,
+                        "endOffset": 9734
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 170,
+                    "startColumn": 4,
+                    "startOffset": 3487,
+                    "endLine": 193,
+                    "endColumn": 16,
+                    "endOffset": 3956
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 496,
+                        "startColumn": 1,
+                        "startOffset": 9738,
+                        "endLine": 519,
+                        "endColumn": 16,
+                        "endOffset": 10207
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 194,
+                    "startColumn": 4,
+                    "startOffset": 3961,
+                    "endLine": 217,
+                    "endColumn": 16,
+                    "endOffset": 4453
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 28,
+                        "startColumn": 1,
+                        "startOffset": 518,
+                        "endLine": 51,
+                        "endColumn": 16,
+                        "endOffset": 1010
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 218,
+                    "startColumn": 4,
+                    "startOffset": 4458,
+                    "endLine": 241,
+                    "endColumn": 16,
+                    "endOffset": 4920
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 53,
+                        "startColumn": 1,
+                        "startOffset": 1014,
+                        "endLine": 76,
+                        "endColumn": 16,
+                        "endOffset": 1476
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 242,
+                    "startColumn": 4,
+                    "startOffset": 4925,
+                    "endLine": 265,
+                    "endColumn": 16,
+                    "endOffset": 5415
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 85,
+                        "startColumn": 1,
+                        "startOffset": 1604,
+                        "endLine": 108,
+                        "endColumn": 16,
+                        "endOffset": 2094
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 266,
+                    "startColumn": 4,
+                    "startOffset": 5420,
+                    "endLine": 289,
+                    "endColumn": 16,
+                    "endOffset": 5902
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 110,
+                        "startColumn": 1,
+                        "startOffset": 2098,
+                        "endLine": 133,
+                        "endColumn": 16,
+                        "endOffset": 2580
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 290,
+                    "startColumn": 4,
+                    "startOffset": 5907,
+                    "endLine": 295,
+                    "endColumn": 16,
+                    "endOffset": 6103
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 633,
+                        "startColumn": 1,
+                        "startOffset": 12362,
+                        "endLine": 638,
+                        "endColumn": 16,
+                        "endOffset": 12558
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 296,
+                    "startColumn": 4,
+                    "startOffset": 6108,
+                    "endLine": 317,
+                    "endColumn": 16,
+                    "endOffset": 6519
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 1,
+                        "startOffset": 102,
+                        "endLine": 26,
+                        "endColumn": 16,
+                        "endOffset": 513
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 318,
+                    "startColumn": 4,
+                    "startOffset": 6524,
+                    "endLine": 341,
+                    "endColumn": 16,
+                    "endOffset": 6992
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 585,
+                        "startColumn": 1,
+                        "startOffset": 11390,
+                        "endLine": 608,
+                        "endColumn": 16,
+                        "endOffset": 11858
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 342,
+                    "startColumn": 4,
+                    "startOffset": 6997,
+                    "endLine": 363,
+                    "endColumn": 16,
+                    "endOffset": 7493
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 610,
+                        "startColumn": 1,
+                        "startOffset": 11862,
+                        "endLine": 631,
+                        "endColumn": 16,
+                        "endOffset": 12358
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 364,
+                    "startColumn": 4,
+                    "startOffset": 7498,
+                    "endLine": 387,
+                    "endColumn": 16,
+                    "endOffset": 7962
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 331,
+                        "startColumn": 1,
+                        "startOffset": 6483,
+                        "endLine": 354,
+                        "endColumn": 16,
+                        "endOffset": 6947
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 388,
+                    "startColumn": 4,
+                    "startOffset": 7967,
+                    "endLine": 411,
+                    "endColumn": 16,
+                    "endOffset": 8487
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 306,
+                        "startColumn": 1,
+                        "startOffset": 5959,
+                        "endLine": 329,
+                        "endColumn": 16,
+                        "endOffset": 6479
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 412,
+                    "startColumn": 4,
+                    "startOffset": 8492,
+                    "endLine": 435,
+                    "endColumn": 16,
+                    "endOffset": 8974
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 167,
+                        "startColumn": 1,
+                        "startOffset": 3210,
+                        "endLine": 190,
+                        "endColumn": 16,
+                        "endOffset": 3698
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 436,
+                    "startColumn": 4,
+                    "startOffset": 8979,
+                    "endLine": 459,
+                    "endColumn": 16,
+                    "endOffset": 9430
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 192,
+                        "startColumn": 1,
+                        "startOffset": 3702,
+                        "endLine": 215,
+                        "endColumn": 16,
+                        "endOffset": 4159
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 460,
+                    "startColumn": 4,
+                    "startOffset": 9435,
+                    "endLine": 483,
+                    "endColumn": 16,
+                    "endOffset": 10039
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 224,
+                        "startColumn": 1,
+                        "startOffset": 4284,
+                        "endLine": 247,
+                        "endColumn": 16,
+                        "endOffset": 4894
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 484,
+                    "startColumn": 4,
+                    "startOffset": 10044,
+                    "endLine": 507,
+                    "endColumn": 16,
+                    "endOffset": 10545
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 142,
+                        "startColumn": 1,
+                        "startOffset": 2705,
+                        "endLine": 165,
+                        "endColumn": 16,
+                        "endOffset": 3206
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 508,
+                    "startColumn": 4,
+                    "startOffset": 10550,
+                    "endLine": 531,
+                    "endColumn": 16,
+                    "endOffset": 11015
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 249,
+                        "startColumn": 1,
+                        "startOffset": 4898,
+                        "endLine": 272,
+                        "endColumn": 16,
+                        "endOffset": 5369
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 532,
+                    "startColumn": 4,
+                    "startOffset": 11020,
+                    "endLine": 555,
+                    "endColumn": 16,
+                    "endOffset": 11486
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 274,
+                        "startColumn": 1,
+                        "startOffset": 5372,
+                        "endLine": 297,
+                        "endColumn": 16,
+                        "endOffset": 5844
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 556,
+                    "startColumn": 4,
+                    "startOffset": 11491,
+                    "endColumn": 46,
+                    "endOffset": 11533
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\strings.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 56,
+                        "endColumn": 46,
+                        "endOffset": 98
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 557,
+                    "startColumn": 4,
+                    "startOffset": 11538,
+                    "endLine": 558,
+                    "endColumn": 9,
+                    "endOffset": 11612
+                },
+                "from": {
+                    "file": "C:\\Users\\toshiba\\Dropbox\\Documents\\apps\\LeagueApp\\src\\main\\res\\values\\styles.xml",
+                    "position": {
+                        "startLine": 2,
+                        "startColumn": 4,
+                        "startOffset": 55,
+                        "endLine": 3,
+                        "endColumn": 9,
+                        "endOffset": 129
+                    }
+                }
+            }
+        ]
+    }
+]
