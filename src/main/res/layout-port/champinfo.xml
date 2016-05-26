@@ -87,8 +87,7 @@
 
 					<TextView
 						android:id="@+id/resource_points"
-						android:gravity="right"
-						android:background="#618924"/>
+						android:gravity="right"/>
 
 				</TableRow>
 

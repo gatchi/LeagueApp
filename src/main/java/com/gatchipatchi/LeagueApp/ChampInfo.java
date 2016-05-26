@@ -117,7 +117,6 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		//loadJson();
 		String resourceName = champs[champId];
 		resourceName = resourceName.toLowerCase();
-		toast(resourceName);
 		int jsonId = res.getIdentifier(resourceName, "raw", getPackageName());
 		InputStream in = getResources().openRawResource(jsonId);
 		JSONObject json = null;
@@ -198,8 +197,19 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		if (parType.equals("MP")) {
 			resourceTypeText.setText("mana");
 			resourceRegenTypeText.setText("mana regen");
+		} else if (parType.equals("Energy")) {
+			resourceTypeText.setText("energy");
+			resourceRegenTypeText.setText("energy regen");
+		} else if (champName.equals("Aatrox") || champName.equals("Vladimir") || champName.equals("DrMundo") || champName.equals("Mordekaiser") || champName.equals("Zac")) {
+			resourceTypeText.setText("uses health");
+		} else if (champName.equals("Rengar")) {
+			resourceTypeText.setText("ferocity");
+		} else if (champName.equals("RekSai") || champName.equals("Renekton") || champName.equals("Shyvana") || champName.equals("Tryndamere") || champName.equals("Gnar")) {
+			resourceTypeText.setText("fury");
+		} else if (champName.equals("Rumble")) {
+			resourceTypeText.setText("heat");
 		} else {
-			resourceTypeText.setText("lol fix dis");
+			resourceTypeText.setText("no resource");
 		}
 		
 		// resource regen type
@@ -235,27 +245,12 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		 * Eventually REPLACE WITH JSON.
 		 */
 		
-		// Stat arrays for ALL champs (use champId to get value from)
-		// remove this eventually
-		// String[] healthBase = res.getStringArray(R.array.champ_health_base);
-		// String[] healthGrowth = res.getStringArray(R.array.champ_health_growth);
-		// String[] hp5Base = res.getStringArray(R.array.champ_hp5_base);
-		// String[] hp5Growth = res.getStringArray(R.array.champ_hp5_growth);
-		// String[] resourceBase = res.getStringArray(R.array.champ_resource_base);
-		// String[] resourceGrowth= res.getStringArray(R.array.champ_resource_growth);
-		// String[] rp5Base= res.getStringArray(R.array.champ_rp5_base);
-		// String[] rp5Growth = res.getStringArray(R.array.champ_rp5_growth);
-		// String[] adBase = res.getStringArray(R.array.champ_AD_base);
-		// String[] adGrowth = res.getStringArray(R.array.champ_AD_growth);
+
+		// keep this until you write AS JSON conversion method
 		String[] asBase = res.getStringArray(R.array.champ_AS_base);
 		String[] asGrowth = res.getStringArray(R.array.champ_AS_growth);
-		// String[] armorBase = res.getStringArray(R.array.champ_armor_base);
-		// String[] armorGrowth = res.getStringArray(R.array.champ_armor_growth);
-		// String[] mrBase = res.getStringArray(R.array.champ_MR_base);
-		// String[] mrGrowth = res.getStringArray(R.array.champ_MR_growth);
 		
 		// TextViews for putting the stats into
-		// this stays
 		TextView healthText = (TextView) findViewById(R.id.health);
 		TextView healthRegenText = (TextView) findViewById(R.id.health_regen);
 		TextView resourceText = (TextView) findViewById(R.id.resource_points);
@@ -269,8 +264,10 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		{
 			setPerLevel(healthText, LARGE, hpBase, hpPerLevel);
 			setPerLevel(healthRegenText, SMALL, hpRegenBase, hpRegenPerLevel);
-			setPerLevel(resourceText, LARGE, mpBase, mpPerLevel);
-			setPerLevel(resourceRegenText, SMALL, mpRegenBase, mpRegenPerLevel);
+			if (parType.equals("MP") || parType.equals("Energy")) {
+				setPerLevel(resourceText, LARGE, mpBase, mpPerLevel);
+				setPerLevel(resourceRegenText, SMALL, mpRegenBase, mpRegenPerLevel);
+			}
 			setPerLevel(adText, SMALL, adBase, adPerLevel);
 			setPerLevel(asText, PERCENT, asBase, asGrowth);
 			setPerLevel(armorText, SMALL, armorBase, armorPerLevel);
@@ -280,8 +277,10 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		{
 			setRange(hpBase, hpPerLevel, LARGE, healthText);
 			setRange(hpRegenBase, hpRegenPerLevel, LARGE, healthRegenText);
-			setRange(mpBase, mpPerLevel, LARGE, resourceText);
-			setRange(mpRegenBase, mpRegenPerLevel, LARGE, resourceRegenText);
+			if (parType.equals("MP") || parType.equals("Energy")) {
+				setRange(mpBase, mpPerLevel, LARGE, resourceText);
+				setRange(mpRegenBase, mpRegenPerLevel, LARGE, resourceRegenText);
+			}
 			setRange(adBase, adPerLevel, LARGE, adText);
 			setRange(asBase, asGrowth, PERCENT, asText);
 			setRange(armorBase, armorPerLevel, LARGE, armorText);
@@ -291,8 +290,10 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		{
 			setCurrentLevel(hpBase, hpPerLevel, LARGE, level, healthText);
 			setCurrentLevel(hpRegenBase, hpRegenPerLevel, LARGE, level, healthRegenText);
-			setCurrentLevel(mpBase, mpPerLevel, LARGE, level, resourceText);
-			setCurrentLevel(mpRegenBase, mpRegenPerLevel, LARGE, level, resourceRegenText);
+			if (parType.equals("MP") || parType.equals("Energy")) {
+				setCurrentLevel(mpBase, mpPerLevel, LARGE, level, resourceText);
+				setCurrentLevel(mpRegenBase, mpRegenPerLevel, LARGE, level, resourceRegenText);
+			}
 			setCurrentLevel(adBase, adPerLevel, LARGE, level, adText);
 			setCurrentLevel(asBase, asGrowth, PERCENT, level, asText);
 			setCurrentLevel(armorBase, armorPerLevel, LARGE, level, armorText);
@@ -310,6 +311,9 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	 * the JSON data uses.  Also it's simpler, and no need to go change shit
 	 * later cause you need a decimal point or more precision or whatever.
 	 * PRUNE LATER.
+	 * 
+	 * Keep the double methods until AS is fixed.  Thats the only function that
+	 * still uses the methods that take Strings as input
 	 */
 	
 	void setPerLevel(TextView text, int valueType, String[] baseValue, String[] growthValue) {
@@ -535,6 +539,12 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	
 	void toast(int i, int length) {
 		String msg = Integer.toString(i);
+		Toast t = Toast.makeText(this, msg, length);
+		t.show();
+	}
+	
+	void toast(double d, int length) {
+		String msg = Double.toString(d);
 		Toast t = Toast.makeText(this, msg, length);
 		t.show();
 	}
