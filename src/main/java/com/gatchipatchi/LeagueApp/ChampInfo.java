@@ -19,13 +19,22 @@ import java.util.HashMap;
 import java.lang.String;
 import java.io.Reader;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.BufferedOutputStream;
 import java.io.InputStreamReader;
+import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.IOException;
+import java.io.File;
+import java.io.OutputStream;
 import org.json.JSONTokener;
 import org.json.JSONObject;
 import org.json.JSONException;
+import cz.msebera.android.httpclient.Header;
+import com.loopj.android.http.AsyncHttpResponseHandler;
+import com.loopj.android.http.AsyncHttpClient;
 
 public class ChampInfo extends Activity implements OnItemSelectedListener
 {
@@ -98,6 +107,11 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		TextView champNameView = (TextView) findViewById(R.id.champ_name);
 		champNameView.setText(champName);
 		
+		// attempt a file download
+		AsyncHttpClient client = new AsyncHttpClient();
+		client.get("http://ddragon.leagueoflegends.com/cdn/6.10.1/data/en_US/champion/Aatrox.json", asyncHandler);
+
+		
 		// Load the JSON data.
 		// (JSON files are stored in the "raw" resource directory.)
 		//loadJson();
@@ -119,7 +133,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			
 			json = new JSONObject(responseStrBuilder.toString());
 			JSONObject champData = json.getJSONObject("data");
-			JSONObject champ = champData.getJSONObject(champs[champId]);
+			JSONObject champ = champData.getJSONObject(champName);
 			JSONObject champStats = champ.getJSONObject("stats");
 			
 			// get stats
@@ -156,20 +170,12 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		}
 
 		
-/* 	// Old code using the map manager class.
-		// Is being replaced with JSON.
-		// Saved here just in case.
-		// set champ name in title using a map
-		map = MapResourceParser.getHashMapResource(getApplicationContext(), R.xml.maps);
-		TextView champName = (TextView) findViewById(R.id.champ_name);
-		int champId = bundle.getInt("button id");
-		champName.setText(map.get(Integer.toString(champId))); */
-		
 		// These dont change with levels, but are linked to which champ is selected
 
-		// resource type
+		// set resource type on view
 		TextView resourceTypeText = (TextView) findViewById(R.id.champ_resource_type);
 		TextView resourceRegenTypeText = (TextView) findViewById(R.id.resource_regen_type);
+		
 		if (parType.equals("MP")) {
 			resourceTypeText.setText("mana");
 			resourceRegenTypeText.setText("mana regen");
@@ -188,17 +194,21 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			resourceTypeText.setText("no resource");
 		}
 
-		// range
+		// set range on view
 		TextView rangeTypeText = (TextView) findViewById(R.id.range_type);
 		TextView rangeText = (TextView) findViewById(R.id.range);
-		if (attackRange < 300) {
+		
+		if (attackRange < 300)
+		{
 			rangeTypeText.setText("melee");
-		} else if (attackRange >= 300) {
+		}
+		else if (attackRange >= 300)
+		{
 			rangeTypeText.setText("ranged");
 		}
 		rangeText.setText(Double.toString(attackRange));
 		
-		// movespeed
+		// set movespeed on view
 		TextView movespeedText = (TextView) findViewById(R.id.movespeed);
 		movespeedText.setText(Double.toString(moveSpeed));
 		
@@ -294,6 +304,69 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			}
 		}
 	} */
+	
+	private AsyncHttpResponseHandler asyncHandler = new AsyncHttpResponseHandler() {
+		
+		@Override
+		public void onStart() {
+        // called before request is started
+		  toast("starting download...");
+		}
+
+		@Override
+		public void onSuccess(int statusCode, Header[] headers, byte[] response) {
+			// called when response HTTP status is "200 OK"
+			// String data;
+			// try {
+				// data = new String(response, "UTF-8");
+				// saveJson(data);
+			// }
+			// catch (UnsupportedEncodingException e) {
+				// toast(e.getMessage());
+			// }
+			saveJson(response);
+			toast("download successful");
+		}
+
+		@Override
+		public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
+        // called when response HTTP status is "4XX" (eg. 401, 403, 404)
+		  toast("didnt work");
+		  toast(statusCode, Toast.LENGTH_LONG);
+		  toast(e.getMessage(), Toast.LENGTH_LONG);
+		}
+
+		@Override
+		public void onRetry(int retryNo) {
+        // called when request is retried
+		  toast("retrying...");
+		}
+	};
+	
+	void saveJson(byte[] data)
+	{
+		String filename = "aaatrox.json";
+		File file = new File(this.getFilesDir(), filename);
+		
+		if (file.exists()) {
+			file.delete();
+		}
+		// save file unless it already exists
+		if (!file.exists())
+		{
+			OutputStream out = null;
+			// write to file
+			try {
+				out = new BufferedOutputStream(new FileOutputStream(file));
+				out.write(data);
+				out.close();
+			}
+			catch (IOException e) {
+				toast("file write failure");
+				toast(e.getMessage(), Toast.LENGTH_SHORT);
+			}
+		}
+	}
 	
 	void setPerLevel(TextView text, int valueType, double baseValue, double growthValue) {
 		if ((baseValue != 0)) {

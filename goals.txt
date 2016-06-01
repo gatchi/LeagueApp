@@ -1,0 +1,21 @@
+Goals for Today
+===============
++ implement saving of files from the web
+	- learn about multithreading in Android
+	- implement a simple file download
+
+Goals for Some Other Day
+===============
++ add all the other champs
+	- put them all in their directories with proper names
+		o maybe make a script for this
+	- add all the buttons
++ get an open source license for LeagueApp (or at least look into it)
++ maybe publish to github
+
+Things Done Already Today
+=========================
+- removed MapParser.java and JsonManager.java
++ searched for an async download solution; found
++ added async http package and handler
++ asynchttphandler seems to be working; need to test

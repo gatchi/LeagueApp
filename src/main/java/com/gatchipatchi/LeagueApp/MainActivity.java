@@ -28,8 +28,8 @@ public class MainActivity extends Activity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+      super.onCreate(savedInstanceState);
+      setContentView(R.layout.main);
 		
 		// some test code
 		LinearLayout ll = (LinearLayout)findViewById(R.id.button_layout);
@@ -73,10 +73,6 @@ public class MainActivity extends Activity
 //		champButton4 = (ImageButton) findViewById(R.id.champbutton4);
 //		champButton4.setOnClickListener(champButtonListener);
     }
-	
-	// pub method test
-	public void jsonStub()
-	{}
 	
 	// stub method for testing
 	void stubMethod()
