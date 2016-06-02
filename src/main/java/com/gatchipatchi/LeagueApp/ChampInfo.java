@@ -22,11 +22,13 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.InputStreamReader;
 import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.IOException;
+import java.io.FileNotFoundException;
 import java.io.File;
 import java.io.OutputStream;
 import org.json.JSONTokener;
@@ -108,18 +110,31 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		champNameView.setText(champName);
 		
 		// attempt a file download
-		AsyncHttpClient client = new AsyncHttpClient();
-		client.get("http://ddragon.leagueoflegends.com/cdn/6.10.1/data/en_US/champion/Aatrox.json", asyncHandler);
-
+		File jsonFile = new File(this.getFilesDir(), "aatrox.json");
+		if (!jsonFile.exists())
+		{
+			toast("File doesnt exist.  Attempting download.", Toast.LENGTH_LONG);
+			AsyncHttpClient client = new AsyncHttpClient();
+			client.get("http://ddragon.leagueoflegends.com/cdn/6.10.1/data/en_US/champion/Aatrox.json", asyncHandler);
+		}
 		
-		// Load the JSON data.
-		// (JSON files are stored in the "raw" resource directory.)
-		//loadJson();
-		String resourceName = champs[champId];
-		resourceName = resourceName.toLowerCase();
-		int jsonId = res.getIdentifier(resourceName, "raw", getPackageName());
-		InputStream in = getResources().openRawResource(jsonId);
+		// load the JSON data
+		
+		InputStream in = null;
+		try {
+			in = new BufferedInputStream(this.openFileInput("aatrox.json"));
+		}
+		catch (FileNotFoundException e) {
+			toast(e.getMessage(), Toast.LENGTH_LONG);
+		}
+		
+		// String resourceName = champs[champId];
+		// resourceName = resourceName.toLowerCase();
+		// int jsonId = res.getIdentifier(resourceName, "raw", getPackageName());
+		// in = getResources().openRawResource(jsonId);
+		
 		JSONObject json = null;
+		
 		try {
 			// Convert input stream to a string for older APIs.
 			// (Newer JSON libraries dont need this step.)
@@ -324,7 +339,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			// catch (UnsupportedEncodingException e) {
 				// toast(e.getMessage());
 			// }
-			saveJson(response);
+			storeJson(response);
 			toast("download successful");
 		}
 
@@ -343,17 +358,19 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		}
 	};
 	
-	void saveJson(byte[] data)
+	void storeJson(byte[] data)
 	{
-		String filename = "aaatrox.json";
+		String filename = "aatrox.json";
 		File file = new File(this.getFilesDir(), filename);
+		// toast(this.getFilesDir().toString(), Toast.LENGTH_LONG);
 		
-		if (file.exists()) {
-			file.delete();
-		}
+		// if (file.exists()) {
+			// file.delete();
+		// }
 		// save file unless it already exists
 		if (!file.exists())
 		{
+			toast("storing file...", Toast.LENGTH_LONG);
 			OutputStream out = null;
 			// write to file
 			try {
@@ -384,22 +401,6 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		}
 	}
 	
-/* 	public void setCurrentLevel(String[] base, String[] growth, int valueType, String level, TextView view)
-	{
-		if (!base[champId].isEmpty() && !growth[champId].isEmpty())
-		{
-			double baseValue = Double.parseDouble(base[champId]);
-			double growthValue = Double.parseDouble(growth[champId]);
-			double levelValue = Double.parseDouble(level);
-			double stat = baseValue + growthValue * (levelValue - (double) 1.0);
-			if (valueType == LARGE) {
-				view.setText(String.format("%.2f", stat));
-			} else if (valueType == PERCENT) {
-				view.setText(String.format("%.3f (+%.0f%%)", baseValue, (growthValue * (levelValue - 1))));
-			}
-		}
-	} */
-	
 	void setCurrentLevel(double base, double growth, int valueType, String level, TextView view) {
 		double levelValue = Double.parseDouble(level);
 		double stat = base + growth * (levelValue - 1);
@@ -413,20 +414,6 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			}
 		}
 	}
-	
-/* 	public void setRange(String[] base, String[] growth, int rangeType, TextView view)
-	{
-		if (!base[champId].isEmpty() && !growth[champId].isEmpty())
-		{
-			double baseValue = Double.parseDouble(base[champId]);
-			double growthValue = Double.parseDouble(growth[champId]);
-			if (rangeType == LARGE) {
-				view.setText(String.format("%.2f – %.2f", baseValue, (baseValue + 17 * growthValue)));
-			} else if (rangeType == PERCENT) {
-				view.setText(String.format("%.3f (+0%% – +%.0f%%)", baseValue, (growthValue * 17)));
-			}
-		}
-	} */
 	
 	void setRange(double base, double growth, int rangeType, TextView view) {
 		if ((base != 0)) {
@@ -444,77 +431,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		return (0.625 / (1 + offset));
 	}
 	
-	/*
-	 * JSON Loading
-	 * 
-	 */
 	
-	/* void loadJson() {
-		String resourceName = champs[champId];
-		resourceName = resourceName.toLowerCase();
-		toast(resourceName);
-		int jsonId = res.getIdentifier(resourceName, "raw", getPackageName());
-		InputStream in = getResources().openRawResource(jsonId);
-		JSONObject json = null;
-		try {
-			// Convert input stream to a string for older APIs.
-			// (Newer JSON libraries dont need this step.)
-			BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-			StringBuilder responseStrBuilder = new StringBuilder();
-			String inputStr;
-			
-			while ((inputStr = streamReader.readLine()) != null) {
-				responseStrBuilder.append(inputStr);
-			}
-			
-			json = new JSONObject(responseStrBuilder.toString());
-			JSONObject champData = json.getJSONObject("data");
-			JSONObject champ = champData.getJSONObject(champs[champId]);
-			JSONObject champStats = champ.getJSONObject("stats");
-			
-			// get stats
-			hpBase = champStats.getDouble("hp");
-			hpPerLevel = champStats.getDouble("hpperlevel");
-			mpBase = champStats.getDouble("mp");
-			mpPerLevel = champStats.getDouble("mpperlevel");
-			moveSpeed = champStats.getDouble("movespeed");
-			armorBase = champStats.getDouble("armor");
-			armorPerLevel = champStats.getDouble("armorperlevel");
-			mrBase = champStats.getDouble("spellblock");
-			mrPerLevel = champStats.getDouble("spellblockperlevel");
-			attackRange = champStats.getDouble("attackrange");
-			hpRegenBase = champStats.getDouble("hpregen");
-			hpRegenPerLevel = champStats.getDouble("hpregenperlevel");
-			mpRegenBase = champStats.getDouble("mpregen");
-			mpRegenPerLevel = champStats.getDouble("mpregenperlevel");
-			adBase = champStats.getDouble("attackdamage");
-			adPerLevel = champStats.getDouble("attackdamageperlevel");
-			asOffset = champStats.getDouble("attackspeedoffset");
-			asPerLevel = champStats.getDouble("attackspeedperlevel");
-			
-			// update screen
-			
-			// test json import
-			// if (hpBase != 0) {
-				// Toast t = Toast.makeText(this, Double.toString(hpBase), Toast.LENGTH_SHORT);
-				// t.show();
-			// } else {
-				// Toast t = Toast.makeText(this, "hpBase is empty", Toast.LENGTH_SHORT);
-				// t.show();
-			// }
-			
-		} catch (UnsupportedEncodingException e) {
-			toast("UnsupportedEncodingException", Toast.LENGTH_LONG);
-			showError(e);
-		} catch (JSONException e) {
-			toast("JSONException", Toast.LENGTH_LONG);
-			showError(e);
-		} catch (IOException e) {
-			toast("IOException", Toast.LENGTH_LONG);
-			showError(e);
-		}
-	} */
-		
 	void aestheticSetup()
 	{
 		ActionBar actionBar = getActionBar();
@@ -527,7 +444,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		levelSelect.setOnItemSelectedListener(this);
 	}
 	
-	// back button
+	// back button handler
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
@@ -538,7 +455,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		
 	}
 	
-	// spinner catcher
+	// spinner handler
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
 	{
