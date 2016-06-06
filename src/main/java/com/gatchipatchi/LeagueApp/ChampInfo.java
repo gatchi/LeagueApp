@@ -34,9 +34,6 @@ import java.io.OutputStream;
 import org.json.JSONTokener;
 import org.json.JSONObject;
 import org.json.JSONException;
-import cz.msebera.android.httpclient.Header;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.AsyncHttpClient;
 
 public class ChampInfo extends Activity implements OnItemSelectedListener
 {
@@ -109,17 +106,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		TextView champNameView = (TextView) findViewById(R.id.champ_name);
 		champNameView.setText(champName);
 		
-		// attempt a file download
-		File jsonFile = new File(this.getFilesDir(), "aatrox.json");
-		if (!jsonFile.exists())
-		{
-			toast("File doesnt exist.  Attempting download.", Toast.LENGTH_LONG);
-			AsyncHttpClient client = new AsyncHttpClient();
-			client.get("http://ddragon.leagueoflegends.com/cdn/6.10.1/data/en_US/champion/Aatrox.json", asyncHandler);
-		}
-		
 		// load the JSON data
-		
 		InputStream in = null;
 		try {
 			in = new BufferedInputStream(this.openFileInput("aatrox.json"));
@@ -128,13 +115,8 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			toast(e.getMessage(), Toast.LENGTH_LONG);
 		}
 		
-		// String resourceName = champs[champId];
-		// resourceName = resourceName.toLowerCase();
-		// int jsonId = res.getIdentifier(resourceName, "raw", getPackageName());
-		// in = getResources().openRawResource(jsonId);
-		
+		// put it into a JSONObject
 		JSONObject json = null;
-		
 		try {
 			// Convert input stream to a string for older APIs.
 			// (Newer JSON libraries dont need this step.)
@@ -320,70 +302,6 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		}
 	} */
 	
-	private AsyncHttpResponseHandler asyncHandler = new AsyncHttpResponseHandler() {
-		
-		@Override
-		public void onStart() {
-        // called before request is started
-		  toast("starting download...");
-		}
-
-		@Override
-		public void onSuccess(int statusCode, Header[] headers, byte[] response) {
-			// called when response HTTP status is "200 OK"
-			// String data;
-			// try {
-				// data = new String(response, "UTF-8");
-				// saveJson(data);
-			// }
-			// catch (UnsupportedEncodingException e) {
-				// toast(e.getMessage());
-			// }
-			storeJson(response);
-			toast("download successful");
-		}
-
-		@Override
-		public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-        // called when response HTTP status is "4XX" (eg. 401, 403, 404)
-		  toast("didnt work");
-		  toast(statusCode, Toast.LENGTH_LONG);
-		  toast(e.getMessage(), Toast.LENGTH_LONG);
-		}
-
-		@Override
-		public void onRetry(int retryNo) {
-        // called when request is retried
-		  toast("retrying...");
-		}
-	};
-	
-	void storeJson(byte[] data)
-	{
-		String filename = "aatrox.json";
-		File file = new File(this.getFilesDir(), filename);
-		// toast(this.getFilesDir().toString(), Toast.LENGTH_LONG);
-		
-		// if (file.exists()) {
-			// file.delete();
-		// }
-		// save file unless it already exists
-		if (!file.exists())
-		{
-			toast("storing file...", Toast.LENGTH_LONG);
-			OutputStream out = null;
-			// write to file
-			try {
-				out = new BufferedOutputStream(new FileOutputStream(file));
-				out.write(data);
-				out.close();
-			}
-			catch (IOException e) {
-				toast("file write failure");
-				toast(e.getMessage(), Toast.LENGTH_SHORT);
-			}
-		}
-	}
 	
 	void setPerLevel(TextView text, int valueType, double baseValue, double growthValue) {
 		if ((baseValue != 0)) {

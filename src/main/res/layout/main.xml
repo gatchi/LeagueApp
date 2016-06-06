@@ -3,8 +3,9 @@
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent"
 	android:layout_height="match_parent"
-	android:gravity="top|center"
-	android:orientation="vertical">
+	android:gravity="center|top"
+	android:orientation="vertical"
+	android:baselineAligned="false">
 
 	<TextView
 		android:text="League App"
@@ -29,11 +30,13 @@
 		android:layout_width="match_parent"/>
 
 	<LinearLayout
-		android:layout_height="match_parent"
-		android:layout_width="match_parent"
 		android:orientation="horizontal"
-		android:gravity="center_horizontal"
+		android:background="#543157"
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:gravity="top|center"
 		android:id="@+id/button_layout">
+		
 
 		<!-- old button xml
 		<ImageButton
@@ -85,6 +88,15 @@
 			android:layout_margin="2dp"/>
 			-->
 
+	</LinearLayout>
+	
+	<LinearLayout
+		android:orientation="horizontal"
+		android:layout_height="match_parent"
+		android:layout_width="match_parent"
+		android:gravity="bottom|center"
+		android:id="@+id/footer">
+		
 	</LinearLayout>
 
 </LinearLayout>

@@ -1,11 +1,12 @@
 Goals for Today
 ===============
-+ implement saving of files from the web
-	- learn about multithreading in Android
-	- implement a simple file download
++ implement icon download
++ replace champ name string array id system with JSON option
++ add internet connectivity check
 
 Goals for Some Other Day
-===============
+========================
++ allow download of first four champs
 + add all the other champs
 	- put them all in their directories with proper names
 		o maybe make a script for this
@@ -15,7 +16,7 @@ Goals for Some Other Day
 
 Things Done Already Today
 =========================
-- removed MapParser.java and JsonManager.java
-+ searched for an async download solution; found
-+ added async http package and handler
-+ asynchttphandler seems to be working; need to test
+o changed button layout from a LinearLayout to a RelativeLayout
+o reverted layout changed
+o got the refresh button to show & work (w/ Aatrox.json)
++ implemented downloading of champion.json
