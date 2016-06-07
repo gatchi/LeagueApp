@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.Gravity;
 import android.content.Intent;
+import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import java.util.Iterator;
@@ -28,6 +29,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.FileWriter;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -47,15 +49,18 @@ public class MainActivity extends Activity
 {
 	// objects
 	EditText editText;
-	ImageButton champButton1, champButton2, champButton3, champButton4;
 	Button refreshButton;
+	File asyncFile;
 	
 	// onCreate
-    @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+	@Override
+	protected void onCreate(Bundle savedInstanceState)
+	{
       super.onCreate(savedInstanceState);
       setContentView(R.layout.main);
+		
+		// make sure this directory exists
+		//initDirectory();
 		
 		// add champ buttons iteratively
 		LinearLayout ll = (LinearLayout)findViewById(R.id.button_layout);
@@ -85,48 +90,71 @@ public class MainActivity extends Activity
 		// add data refresh button
 		LinearLayout footer = (LinearLayout) findViewById(R.id.footer);
 		refreshButton = new Button(this);
-		// RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-		// refreshButton.setLayoutParams(params);
 		refreshButton.setText("refresh data");
-		// refreshButton.setGravity(Gravity.BOTTOM | Gravity.CENTER);
 		footer.addView(refreshButton);
-		
-		// add listener to refresh button
 		refreshButton.setOnClickListener(refreshButtonListener);		
 		
 		// add listener to search bar
 		editText = (EditText) findViewById(R.id.search);
 		editText.setOnEditorActionListener(searchListener);
-		
-//		// buttons (this is gonna be long)
-//		champButton1 = (ImageButton) findViewById(R.id.champbutton1);
-//		champButton1.setOnClickListener(champButtonListener);
-//
-//		champButton2 = (ImageButton) findViewById(R.id.champbutton2);
-//		champButton2.setOnClickListener(champButtonListener);
-//		
-//		champButton3 = (ImageButton) findViewById(R.id.champbutton3);
-//		champButton3.setOnClickListener(champButtonListener);
-//		
-//		champButton4 = (ImageButton) findViewById(R.id.champbutton4);
-//		champButton4.setOnClickListener(champButtonListener);
 
-		// actual button code
 		
-		// load the JSON data
-		InputStream in = null;
+		// load champion list into app
 		try {
-			in = new BufferedInputStream(this.openFileInput("champion.json"));
-		}
-		catch (FileNotFoundException e) {
-			toast(e.getMessage(), Toast.LENGTH_LONG);
+			getChampList();
+		} catch (FileNotFoundException e) {
+			toast("Could not retrieve champ list");
+			showError(e);
 		}
 		
-		// put data into a JSONObject
+	}
+	
+	
+	/*----------- MainActivity Private Methods and Handlers --------------*/
+	
+	void initDirectory() {
+		File championDirectory = this.getDir("champs", Context.MODE_PRIVATE);
+		if (!championDirectory.exists()) {
+			toast("making champ directory");
+			championDirectory.mkdir();
+		}
+	}
+	
+/* 	void download(String filename, String shortUrl)
+	{
+		// attempt a file download
+		File jsonFile = new File(this.getFilesDir(), filename);
+		String baseUrl = "http://ddragon.leagueoflegends.com/cdn/6.11.1/";
+		if (!jsonFile.exists())
+		{
+			toast("File doesnt exist.  Attempting download.", Toast.LENGTH_SHORT);
+			AsyncHttpClient client = new AsyncHttpClient();
+			asyncHandler.takeFilename(filename);
+			client.get(baseUrl + shortUrl, asyncHandler);
+		}
+		else {
+			toast("Up to date");
+		}
+	} */
+	
+	void getChampList() throws FileNotFoundException
+	{
+		File champListFile;
+		champListFile = new File(this.getDir("champs", Context.MODE_PRIVATE), "champion.json");
+		if (!champListFile.exists()) {
+			toast("No champ list file.  Downloading...");
+			download("champion.json", "champs", "data/en_US/champion.json");
+		}
+		
+		InputStream in = null;
+
+		in = new BufferedInputStream(new FileInputStream(champListFile));
+	
+	
 		JSONObject json = null;
 		try {
-			// Convert input stream to a string for older APIs.
-			// (Newer JSON libraries dont need this step.)
+			/* Convert input stream to a string for older APIs.
+			(Newer JSON libraries dont need this step.) */
 			BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 			StringBuilder responseStrBuilder = new StringBuilder();
 			String inputStr;
@@ -138,29 +166,26 @@ public class MainActivity extends Activity
 			json = new JSONObject(responseStrBuilder.toString());
 			JSONObject champData = json.getJSONObject("data");
 			
-			// get champ list
+			// get champ list and put into alpha ordered list
 			Iterator<String> champs = champData.keys();
-			
-			// put it into an ordered list 
 			ArrayList<String> champList = new ArrayList();
 			int i = 0;
-			while (champs.hasNext()) {
+			while (champs.hasNext())
+			{
 				champList.add(champs.next());
 				i++;
 			}
-			
-			// sort the list into alpha order
 			java.util.Collections.sort(champList);
 			
-			for (int c=0; c<4; c++) {
-				toast(champList.get(c));
+			
+			// download champ icons
+			File drawableDir = this.getDir("drawable", Context.MODE_PRIVATE);
+			if (!drawableDir.exists())
+			{
+				toast("creating drawable directory");
+				drawableDir.mkdir();
 			}
-			// StringWriter sw = new StringWriter();
-			// while (champs.hasNext()) {
-				// sw.append(champs.next() + ",");
-			// }
-			// String champList = sw.toString();
-			// storeTextFile(champList);
+			download("Aatrox.png", "drawable", "img/champion/Aatrox.png");
 			
 		} catch (UnsupportedEncodingException e) {
 			toast("UnsupportedEncodingException", Toast.LENGTH_LONG);
@@ -174,31 +199,25 @@ public class MainActivity extends Activity
 		}
 	}
 	
-	// stub method for testing
-	void stubMethod()
-	{
-		// stub
-		Toast toast = Toast.makeText(getApplicationContext(), "Tada!", Toast.LENGTH_SHORT);
-		toast.show();
-	}
-	
-	void downloadChamps()
+	void download(String filename, String directory, String shortUrl)
 	{
 		// attempt a file download
-		File jsonFile = new File(this.getFilesDir(), "champion.json");
-		String url = "http://ddragon.leagueoflegends.com/cdn/6.10.1/data/en_US/champion.json";
+		File jsonFile = new File(this.getDir(directory, Context.MODE_PRIVATE), filename);
+		String baseUrl = "http://ddragon.leagueoflegends.com/cdn/6.11.1/";
 		if (!jsonFile.exists())
 		{
-			toast("File doesnt exist.  Attempting download.", Toast.LENGTH_LONG);
+			toast("File doesnt exist.  Attempting download.", Toast.LENGTH_SHORT);
 			AsyncHttpClient client = new AsyncHttpClient();
-			client.get(url, asyncHandler);
+			asyncHandler.takeFilename(filename);
+			asyncHandler.takeDirectory(directory);
+			client.get(baseUrl + shortUrl, asyncHandler);
 		}
 		else {
 			toast("Up to date");
 		}
 	}
 	
-	private AsyncHttpResponseHandler asyncHandler = new AsyncHttpResponseHandler() {
+	private FilesAsyncHttpResponseHandler asyncHandler = new FilesAsyncHttpResponseHandler() {
 		
 		@Override
 		public void onStart() {
@@ -209,16 +228,8 @@ public class MainActivity extends Activity
 		@Override
 		public void onSuccess(int statusCode, Header[] headers, byte[] response) {
 			// called when response HTTP status is "200 OK"
-			// String data;
-			// try {
-				// data = new String(response, "UTF-8");
-				// saveJson(data);
-			// }
-			// catch (UnsupportedEncodingException e) {
-				// toast(e.getMessage());
-			// }
-			storeJson(response);
 			toast("download successful");
+			storeFile(response, filename, directory);
 		}
 
 		@Override
@@ -236,24 +247,71 @@ public class MainActivity extends Activity
 		}
 	};
 	
-	void storeJson(byte[] data)
+/* 	void storeFile(byte[] data, String filename)
 	{
-		String filename = "champion.json";
-		File file = new File(this.getFilesDir(), filename);
-		// toast(this.getFilesDir().toString(), Toast.LENGTH_LONG);
-		
-		// if (file.exists()) {
-			// file.delete();
-		// }
+		File file = new File(this.getDir("drawable", Context.MODE_PRIVATE), "Aatrox.png");
+
 		// save file unless it already exists
 		if (!file.exists())
 		{
-			toast("storing file...", Toast.LENGTH_LONG);
+			toast("storing file " + filename + "...", Toast.LENGTH_SHORT);
 			OutputStream out = null;
 			
 			// write to file
 			try {
 				out = new BufferedOutputStream(new FileOutputStream(file));
+				out.write(data);
+				out.close();
+				toast("file written");
+			}
+			catch (IOException e) {
+				toast("file write failure");
+				toast(e.getMessage(), Toast.LENGTH_LONG);
+			}
+		}
+	} */
+	
+	void storeFile(byte[] data, String filename, String directory)
+	{
+		File file = new File(this.getDir(directory, Context.MODE_PRIVATE), filename);
+
+		// save file unless it already exists
+		if (!file.exists())
+		{
+			toast("storing file " + filename + "...", Toast.LENGTH_SHORT);
+			OutputStream out = null;
+			
+			// write to file
+			try {
+				out = new BufferedOutputStream(new FileOutputStream(file));
+				out.write(data);
+				out.close();
+				toast("file written");
+			}
+			catch (IOException e) {
+				toast("file write failure");
+				toast(e.getMessage(), Toast.LENGTH_LONG);
+			}
+		}
+		else {
+			toast("files up to date");
+		}
+	}
+	
+	void storeIcon(String data)
+	{
+		String filename = "champ_list.txt";
+		File file = new File(this.getFilesDir(), filename);
+
+		// save file unless it already exists
+		if (!file.exists())
+		{
+			toast("storing file...", Toast.LENGTH_LONG);
+			BufferedWriter out = null;
+			
+			// write to file
+			try {
+				out = new BufferedWriter(new FileWriter(file));
 				out.write(data);
 				out.close();
 				toast("file written");
@@ -269,11 +327,7 @@ public class MainActivity extends Activity
 	{
 		String filename = "champ_list.txt";
 		File file = new File(this.getFilesDir(), filename);
-		// toast(this.getFilesDir().toString(), Toast.LENGTH_LONG);
-		
-		// if (file.exists()) {
-			// file.delete();
-		// }
+
 		// save file unless it already exists
 		if (!file.exists())
 		{
@@ -301,7 +355,7 @@ public class MainActivity extends Activity
 		public void onClick(View p1)
 		{
 			// button click action
-			downloadChamps();
+			download("champion.json", "champs", "data/en_US/champion.json");
 		}
 	};
 	
@@ -359,4 +413,11 @@ public class MainActivity extends Activity
 		t.show();
 	}
 	
+	// stub method for testing
+	void stubMethod()
+	{
+		// stub
+		Toast toast = Toast.makeText(getApplicationContext(), "Tada!", Toast.LENGTH_SHORT);
+		toast.show();
+	}
 }

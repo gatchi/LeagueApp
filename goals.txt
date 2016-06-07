@@ -6,6 +6,7 @@ Goals for Today
 
 Goals for Some Other Day
 ========================
++ get downloads from latest version
 + allow download of first four champs
 + add all the other champs
 	- put them all in their directories with proper names
@@ -16,7 +17,8 @@ Goals for Some Other Day
 
 Things Done Already Today
 =========================
-o changed button layout from a LinearLayout to a RelativeLayout
-o reverted layout changed
-o got the refresh button to show & work (w/ Aatrox.json)
-+ implemented downloading of champion.json
+- removed dead code
++ half implemented icon download... it was working but now its not, cause i
++ implemented folder system for data (champs, drawable)
++ implemented FilesAsyncHttpResponseHandler (an abstract subclass of AsyncHttpResponseHandler)
++ encapsulated the champlist downloading, saving, and loading into one method that throws a FileNotFound exception, so if it fails it doesnt crash the whole app anymore
