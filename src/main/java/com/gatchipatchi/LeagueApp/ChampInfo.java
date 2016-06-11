@@ -238,7 +238,8 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		{
 			setPerLevel(healthText, LARGE, hpBase, hpPerLevel);
 			setPerLevel(healthRegenText, SMALL, hpRegenBase, hpRegenPerLevel);
-			if (parType.equals("MP") || parType.equals("Energy")) {
+			if (parType.equals("MP") || parType.equals("Energy"))
+			{
 				setPerLevel(resourceText, LARGE, mpBase, mpPerLevel);
 				setPerLevel(resourceRegenText, SMALL, mpRegenBase, mpRegenPerLevel);
 			}
@@ -251,7 +252,8 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		{
 			setRange(hpBase, hpPerLevel, LARGE, healthText);
 			setRange(hpRegenBase, hpRegenPerLevel, LARGE, healthRegenText);
-			if (parType.equals("MP") || parType.equals("Energy")) {
+			if (parType.equals("MP") || parType.equals("Energy"))
+			{
 				setRange(mpBase, mpPerLevel, LARGE, resourceText);
 				setRange(mpRegenBase, mpRegenPerLevel, LARGE, resourceRegenText);
 			}
@@ -264,7 +266,8 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		{
 			setCurrentLevel(hpBase, hpPerLevel, LARGE, level, healthText);
 			setCurrentLevel(hpRegenBase, hpRegenPerLevel, LARGE, level, healthRegenText);
-			if (parType.equals("MP") || parType.equals("Energy")) {
+			if (parType.equals("MP") || parType.equals("Energy"))
+			{
 				setCurrentLevel(mpBase, mpPerLevel, LARGE, level, resourceText);
 				setCurrentLevel(mpRegenBase, mpRegenPerLevel, LARGE, level, resourceRegenText);
 			}

@@ -1,6 +1,8 @@
 Goals for Today
 ===============
-+ implement icon download
+o fix icon download
+	o finish up tweaking download task
+- remove/move unecessary files in src
 + replace champ name string array id system with JSON option
 + add internet connectivity check
 
@@ -17,8 +19,11 @@ Goals for Some Other Day
 
 Things Done Already Today
 =========================
-- removed dead code
-+ half implemented icon download... it was working but now its not, cause i
-+ implemented folder system for data (champs, drawable)
-+ implemented FilesAsyncHttpResponseHandler (an abstract subclass of AsyncHttpResponseHandler)
-+ encapsulated the champlist downloading, saving, and loading into one method that throws a FileNotFound exception, so if it fails it doesnt crash the whole app anymore
+! icon downloading broken cause two sync requests are running at the same time, and wont block each other
+x tried to fix this by limiting their thread pool but threads start immediately upon creation
+o instead, im changing the download method to take in a queue
+x this doesnt work either unless the queue is accessed from the handler
+? maybe a better workaround is synchronized threads
+o problem was fixed by moving file location to public variables instead of within the handler
+x ALL OF THIS IS BULLSHIT I SHOULDNT HAVE EVEN USED THIS ASYNC HTTP LIBRARY THE TOOLS WERE ALREADY HERE
+o after seemingly forever, icon downloading is now fixed
