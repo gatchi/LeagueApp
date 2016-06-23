@@ -2,6 +2,7 @@ package com.gatchipatchi.LeagueApp;
 
 import android.app.Activity;
 import android.app.ActionBar;
+import android.content.Context;
 import android.os.Bundle;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -14,14 +15,15 @@ import android.view.MenuItem;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.util.JsonReader;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.ArrayList;
 import java.lang.String;
 import java.io.Reader;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.InputStream;
+import java.io.FileInputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.InputStreamReader;
@@ -56,7 +58,8 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	public static final short PERCENT = 1;
 	public static final short SMALL = 2;
 	
-	// global variables
+	//--------------- Public Objects ------------------//
+	
 	Resources res;
 	int champId;
 	String champName;
@@ -81,45 +84,68 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	double asPerLevel;
 	double asBase;
 	
-	// onCreate
+	ArrayList<String> champList = new ArrayList();
+	
+	//--------------- onCreate (main) -----------------//
+	
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-		// default stuff
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.champinfo);
 		
 		aestheticSetup();
 		
-		// Get champ ID (button pressed ID) which is used in pulling data
-		// from string arrays in xml.
+		// Get champ ID (button pressed ID)
+		
 		Intent intent = getIntent();
 		Bundle bundle = intent.getExtras();
 		champId = bundle.getInt("button id");
 		
-		// Load champ list from string array resource.
-		// Set the screen title while you're at it.
-		// Replace eventually, maybe?
-		res = getResources();
-		String[] champs = res.getStringArray(R.array.champ_names);
-		champName = champs[champId];
+		// Load champ list from JSON
+		
+		champList = (ArrayList<String>) bundle.get("champ list");
+		/* File championListFile = new File(this.getDir(MainActivity.CHAMPIONS_DIR, Context.MODE_PRIVATE), "champion_list.txt");
+		if (championListFile.exists())
+		{
+			try {
+				InputStream in = new BufferedInputStream(new FileInputStream(championListFile));
+			}
+			catch (FileNotFoundException e) {
+				showError(e);
+			}
+		} */
+		champName = champList.get(champId);
 		TextView champNameView = (TextView) findViewById(R.id.champ_name);
 		champNameView.setText(champName);
+		toast(champName);
 		
-		// load the JSON data
+		// Load champ list from string array resource.
+		
+		res = getResources();
+		String[] champs = res.getStringArray(R.array.champ_names);
+		/* champName = champs[champId];
+		TextView champNameView = (TextView) findViewById(R.id.champ_name);
+		champNameView.setText(champName); */
+		
+		// Load the JSON data
+		
 		InputStream in = null;
+		File championFile = new File(this.getDir(MainActivity.CHAMPIONS_DIR, Context.MODE_PRIVATE), champName + ".json");
 		try {
-			in = new BufferedInputStream(this.openFileInput("aatrox.json"));
+			in = new BufferedInputStream(new FileInputStream(championFile));
 		}
 		catch (FileNotFoundException e) {
 			toast(e.getMessage(), Toast.LENGTH_LONG);
 		}
 		
-		// put it into a JSONObject
+		// Put it into a JSONObject
+		
 		JSONObject json = null;
 		try {
+			
 			// Convert input stream to a string for older APIs.
-			// (Newer JSON libraries dont need this step.)
+			
 			BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
 			StringBuilder responseStrBuilder = new StringBuilder();
 			String inputStr;
@@ -133,7 +159,8 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			JSONObject champ = champData.getJSONObject(champName);
 			JSONObject champStats = champ.getJSONObject("stats");
 			
-			// get stats
+			// Get stats
+			
 			parType = champ.getString("partype");
 			hpBase = champStats.getDouble("hp");
 			hpPerLevel = champStats.getDouble("hpperlevel");
@@ -154,64 +181,89 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			asOffset = champStats.getDouble("attackspeedoffset");
 			asPerLevel = champStats.getDouble("attackspeedperlevel");
 			asBase = calcAs(asOffset);
+
+			// Set resource type on stat page
 			
+			TextView resourceTypeText = (TextView) findViewById(R.id.champ_resource_type);
+			TextView resourceRegenTypeText = (TextView) findViewById(R.id.resource_regen_type);
+			
+			if (parType.equals("MP"))
+			{
+				resourceTypeText.setText("mana");
+				resourceRegenTypeText.setText("mana regen");
+			}
+			else if (parType.equals("Energy"))
+			{
+				resourceTypeText.setText("energy");
+				resourceRegenTypeText.setText("energy regen");
+			}
+			else if (champName.equals("Aatrox") || champName.equals("Vladimir") || champName.equals("DrMundo") || champName.equals("Mordekaiser") || champName.equals("Zac"))
+			{
+				resourceTypeText.setText("uses health");
+			}
+			else if (champName.equals("Rengar"))
+			{
+				resourceTypeText.setText("ferocity");
+			}
+			else if (champName.equals("RekSai") || champName.equals("Renekton") || champName.equals("Shyvana") || champName.equals("Tryndamere") || champName.equals("Gnar")) {
+				resourceTypeText.setText("fury");
+			}
+			else if (champName.equals("Rumble")) {
+				resourceTypeText.setText("heat");
+			}
+			else {
+				resourceTypeText.setText("no resource");
+			}
+
+			// Set range on stat page
+			
+			TextView rangeTypeText = (TextView) findViewById(R.id.range_type);
+			TextView rangeText = (TextView) findViewById(R.id.range);
+			
+			if (attackRange < 300)
+			{
+				rangeTypeText.setText("melee");
+			}
+			else if (attackRange >= 300)
+			{
+				rangeTypeText.setText("ranged");
+			}
+			rangeText.setText(Double.toString(attackRange));
+			
+			// Set movespeed on stat page
+			
+			TextView movespeedText = (TextView) findViewById(R.id.movespeed);
+			movespeedText.setText(Double.toString(moveSpeed));
+		
 		} catch (UnsupportedEncodingException e) {
-			toast("UnsupportedEncodingException", Toast.LENGTH_LONG);
+			toast("UnsupportedEncodingException");
 			showError(e);
 		} catch (JSONException e) {
-			toast("JSONException", Toast.LENGTH_LONG);
+			toast("JSONException");
 			showError(e);
 		} catch (IOException e) {
-			toast("IOException", Toast.LENGTH_LONG);
+			toast("IOException");
+			showError(e);
+		} catch (NullPointerException e) {
+			toast("NullPointerException");
 			showError(e);
 		}
-
-		
-		// These dont change with levels, but are linked to which champ is selected
-
-		// set resource type on view
-		TextView resourceTypeText = (TextView) findViewById(R.id.champ_resource_type);
-		TextView resourceRegenTypeText = (TextView) findViewById(R.id.resource_regen_type);
-		
-		if (parType.equals("MP")) {
-			resourceTypeText.setText("mana");
-			resourceRegenTypeText.setText("mana regen");
-		} else if (parType.equals("Energy")) {
-			resourceTypeText.setText("energy");
-			resourceRegenTypeText.setText("energy regen");
-		} else if (champName.equals("Aatrox") || champName.equals("Vladimir") || champName.equals("DrMundo") || champName.equals("Mordekaiser") || champName.equals("Zac")) {
-			resourceTypeText.setText("uses health");
-		} else if (champName.equals("Rengar")) {
-			resourceTypeText.setText("ferocity");
-		} else if (champName.equals("RekSai") || champName.equals("Renekton") || champName.equals("Shyvana") || champName.equals("Tryndamere") || champName.equals("Gnar")) {
-			resourceTypeText.setText("fury");
-		} else if (champName.equals("Rumble")) {
-			resourceTypeText.setText("heat");
-		} else {
-			resourceTypeText.setText("no resource");
-		}
-
-		// set range on view
-		TextView rangeTypeText = (TextView) findViewById(R.id.range_type);
-		TextView rangeText = (TextView) findViewById(R.id.range);
-		
-		if (attackRange < 300)
-		{
-			rangeTypeText.setText("melee");
-		}
-		else if (attackRange >= 300)
-		{
-			rangeTypeText.setText("ranged");
-		}
-		rangeText.setText(Double.toString(attackRange));
-		
-		// set movespeed on view
-		TextView movespeedText = (TextView) findViewById(R.id.movespeed);
-		movespeedText.setText(Double.toString(moveSpeed));
 		
 	}
 
-	private void statUpdate(String level) {
+	/* String inputStreamToString(InputStream in) {
+		
+		// Convert input stream to a string
+		BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+		StringBuilder responseStrBuilder = new StringBuilder();
+		String inputStr;
+		while ((inputStr = streamReader.readLine()) != null) {
+			responseStrBuilder.append(inputStr);
+		}	
+		return responseStrBuilder.toString();
+	} */
+	
+	private void statUpdate(String level) throws NullPointerException {
 		/* 
 		 * When any level or level range is selected from the spinner,
 		 * this method updates the stats displayed using that spinner entry.
@@ -353,8 +405,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	}
 	
 	
-	void aestheticSetup()
-	{
+	void aestheticSetup() {
 		ActionBar actionBar = getActionBar();
 		actionBar.setTitle("Champ Stats");
 		actionBar.setDisplayHomeAsUpEnabled(true);
@@ -383,7 +434,12 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		// An item was selected. You can retrieve the selected item using
 		// parent.getItemAtPosition(pos)
 		String item = (String) parent.getItemAtPosition(pos);
-		statUpdate(item);
+		try {
+			statUpdate(item);
+		}
+		catch (NullPointerException e) {
+			showError(e);
+		}
 		
 	}
 

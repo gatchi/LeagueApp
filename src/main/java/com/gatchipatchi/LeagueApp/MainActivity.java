@@ -22,18 +22,22 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.AsyncTask;
+import android.graphics.BitmapFactory;
 import java.util.Queue;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.NoSuchElementException;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -42,6 +46,7 @@ import java.io.BufferedWriter;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.StringWriter;
+import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
@@ -57,8 +62,32 @@ import com.loopj.android.http.SyncHttpClient;
 
 public class MainActivity extends Activity 
 {
+	final static String CHAMPIONS_FILE = "champ_list.txt";
+	final static String CHAMPIONS_JSON = "champion.json";
+	final static String CHAMPIONS_DIR = "champs";
+	final static String ICONS_DIR = "drawable";
+	final static String ERROR_LOG = "error.log";
+	final static String LOG_FILE = "log";
+	final static String BASE_DOWNLOAD_URL = "http://ddragon.leagueoflegends.com/cdn/6.11.1/";
 	
-	//---------------- Nested Classes ------------------//
+	
+	//--------------- Public Objects ------------------//
+	
+	EditText editText;
+	TextView warningText;
+	Button refreshButton;
+	Button clearButton;
+	Button logClearButton;
+	ArrayList<String> champList = new ArrayList();
+	int tvId = View.generateViewId();
+	
+	/* // Must stay up here so its accesible by the HttpClient and Downloader
+	ArrayDeque<Pack> downloadQueue;
+	Pack currentDownload; */
+
+	
+	
+	//--------------- Nested Classes ------------------//
 	
 	class Pack {
 		
@@ -78,7 +107,7 @@ public class MainActivity extends Activity
 		}
 	}
 	
-	class DownloadFilesTask extends AsyncTask<String, Integer, InputStream> {
+	class DownloadFilesTask extends AsyncTask<String, Object, InputStream> {
 		
 		String[] filenames;
 		String[] directories;
@@ -90,8 +119,8 @@ public class MainActivity extends Activity
 		}
 		int i = 0;
 		
-		protected InputStream doInBackground(String... s)
-		{
+		protected InputStream doInBackground(String... s) {
+			
 			Pack pack;
 			HttpURLConnection urlConnection;
 			URL url;
@@ -100,21 +129,27 @@ public class MainActivity extends Activity
 			byte[] buffer;
 			
 			try {
+				
 				while (queue.peek() != null)
 				{
 					// Just some declarations
+					
 					pack = queue.remove();
 					url = pack.url;
 					urlConnection = (HttpURLConnection) url.openConnection();
 					file = new File(getApplicationContext().getDir(pack.directory, Context.MODE_PRIVATE), pack.filename);
 					
 					// Check to see if files are even in need of downloading
+					
 					if(!file.exists())
 					{
 						// Download
+						
+						publishProgress("Downloading " + pack.filename + "...", null);
 						in = new BufferedInputStream(urlConnection.getInputStream());
 					
 						// Convert to a byte buffer for filewriting
+						
 						buffer = new byte[1024];
 						int len;
 						OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
@@ -123,20 +158,24 @@ public class MainActivity extends Activity
 						}
 					
 						// Store file
+						
 						try {
-							/* toast("Writing file..."); */
+							publishProgress("Writing " +  pack.filename + "...", null);
 							out.write(buffer);
 						}
 						catch (IOException e) {
-							/* toast("Couldnt write to file");
-							showError(e); */
+							publishProgress("Write failed", e);
+							appendTextFile(null, LOG_FILE, e.getMessage());
 							return null;
 						}
 						finally {
 							try {
 								out.close();
 							}
-							catch (IOException e) { }
+							catch (IOException e) {
+								publishProgress("Couldnt close file", e);
+								appendTextFile(null, LOG_FILE, e.getMessage());
+							}
 						}
 						
 					}
@@ -145,25 +184,48 @@ public class MainActivity extends Activity
 				return in;
 				
 			} catch (IOException e) {
-				// No toasting on asynctask
+				publishProgress("Unexpected download error", e);
 				return null;
 			}
 		}
 		
-		protected void onProgressUpdate(Integer... progress) {
-			// Can we toast here tho?
-			toast(Integer.toString(progress[0]));
-			toast("Anything?");
+		protected void onProgressUpdate(Object... objArray) {
+			
+			/*
+			 * Takes in "params..." which means it can take in any amount of
+			 * arguments, which are put into an array that the method can use.
+			 * However, for this method, the following convention should be used:
+			 * 
+			 * param 1: a message (String)
+			 * param 2: an error (Exception)
+			 * 
+			 * Use null for unused elements.
+			 * 
+			 * Lastly, since the params is untyped (plain Objects), dont forget to cast each
+			 * member of the array before using.
+			 * 
+			 */
+			
+			if (objArray[0] != null) {
+				String message = (String)objArray[0];
+				toast(message);
+			}
+			if (objArray[1] != null) {
+				Exception errorMesg = (Exception)objArray[1];
+				showError(errorMesg);
+			}
+			
 		}
 		
-		protected void onPostExecute(InputStream in)
-		{
+		protected void onPostExecute(InputStream in) {
+			
 			if (in != null) {
 				toast("Update complete");
 			}
 			else {
 				toast("Update failed or not needed");
 			}
+			recreate();
 		}
 	}
 	
@@ -202,23 +264,7 @@ public class MainActivity extends Activity
 		
 	} */
 			
-	//-------------- Public Objects ------------------//
-	
-	EditText editText;
-	Button refreshButton;
-	Button clearButton;
-	final String BASE_DOWNLOAD_URL = "http://ddragon.leagueoflegends.com/cdn/6.11.1/";
-	/* ExecutorService threadpool = Executors.newFixedThreadPool(1); */
-	/* int threadNum = 0;
-	String downloadDirectory;
-	String downloadFilename;
-	final ReentrantLock lock = new ReentrantLock(); */
-	
-	/* // Must stay up here so its accesible by the HttpClient and Downloader
-	ArrayDeque<Pack> downloadQueue;
-	Pack currentDownload; */
-	
-	
+		
 	//--------------- onCreate (main) -----------------//
 	
 	@Override
@@ -231,38 +277,146 @@ public class MainActivity extends Activity
 		
 		initDirectories();
 		
-		// Add champ buttons iteratively
+		// Setup champ buttons
 		
-		LinearLayout ll = (LinearLayout)findViewById(R.id.button_layout);
-		for(int i=0; i<4; i++) {
+		File champListFile = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), CHAMPIONS_FILE);
+		/* File championJsonFile = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), CHAMPIONS_JSON); */
+		
+		if (champListFile.exists()) {
 			
-			ImageButton ib = new ImageButton(this);
+			// Load champ list
+			toast("Champ list found.  Loading...");
+			log("Champ list found.  Loading...");
 			
-			// Populate icons
+			try {
+				
+				BufferedReader listReader = new BufferedReader(new FileReader(champListFile));
+				int ic = 0;
+				char c = 0;
+				int d = 0;
+				String word = "";
+				
+				/* log("Entering loop..."); */
+				
+				while ((c != ']') & (ic != -1)) {
+					
+					// Comma is the delimiter
+					
+					do {
+					
+						ic = listReader.read();
+						c = (char)ic;
+						/* log(String.valueOf(c)); */
+						
+						if ((c != '[') & (c != ',') & (c != ']')) {
+							word = word + c;
+						}
+					} while ((c != ',') & (c != ']') & (ic != -1));
+					
+					champList.add(word);
+					/* log("Made word"); */
+					/* log(word); */
+					
+					if (c != ']') {
+						listReader.skip(1);
+						word = "";
+						c = 0;
+					}
+					
+					// Debug
+					if (d > 200) {
+						break;
+					}
+					else {
+						d++;
+					}
+				}
 			
-			Resources res = getResources();
-			TypedArray champIcons = res.obtainTypedArray(R.array.champ_icons);
-			ib.setImageResource(champIcons.getResourceId(i, 0));
-			champIcons.recycle();
+				/* log("Left loop."); */
+				/* java.util.Collections.sort(champList); */
+				log("Champ list generated");
+				
+				// Add champ buttons iteratively
+					
+				Iterator<String> champIterator = champList.listIterator();
+				LinearLayout ll = (LinearLayout)findViewById(R.id.button_layout);
+				
+				for (int i=0; i<4; i++) {
+				
+					if (warningText != null) {
+						warningText.setVisibility(View.GONE);
+					}
+					
+					ImageButton ib = new ImageButton(this);
+					
+					// Populate icons
+					
+					String champName = champIterator.next();
+					File championIconFile = new File(this.getDir("drawable", Context.MODE_PRIVATE), champName + ".png");
+					InputStream iconStream = new BufferedInputStream(new FileInputStream(championIconFile));
+					/* Resources res = getResources();
+					TypedArray champIcons = res.obtainTypedArray(R.array.champ_icons);
+					ib.setImageResource(champIcons.getResourceId(i, 0)); */
+					ib.setImageBitmap(BitmapFactory.decodeStream(iconStream));
+					/* champIcons.recycle(); */
+					
+					ib.setAdjustViewBounds(true);
+					ib.setScaleType(ScaleType.FIT_CENTER);
+					ib.setCropToPadding(false);
+					ib.setPadding(0,0,0,0);
+					ib.setOnClickListener(champButtonListener);
+					ib.setId(i);
+					ll.addView(ib, 87, 87);
+					
+					LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(87, 87);
+					params.setMargins(2,2,2,2);
+					ib.setLayoutParams(params);
+				}
+				toast("Layout generated");
+			}
+			catch (FileNotFoundException e) {
+				toast("FileNotFoundException");
+				showError(e);
+				appendTextFile(null, LOG_FILE, e.getMessage());
+			}
+			catch (IOException e) {
+				toast("IOException");
+				showError(e);
+				appendTextFile(null, LOG_FILE, e.getMessage());
+			}
+		}
+		else {
 			
-			ib.setAdjustViewBounds(true);
-			ib.setScaleType(ScaleType.FIT_CENTER);
-			ib.setCropToPadding(false);
-			ib.setPadding(0,0,0,0);
-			ib.setOnClickListener(champButtonListener);
-			ib.setId(i);
-			ll.addView(ib, 87, 87);
+			// Ask to update
 			
-			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(87, 87);
-			params.setMargins(2,2,2,2);
-			ib.setLayoutParams(params);
+			LinearLayout ll = (LinearLayout)findViewById(R.id.button_layout);
+			warningText = new TextView(this);
+			warningText.setText("No data");
+			warningText.setBackgroundColor(0xFFFF);
+			ll.addView(warningText);
+			
+			/* 
+			
+				
+				
+			} catch (FileNotFoundException e) {
+				showError(e);
+			} catch (JSONException e) {
+				showError(e);
+			} catch (UnsupportedEncodingException e) {
+				toast("InputStream to String conversion failed");
+				showError(e);
+			} catch (IOException e) {
+				toast("InputStream to String conversion failed");
+				showError(e);
+			} */
 		}
 		
 		// Add data refresh button
 		
 		LinearLayout footer = (LinearLayout) findViewById(R.id.footer);
 		refreshButton = new Button(this);
-		refreshButton.setText("refresh data");
+		refreshButton.setText("update");
 		footer.addView(refreshButton);
 		refreshButton.setOnClickListener(refreshButtonListener);
 		
@@ -273,125 +427,18 @@ public class MainActivity extends Activity
 		footer.addView(clearButton);
 		clearButton.setOnClickListener(clearButtonListener);
 		
+		// Add log clear button
+		
+		logClearButton = new Button(this);
+		logClearButton.setText("clear log");
+		footer.addView(logClearButton);
+		logClearButton.setOnClickListener(logClearButtonListener);
+		
 		// Add listener to search bar
 		
 		editText = (EditText) findViewById(R.id.search);
 		editText.setOnEditorActionListener(searchListener);
-
-		
-		// Load champion list into app
-
-	/* getChampList();
-		getIcons(); */
-	/* Queue<Pack> queue = new ArrayDeque<Pack>(2);
-		queue.add(new Pack("champion.json", "champs", "data/en_US/champion.json"));
-		queue.add(new Pack("Aatrox.png", "drawable", "img/champion/Aatrox.png"));
-		download(queue);
-		download("champion.json", "champs", "data/en_US/champion.json");
-		download("Aatrox.png", "drawable", "img/champion/Aatrox.png"); */
-/* 		Queue<Pack> queue = new ArrayDeque<Pack>();
-		Pack pack = new Pack("champion.json", "champs");
-		queue.add(pack);
-		URL url;
-		toast("Attempting download");
-		try {
-			url = new URL(BASE_DOWNLOAD_URL + "data/en_US/champion.json");
-			new DownloadFilesTask(queue).execute(url);
-		} catch (MalformedURLException e) {
-			toast("you fucked up the url");
-			showError(e);
-			toast("abandoned download");
-		} */
-		downloadData();
-		
-/* 		} catch (FileNotFoundException e) {
-			toast("Could not retrieve champ list");
-			showError(e);
-		} */
-		
 	}
-	
-	
-	//---------- MainActivity Private Methods and Handlers ------------//	
-	
-	void initDirectories() {
-		
-		// Make sure director structure is correct (new install)
-		
-		File championDirectory = this.getDir("champs", Context.MODE_PRIVATE);
-		if (!championDirectory.exists()) {
-			toast("making champ directory");
-			championDirectory.mkdir();
-		}
-		
-		File drawableDir = this.getDir("drawable", Context.MODE_PRIVATE);
-		if (!drawableDir.exists()) {
-			toast("creating drawable directory");
-			drawableDir.mkdir();
-		}
-		
-	}
-	
-/* 	void download(String filename, String shortUrl)
-	{
-		// attempt a file download
-		File jsonFile = new File(this.getFilesDir(), filename);
-		String baseUrl = "http://ddragon.leagueoflegends.com/cdn/6.11.1/";
-		if (!jsonFile.exists())
-		{
-			toast("File doesnt exist.  Attempting download.", Toast.LENGTH_SHORT);
-			AsyncHttpClient client = new AsyncHttpClient();
-			asyncHandler.takeFilename(filename);
-			client.get(baseUrl + shortUrl, asyncHandler);
-		}
-		else {
-			toast("Up to date");
-		}
-	} */
-	
-	void downloadData() {
-		
-		// Make & prepare download queue
-		Queue<Pack> queue = new ArrayDeque<Pack>();
-		URL url;
-		try {
-			url = new URL(BASE_DOWNLOAD_URL + "data/en_US/champion.json");
-			Pack pack = new Pack("champion.json", "champs", url);
-			queue.add(pack);
-			url = new URL(BASE_DOWNLOAD_URL + "img/champion/Aatrox.png");
-			pack = new Pack("Aatrox.png", "drawable", url);
-			queue.add(pack);
-		
-			// Download
-			toast("Attempting download");
-			new DownloadFilesTask(queue).execute();
-			
-		} catch (MalformedURLException e) {
-			toast("you fucked up the url");
-			showError(e);
-			toast("abandoned download");
-		}
-	}
-	
-	/* void getChampList() {
-		
-		File champListFile;
-		champListFile = new File(this.getDir("champs", Context.MODE_PRIVATE), "champion.json");
-		if (!champListFile.exists())
-		{
-			toast("No champ list file.  Downloading...");
-			download("champion.json", "champs", "data/en_US/champion.json");
-		}
-		
-	} */
-	
-	/* void getIcons() {
-		
-		// Download champ icons
-		
-		download("Aatrox.png", "drawable", "img/champion/Aatrox.png");
-		
-	} */
 	
 /*	void whatTheFuckIsThis() throws UnsupportedEncodingException, JSONException, IOException {
 		
@@ -451,54 +498,7 @@ public class MainActivity extends Activity
 			showError(e);
 		}
 	} */
-	
-/*	void download(String filename, String directory, String shortUrl) {
 		
-		// Attempt a file download
-		File file = new File(this.getDir(directory, Context.MODE_PRIVATE), filename);
-		String baseUrl = "http://ddragon.leagueoflegends.com/cdn/6.11.1/";
-		if (!file.exists())
-		{
-			toast("File " + filename + " doesnt exist. Attempting download.", Toast.LENGTH_SHORT);
-			currentDownload = new Pack(filename, directory);
-			AsyncHttpClient client = new AsyncHttpClient();
-			while (!downloadQueue.isEmpty()) {
-				client.get(baseUrl + shortUrl, asyncHandler);
-			}
-		}
-		else {
-			toast("Canceled download");
-			toast(filename + " already exists");
-		}
-	} */
-	
-/*	void download(Queue<Packvoidueue) {
-		
-		threadNum = threadNum + 1;
-		toast("threadnum: " + Integer.toString(threadNum));
-		Pack pack;
-		
-		// Attempt a file download
-		while (queue.peek() != null)
-		{
-			pack = queue.remove();
-			File jsonFile = new File(this.getDir(pack.directory, Context.MODE_PRIVATE), pack.filename);
-			String baseUrl = "http://ddragon.leagueoflegends.com/cdn/6.11.1/";
-			if (!jsonFile.exists())
-			{
-				toast("File " + pack.filename + " doesnt exist. Attempting download.", Toast.LENGTH_SHORT);
-				AsyncHttpClient client = new AsyncHttpClient();
-				downloadDirectory = pack.directory;
-				downloadFilename = pack.filename;
-				client.get(baseUrl + pack.url, asyncHandler);
-			}
-			else {
-				toast("Download error");
-				toast(pack.filename + " already exists");
-			}
-		}
-	} */
-	
 	/* private AsyncHttpResponseHandler asyncHandler = new AsyncHttpResponseHandler() {
 		
 		@Override
@@ -559,6 +559,9 @@ public class MainActivity extends Activity
 		}
 	} */
 	
+	
+	//--------------- Class Methods -------------------//
+	
 	void storeFile(byte[] data, String filename, String directory) throws NullPointerException {
 		
 		File file = new File(this.getDir(directory, Context.MODE_PRIVATE), filename);
@@ -586,21 +589,28 @@ public class MainActivity extends Activity
 		}
 	}
 	
-	/* void storeIcon(String data)
-	{
-		String filename = "champ_list.txt";
-		File file = new File(this.getFilesDir(), filename);
+	void writeTextFile(String directory, String filename, String text)
+	{	
+		File file;
+		if (directory == null) {
+			file = new File(getApplicationContext().getFilesDir(), filename);
+		}
+		else {
+			file = new File(getApplicationContext().getDir(directory, Context.MODE_PRIVATE), filename);
+		}
 
-		// save file unless it already exists
+		// Save file unless it already exists
+		
 		if (!file.exists())
 		{
 			toast("storing file...", Toast.LENGTH_LONG);
 			BufferedWriter out = null;
 			
-			// write to file
+			// Write
+
 			try {
 				out = new BufferedWriter(new FileWriter(file));
-				out.write(data);
+				out.write(text);
 				out.close();
 				toast("file written");
 			}
@@ -609,50 +619,391 @@ public class MainActivity extends Activity
 				toast(e.getMessage(), Toast.LENGTH_SHORT);
 			}
 		}
-	} */
+	}
 	
-	/* void storeTextFile(String data)
+	void appendTextFile(String directory, String filename, String text)
 	{
-		String filename = "champ_list.txt";
-		File file = new File(this.getFilesDir(), filename);
+		/* toast("Attempting to append log..."); */
+		File file;
+		if (directory == null) {
+			file = new File(getApplicationContext().getFilesDir(), filename);
+		}
+		else {
+			file = new File(getApplicationContext().getDir(directory, Context.MODE_PRIVATE), filename);
+		}
 
-		// save file unless it already exists
-		if (!file.exists())
-		{
-			toast("storing file...", Toast.LENGTH_LONG);
-			BufferedWriter out = null;
+		// Save file unless it already exists
+		
+		/* toast("storing file...", Toast.LENGTH_LONG); */
+		PrintWriter out;
+		
+		// Write
+
+		try {
+			out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
+			out.println(text);
 			
-			// write to file
-			try {
-				out = new BufferedWriter(new FileWriter(file));
-				out.write(data);
-				out.close();
-				toast("file written");
+			if (out.checkError()) {
+				/* toast("Oops, PrintWriter error'd"); */
 			}
-			catch (IOException e) {
-				toast("file write failure");
-				toast(e.getMessage(), Toast.LENGTH_SHORT);
+			else {
+				/* toast("PrintWriter claimed it worked..."); */
+			}
+			
+			out.close();
+			/* toast("file written"); */
+		}
+		catch (IOException e) {
+			toast("file write failure");
+			toast(e.getMessage(), Toast.LENGTH_SHORT);
+		}
+	}
+	
+	void downloadData() {
+		
+		// Check for to see if champ list exists
+		
+		File champListFile = new File(getApplicationContext().getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), CHAMPIONS_FILE);
+		File championJsonFile = new File(getApplicationContext().getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), CHAMPIONS_JSON);
+		
+		if (!champListFile.exists()) {
+			
+			toast("Champ list not found.");
+			
+			// If champ file doesnt exist, check for champ json and generate the list from it
+			
+			if (championJsonFile.exists()) {
+				
+				toast("Champ JSON found.  Generating list...");
+				
+				JSONObject json = null;
+				InputStream in = null;
+				
+				try {
+					
+					in = new BufferedInputStream(new FileInputStream(championJsonFile));
+					
+					JSONObject championJson = new JSONObject(inputStreamToString(in));
+					JSONObject champData = championJson.getJSONObject("data");
+					
+					// Get champ list from JSON object and put into alpha ordered list
+					
+					Iterator<String> champs = champData.keys();
+					
+					while (champs.hasNext()) {
+					/* for (int i=0; i<4; i++) { */
+						champList.add(champs.next());
+					}
+					
+					java.util.Collections.sort(champList);
+					toast("Champ list generated");
+					
+					// Save champ list
+					
+					writeTextFile("champs", "champ_list.txt", champList.toString());
+					toast("Champ list saved");
+					
+					// Make & prepare download queue
+			
+					Pack pack;
+					URL url;
+					Iterator<String> champIterator = champList.iterator();
+					Queue<Pack> queue = new ArrayDeque<Pack>(champList.size() * 2);
+					String champName;
+					
+					try {
+						
+						toast("Prepping data download...");
+						
+						for (int i=0; i<4; i++) {
+						
+							champName = champIterator.next();
+							
+							url = new URL(BASE_DOWNLOAD_URL + "img/champion/" + champName + ".png");
+							pack = new Pack(champName + ".png", ICONS_DIR, url);
+							queue.add(pack);
+							
+							url = new URL(BASE_DOWNLOAD_URL + "data/en_US/champion/" + champName + ".json");
+							pack = new Pack(champName + ".json", CHAMPIONS_DIR, url);
+							queue.add(pack);
+						}
+						
+						// Download data
+						
+						toast("Attempting download");
+						new DownloadFilesTask(queue).execute();
+						
+					}
+					catch (MalformedURLException e) {
+						toast("Download abandoned");
+						toast("you fucked up the url");
+						showError(e);
+						logError(e);
+					}
+					catch (NullPointerException e) {
+						toast("Download abandoned");
+						toast("NullPointerException");
+						showError(e);
+						logError(e);
+					}
+					catch (NoSuchElementException e) {
+						toast("Download abandoned");
+						toast("champList not initialized");
+						showError(e);
+						logError(e);
+					}
+				}
+				catch (FileNotFoundException e) {
+					toast("List generation failed");
+					toast("FileNotFoundException");
+					showError(e);
+					logError(e);
+				}
+				catch (NoSuchElementException e) {
+					toast("List generation failed");
+					toast("Cant get keys from champion.json");
+					showError(e);
+					logError(e);
+				}
+				catch (UnsupportedEncodingException e) {
+					toast("List generation failed");
+					toast("Something is wrong with the champion json file");
+					showError(e);
+					logError(e);
+				}
+				catch (JSONException e) {
+					toast("List generation failed");
+					toast("JSONException");
+					showError(e);
+					logError(e);
+				}
+				catch (IOException e) {
+					toast("List generation failed");
+					toast("IOException");
+					showError(e);
+					logError(e);
+				}
+			}
+			
+			else if (!champListFile.exists() & !championJsonFile.exists()) {
+
+				// If neither exists, download champ json and restart activity
+				toast("No champ list or JSON");
+				
+				try {
+					toast("Prepping champ JSON download...");
+					
+					Queue<Pack> queue = new ArrayDeque<Pack>(1);
+					URL url = new URL(BASE_DOWNLOAD_URL + "data/en_US/champion.json");
+					Pack pack = new Pack(CHAMPIONS_JSON, CHAMPIONS_DIR, url);
+					queue.add(pack);
+					
+					// Download champion JSON
+					
+					toast("Attempting download");
+					new DownloadFilesTask(queue).execute();
+				}
+				catch (MalformedURLException e) {
+					toast("JSON download abandoned");
+					toast("you fucked up the url buddy");
+					showError(e);
+					logError(e);
+				}
+			}
+			
+			else {
+				toast("how did you even get here");
+				toast("nothing downloaded everything is fucked");
+			}
+			
+		}
+		else {
+			
+			// Make & prepare download queue
+			
+			Pack pack;
+			URL url;
+			Iterator<String> champIterator = champList.iterator();
+			Queue<Pack> queue = new ArrayDeque<Pack>(champList.size() * 2);
+			String champName;
+			
+			try {
+				
+				toast("Prepping data download...");
+				
+				for (int i=0; i<4; i++) {
+				
+					champName = champIterator.next();
+					
+					url = new URL(BASE_DOWNLOAD_URL + "img/champion/" + champName + ".png");
+					pack = new Pack(champName + ".png", ICONS_DIR, url);
+					queue.add(pack);
+					
+					url = new URL(BASE_DOWNLOAD_URL + "data/en_US/champion/" + champName + ".json");
+					pack = new Pack(champName + ".json", CHAMPIONS_DIR, url);
+					queue.add(pack);
+				}
+				
+				// Download data
+				
+				toast("Attempting download");
+				new DownloadFilesTask(queue).execute();
+				
+			}
+			catch (MalformedURLException e) {
+				toast("Download abandoned");
+				toast("you fucked up the url");
+				showError(e);
+				logError(e);
+			}
+			catch (NullPointerException e) {
+				toast("Download abandoned");
+				toast("NullPointerException");
+				showError(e);
+				logError(e);
+			}
+			catch (NoSuchElementException e) {
+				toast("Download abandoned");
+				toast("champList not initialized");
+				showError(e);
+				logError(e);
 			}
 		}
-	} */
+	}
 	
 	void clearDownloads() {
 		
 		// Delete all downloaded files
+		
 		File file;
-		file = new File(this.getDir("champs", Context.MODE_PRIVATE), "champion.json");
-		if (file.exists()) {
+		File dir;
+		
+		file = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), "champ_list.txt");
+		if (file.exists())
+		{
 			file.delete();
-			toast("Deleted champion.json");
+			log("Deleted champ_list.txt");
 		}
-		file = new File(this.getDir("drawable", Context.MODE_PRIVATE), "Aatrox.png");
-		if (file.exists()) {
+		
+		file = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), "champion.json");
+		if (file.exists())
+		{
 			file.delete();
-			toast("Deleted Aatrox.png");
+			log("Deleted champion.json");
 		}
+		
+		file = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), "Aatrox.json");
+		if (file.exists())
+		{
+			file.delete();
+			log("Deleted Aatrox.json");
+		}
+		
+		file = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), "Ahri.json");
+		if (file.exists())
+		{
+			file.delete();
+			log("Deleted Ahri.json");
+		}
+		
+		file = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), "Akali.json");
+		if (file.exists())
+		{
+			file.delete();
+			log("Deleted Akali.json");
+		}
+		
+		file = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), "Alistar.json");
+		if (file.exists())
+		{
+			file.delete();
+			log("Deleted Alistar.json");
+		}
+		
+		file = new File(this.getDir(ICONS_DIR, Context.MODE_PRIVATE), "Aatrox.png");
+		if (file.exists())
+		{
+			file.delete();
+			log("Deleted Aatrox.png");
+		}
+		
+		file = new File(this.getDir(ICONS_DIR, Context.MODE_PRIVATE), "Ahri.png");
+		if (file.exists())
+		{
+			file.delete();
+			log("Deleted Ahri.png");
+		}
+		
+		file = new File(this.getDir(ICONS_DIR, Context.MODE_PRIVATE), "Akali.png");
+		if (file.exists())
+		{
+			file.delete();
+			log("Deleted Akali.png");
+		}
+		
+		file = new File(this.getDir(ICONS_DIR, Context.MODE_PRIVATE), "Alistar.png");
+		if (file.exists())
+		{
+			file.delete();
+			log("Deleted Alistar.png");
+		}
+		
+		file = new File(getApplicationContext().getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), CHAMPIONS_FILE);
+		dir = file.getParentFile();
+		log(dir.toString());
+		if (dir.exists())
+		{
+			dir.delete();
+			log("Deleted app_champs directory");
+		}
+		
+		file = new File(getApplicationContext().getDir(ICONS_DIR, Context.MODE_PRIVATE), "Aatrox.png");
+		dir = file.getParentFile();
+		log(dir.toString());
+		if (dir.exists())
+		{
+			dir.delete();
+			log("Deleted app_drawable directory");
+		}
+		
+		toast("Data deleted");
+		recreate();
 	}
 	
-	// refresh button listener
+	String inputStreamToString(InputStream in) throws UnsupportedEncodingException, IOException {
+		
+		// Convert input stream to a string
+		
+		BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+		StringBuilder responseStrBuilder = new StringBuilder();
+		String inputStr;
+		while ((inputStr = streamReader.readLine()) != null) {
+			responseStrBuilder.append(inputStr);
+		}	
+		return responseStrBuilder.toString();
+	}
+	
+	void initDirectories() {
+		
+		// Make sure director structure is correct (new install)
+		
+		File championDirectory = this.getDir("champs", Context.MODE_PRIVATE);
+		if (!championDirectory.exists()) {
+			toast("making champ directory");
+			championDirectory.mkdir();
+		}
+		
+		File drawableDir = this.getDir("drawable", Context.MODE_PRIVATE);
+		if (!drawableDir.exists()) {
+			toast("creating drawable directory");
+			drawableDir.mkdir();
+		}
+		
+	}
+	
+	
+	//----------------- Listeners ---------------------//
+	
 	private OnClickListener refreshButtonListener = new OnClickListener() {
 		
 		@Override
@@ -665,7 +1016,6 @@ public class MainActivity extends Activity
 		}
 	};
 	
-	// clear button listener
 	private OnClickListener clearButtonListener = new OnClickListener() {
 		
 		@Override
@@ -676,7 +1026,15 @@ public class MainActivity extends Activity
 		}
 	};
 	
-	// champ button onClick listener
+	private OnClickListener logClearButtonListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View p1)
+		{
+			clearLog();
+		}
+	};
+	
 	private OnClickListener champButtonListener = new OnClickListener() {
 		
 		@Override
@@ -687,6 +1045,7 @@ public class MainActivity extends Activity
 			toast.show(); */
 			Intent intent = new Intent(MainActivity.this, ChampInfo.class);
 			intent.putExtra("button id", p1.getId());
+			intent.putExtra("champ list", champList);
 			startActivity(intent);
 		}
 	};
@@ -708,6 +1067,9 @@ public class MainActivity extends Activity
 		}
 	};
 	
+	
+	//----------- Temporary Debug Methods -------------//
+	
 	void toast(String msg) {
 		Toast t = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
 		t.show();
@@ -724,9 +1086,29 @@ public class MainActivity extends Activity
 		t.show();
 	}
 	
-	public void showError(Exception e) {
-		Toast t = Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
-		t.show();
+	void showError(Exception e) {
+		if (e != null) {
+			Toast t = Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
+			t.show();
+		}
+	}
+	
+	void logError(Exception e) {
+		if (e != null) {
+			appendTextFile(null, LOG_FILE, e.getMessage());
+		}
+	}
+	
+	void log(String s) {
+		appendTextFile(null, LOG_FILE, s);
+	}
+	
+	void clearLog() {
+		File file = new File(getApplicationContext().getFilesDir(), LOG_FILE);
+		if (file.exists()) {
+			file.delete();
+			toast("Log cleared");
+		}
 	}
 	
 	// stub method for testing

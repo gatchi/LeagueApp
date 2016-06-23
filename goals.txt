@@ -1,29 +1,31 @@
 Goals for Today
 ===============
-o fix icon download
-	o finish up tweaking download task
-- remove/move unecessary files in src
-+ replace champ name string array id system with JSON option
-+ add internet connectivity check
+! please commit after these are finished; make adding the rest of the champs another commit
 
 Goals for Some Other Day
 ========================
++ make it so main activity recreates after an update (or something like that)
 + get downloads from latest version
-+ allow download of first four champs
 + add all the other champs
 	- put them all in their directories with proper names
 		o maybe make a script for this
 	- add all the buttons
-+ get an open source license for LeagueApp (or at least look into it)
-+ maybe publish to github
++ make it so champ icons are downloaded iteratively using champList
++ make it so that runtime reconfigurations (like screen orientation changes) dont fuck up async
++ add internet connectivity check
 
-Things Done Already Today
-=========================
-! icon downloading broken cause two sync requests are running at the same time, and wont block each other
-x tried to fix this by limiting their thread pool but threads start immediately upon creation
-o instead, im changing the download method to take in a queue
-x this doesnt work either unless the queue is accessed from the handler
-? maybe a better workaround is synchronized threads
-o problem was fixed by moving file location to public variables instead of within the handler
-x ALL OF THIS IS BULLSHIT I SHOULDNT HAVE EVEN USED THIS ASYNC HTTP LIBRARY THE TOOLS WERE ALREADY HERE
-o after seemingly forever, icon downloading is now fixed
+Things Done Since Last Commit
+=============================
+- remove/move unecessary files in src
++ replace champ name string array id system with JSON option
++ champList now saves to a file, and is passed into ChampInfo activity
++ partially implemented champion icon & details downloading via champ_list
++ changed order of arguments for writeTextFile so its easier to remember
++ allow download of first four champs
+o fix'd data downloading and ChampInfo functioning
++ added a very basic logging system (needs testing)
+- deleted raw directory in res
+- deleted xml directory in res
+- deleted icons in drawable directory
+o test logging system
+o fix: wont download properly if champion.json doesnt exist (chicken-egg situation)

@@ -49,11 +49,13 @@
 		<item>Diana</item>		
 	</string-array>
 	
+	<!--
 	<string-array name="champ_icons">
 		<item>@drawable/aatrox_icon</item>
 		<item>@drawable/ahri_icon</item>
 		<item>@drawable/akali_icon</item>
 		<item>@drawable/alistar_icon</item>
 	</string-array>
+	-->
 
 </resources>
