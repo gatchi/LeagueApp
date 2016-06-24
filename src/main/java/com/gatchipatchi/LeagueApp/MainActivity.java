@@ -9,7 +9,7 @@ import android.widget.Toast;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.TableLayout;
 import android.widget.ImageView.ScaleType;
 import android.view.inputmethod.EditorInfo;
 import android.view.KeyEvent;
@@ -29,9 +29,6 @@ import java.util.Iterator;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Collections;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.NoSuchElementException;
 import java.io.File;
 import java.io.InputStream;
@@ -56,9 +53,6 @@ import java.net.MalformedURLException;
 import java.lang.Runnable;
 import org.json.JSONObject;
 import org.json.JSONException;
-import cz.msebera.android.httpclient.Header;
-import com.loopj.android.http.AsyncHttpResponseHandler;
-import com.loopj.android.http.SyncHttpClient;
 
 public class MainActivity extends Activity 
 {
@@ -69,6 +63,7 @@ public class MainActivity extends Activity
 	final static String ERROR_LOG = "error.log";
 	final static String LOG_FILE = "log";
 	final static String BASE_DOWNLOAD_URL = "http://ddragon.leagueoflegends.com/cdn/6.11.1/";
+	final static int TABLE_ROW_WIDTH = 5;
 	
 	
 	//--------------- Public Objects ------------------//
@@ -145,7 +140,8 @@ public class MainActivity extends Activity
 					{
 						// Download
 						
-						publishProgress("Downloading " + pack.filename + "...", null);
+						/* publishProgress("Downloading " + pack.filename + "...", null); */
+						log("Downloading " + pack.filename + "...");
 						in = new BufferedInputStream(urlConnection.getInputStream());
 					
 						// Convert to a byte buffer for filewriting
@@ -160,12 +156,15 @@ public class MainActivity extends Activity
 						// Store file
 						
 						try {
-							publishProgress("Writing " +  pack.filename + "...", null);
+							/* publishProgress("Writing " +  pack.filename + "...", null); */
+							log("Writing " +  pack.filename + "...");
 							out.write(buffer);
 						}
 						catch (IOException e) {
-							publishProgress("Write failed", e);
-							appendTextFile(null, LOG_FILE, e.getMessage());
+							/* publishProgress("Write failed", e); */
+							/* appendTextFile(null, LOG_FILE, e.getMessage()); */
+							log("Write failed");
+							logError(e);
 							return null;
 						}
 						finally {
@@ -173,8 +172,10 @@ public class MainActivity extends Activity
 								out.close();
 							}
 							catch (IOException e) {
-								publishProgress("Couldnt close file", e);
-								appendTextFile(null, LOG_FILE, e.getMessage());
+								/* publishProgress("Couldnt close file", e); */
+								/* appendTextFile(null, LOG_FILE, e.getMessage()); */
+								log("Couldnt close file");
+								logError(e);
 							}
 						}
 						
@@ -285,7 +286,7 @@ public class MainActivity extends Activity
 		if (champListFile.exists()) {
 			
 			// Load champ list
-			toast("Champ list found.  Loading...");
+			/* toast("Champ list found.  Loading..."); */
 			log("Champ list found.  Loading...");
 			
 			try {
@@ -323,8 +324,9 @@ public class MainActivity extends Activity
 						c = 0;
 					}
 					
-					// Debug
-					if (d > 200) {
+					// To prevent hanging
+					if (d > 600) {
+						log("Force break of list-reading loop");
 						break;
 					}
 					else {
@@ -339,12 +341,23 @@ public class MainActivity extends Activity
 				// Add champ buttons iteratively
 					
 				Iterator<String> champIterator = champList.listIterator();
-				LinearLayout ll = (LinearLayout)findViewById(R.id.button_layout);
+				LinearLayout ll = new LinearLayout(this);
+				TableLayout tl = (TableLayout)findViewById(R.id.button_layout);
+				/* TableRow tr = new TableRow(this); */
+				int count = 0;
 				
-				for (int i=0; i<4; i++) {
+				for (int i=0; i<161; i++) {
 				
 					if (warningText != null) {
 						warningText.setVisibility(View.GONE);
+					}
+					
+					if (count % TABLE_ROW_WIDTH == 0) {
+						ll = new LinearLayout(this);
+						ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
+						ll.setGravity(Gravity.CENTER_HORIZONTAL);
+						/* log("Added row"); */
+						tl.addView(ll);
 					}
 					
 					ImageButton ib = new ImageButton(this);
@@ -371,29 +384,35 @@ public class MainActivity extends Activity
 					LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(87, 87);
 					params.setMargins(2,2,2,2);
 					ib.setLayoutParams(params);
+					
+					/* log("Added button."); */
+					count++;
 				}
 				toast("Layout generated");
 			}
 			catch (FileNotFoundException e) {
-				toast("FileNotFoundException");
-				showError(e);
-				appendTextFile(null, LOG_FILE, e.getMessage());
+				toast("Champ missing. Try updating");
+				log("FileNotFoundException");
+				/* showError(e); */
+				logError(e);
 			}
 			catch (IOException e) {
-				toast("IOException");
+				log("IOException");
 				showError(e);
-				appendTextFile(null, LOG_FILE, e.getMessage());
+				logError(e);
 			}
 		}
 		else {
 			
 			// Ask to update
 			
-			LinearLayout ll = (LinearLayout)findViewById(R.id.button_layout);
+			log("Adding simple TextView to empty View...");
+			TableLayout tl = (TableLayout)findViewById(R.id.button_layout);
 			warningText = new TextView(this);
 			warningText.setText("No data");
 			warningText.setBackgroundColor(0xFFFF);
-			ll.addView(warningText);
+			tl.addView(warningText);
+			log("Added.");
 			
 			/* 
 			
@@ -566,13 +585,15 @@ public class MainActivity extends Activity
 		
 		File file = new File(this.getDir(directory, Context.MODE_PRIVATE), filename);
 
-		// save file unless it already exists
+		// Save file unless it already exists
+		
 		if (!file.exists())
 		{
 			toast("storing file " + filename + "...", Toast.LENGTH_SHORT);
 			OutputStream out = null;
 			
-			// write to file
+			// Write to file
+			
 			try {
 				out = new BufferedOutputStream(new FileOutputStream(file));
 				out.write(data);
@@ -668,13 +689,13 @@ public class MainActivity extends Activity
 		
 		if (!champListFile.exists()) {
 			
-			toast("Champ list not found.");
+			log("Champ list not found.");
 			
 			// If champ file doesnt exist, check for champ json and generate the list from it
 			
 			if (championJsonFile.exists()) {
 				
-				toast("Champ JSON found.  Generating list...");
+				log("Champ JSON found.  Generating list...");
 				
 				JSONObject json = null;
 				InputStream in = null;
@@ -691,17 +712,17 @@ public class MainActivity extends Activity
 					Iterator<String> champs = champData.keys();
 					
 					while (champs.hasNext()) {
-					/* for (int i=0; i<4; i++) { */
+					/* for (int i=0; i<161; i++) { */
 						champList.add(champs.next());
 					}
 					
 					java.util.Collections.sort(champList);
-					toast("Champ list generated");
+					log("Champ list generated");
 					
 					// Save champ list
 					
 					writeTextFile("champs", "champ_list.txt", champList.toString());
-					toast("Champ list saved");
+					log("Champ list saved");
 					
 					// Make & prepare download queue
 			
@@ -713,9 +734,9 @@ public class MainActivity extends Activity
 					
 					try {
 						
-						toast("Prepping data download...");
+						log("Prepping data download...");
 						
-						for (int i=0; i<4; i++) {
+						for (int i=0; i<161; i++) {
 						
 							champName = champIterator.next();
 							
@@ -730,56 +751,56 @@ public class MainActivity extends Activity
 						
 						// Download data
 						
-						toast("Attempting download");
+						log("Attempting download");
 						new DownloadFilesTask(queue).execute();
 						
 					}
 					catch (MalformedURLException e) {
-						toast("Download abandoned");
-						toast("you fucked up the url");
+						log("Download abandoned");
+						log("you fucked up the url");
 						showError(e);
 						logError(e);
 					}
 					catch (NullPointerException e) {
-						toast("Download abandoned");
-						toast("NullPointerException");
+						log("Download abandoned");
+						log("NullPointerException");
 						showError(e);
 						logError(e);
 					}
 					catch (NoSuchElementException e) {
-						toast("Download abandoned");
-						toast("champList not initialized");
+						log("Download abandoned");
+						log("champList not initialized");
 						showError(e);
 						logError(e);
 					}
 				}
 				catch (FileNotFoundException e) {
-					toast("List generation failed");
-					toast("FileNotFoundException");
+					log("List generation failed");
+					log("FileNotFoundException");
 					showError(e);
 					logError(e);
 				}
 				catch (NoSuchElementException e) {
-					toast("List generation failed");
-					toast("Cant get keys from champion.json");
+					log("List generation failed");
+					log("Cant get keys from champion.json");
 					showError(e);
 					logError(e);
 				}
 				catch (UnsupportedEncodingException e) {
-					toast("List generation failed");
-					toast("Something is wrong with the champion json file");
+					log("List generation failed");
+					log("Something is wrong with the champion json file");
 					showError(e);
 					logError(e);
 				}
 				catch (JSONException e) {
-					toast("List generation failed");
-					toast("JSONException");
+					log("List generation failed");
+					log("JSONException");
 					showError(e);
 					logError(e);
 				}
 				catch (IOException e) {
-					toast("List generation failed");
-					toast("IOException");
+					log("List generation failed");
+					log("IOException");
 					showError(e);
 					logError(e);
 				}
@@ -788,10 +809,11 @@ public class MainActivity extends Activity
 			else if (!champListFile.exists() & !championJsonFile.exists()) {
 
 				// If neither exists, download champ json and restart activity
-				toast("No champ list or JSON");
+				
+				log("No champ list or JSON");
 				
 				try {
-					toast("Prepping champ JSON download...");
+					log("Prepping champ JSON download...");
 					
 					Queue<Pack> queue = new ArrayDeque<Pack>(1);
 					URL url = new URL(BASE_DOWNLOAD_URL + "data/en_US/champion.json");
@@ -800,12 +822,12 @@ public class MainActivity extends Activity
 					
 					// Download champion JSON
 					
-					toast("Attempting download");
+					log("Attempting download");
 					new DownloadFilesTask(queue).execute();
 				}
 				catch (MalformedURLException e) {
-					toast("JSON download abandoned");
-					toast("you fucked up the url buddy");
+					log("JSON download abandoned");
+					log("you fucked up the url buddy");
 					showError(e);
 					logError(e);
 				}
@@ -829,9 +851,9 @@ public class MainActivity extends Activity
 			
 			try {
 				
-				toast("Prepping data download...");
+				log("Prepping data download...");
 				
-				for (int i=0; i<4; i++) {
+				for (int i=0; i<161; i++) {
 				
 					champName = champIterator.next();
 					
@@ -846,25 +868,25 @@ public class MainActivity extends Activity
 				
 				// Download data
 				
-				toast("Attempting download");
+				log("Attempting download");
 				new DownloadFilesTask(queue).execute();
 				
 			}
 			catch (MalformedURLException e) {
-				toast("Download abandoned");
-				toast("you fucked up the url");
+				log("Download abandoned");
+				log("you fucked up the url");
 				showError(e);
 				logError(e);
 			}
 			catch (NullPointerException e) {
-				toast("Download abandoned");
-				toast("NullPointerException");
+				log("Download abandoned");
+				log("NullPointerException");
 				showError(e);
 				logError(e);
 			}
 			catch (NoSuchElementException e) {
-				toast("Download abandoned");
-				toast("champList not initialized");
+				log("Download abandoned");
+				log("champList not initialized");
 				showError(e);
 				logError(e);
 			}
@@ -1011,8 +1033,8 @@ public class MainActivity extends Activity
 		{
 			// button click action
 			/* download("champion.json", "champs", "data/en_US/champion.json"); */
+			toast("Updating...");
 			downloadData();
-			
 		}
 	};
 	
@@ -1111,9 +1133,7 @@ public class MainActivity extends Activity
 		}
 	}
 	
-	// stub method for testing
 	void stubMethod() {
-		// stub
 		Toast toast = Toast.makeText(getApplicationContext(), "Tada!", Toast.LENGTH_SHORT);
 		toast.show();
 	}

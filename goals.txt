@@ -1,6 +1,6 @@
 Goals for Today
 ===============
-! please commit after these are finished; make adding the rest of the champs another commit
++ get as many entries working as possible
 
 Goals for Some Other Day
 ========================
@@ -16,16 +16,9 @@ Goals for Some Other Day
 
 Things Done Since Last Commit
 =============================
-- remove/move unecessary files in src
-+ replace champ name string array id system with JSON option
-+ champList now saves to a file, and is passed into ChampInfo activity
-+ partially implemented champion icon & details downloading via champ_list
-+ changed order of arguments for writeTextFile so its easier to remember
-+ allow download of first four champs
-o fix'd data downloading and ChampInfo functioning
-+ added a very basic logging system (needs testing)
-- deleted raw directory in res
-- deleted xml directory in res
-- deleted icons in drawable directory
-o test logging system
-o fix: wont download properly if champion.json doesnt exist (chicken-egg situation)
+o tested maintaining of 5 champs
++ TableLayout, parameters for adding rows (LinearLayouts)
+o tested maintaining of 100 champs
+o tested maintaining of 200 champs
+	! stopped loading/downloading at 160 (Poppy) for some reason, champList iterator "no such element"
+- removed unused library imports

@@ -117,8 +117,13 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		} */
 		champName = champList.get(champId);
 		TextView champNameView = (TextView) findViewById(R.id.champ_name);
-		champNameView.setText(champName);
-		toast(champName);
+		if (champName.equals("MonkeyKing")) {
+			champNameView.setText("Wukong");
+		}
+		else {
+			champNameView.setText(champName);
+		}
+		/* toast(champName); */
 		
 		// Load champ list from string array resource.
 		
