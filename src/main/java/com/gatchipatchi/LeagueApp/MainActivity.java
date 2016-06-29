@@ -20,14 +20,12 @@ import android.view.Gravity;
 import android.content.Intent;
 import android.content.Context;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.os.AsyncTask;
 import android.graphics.BitmapFactory;
 import java.util.Queue;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.io.File;
@@ -42,7 +40,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.StringWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.io.FileNotFoundException;
@@ -50,7 +47,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.lang.Runnable;
 import org.json.JSONObject;
 import org.json.JSONException;
 
@@ -75,12 +71,7 @@ public class MainActivity extends Activity
 	Button logClearButton;
 	ArrayList<String> champList = new ArrayList();
 	int tvId = View.generateViewId();
-	
-	/* // Must stay up here so its accesible by the HttpClient and Downloader
-	ArrayDeque<Pack> downloadQueue;
-	Pack currentDownload; */
 
-	
 	
 	//--------------- Nested Classes ------------------//
 	
@@ -230,42 +221,7 @@ public class MainActivity extends Activity
 		}
 	}
 	
-	/* class Downloader implements Runnable {
-		
-		Queue<Pack> downloadQueue;
-		
-		Downloader(Queue<Pack> queue) {
-			downloadQueue = queue;
-		}
-		
-		public void run() {
-			
-			// While downloadQueue is full, send each pack to the HTTPClient
-			while (downloadQueue.peek() != null)
-			{
-				currentDownload = downloadQueue.remove();
-				File file = new File(getApplicationContext().getDir(currentDownload.directory, Context.MODE_PRIVATE), currentDownload.filename);
-				String baseUrl = "http://ddragon.leagueoflegends.com/cdn/6.11.1/";
-				
-				// Using SyncClient so only one download at a time can proceed
-				SyncHttpClient httpClient = new SyncHttpClient();
-				
-				// Only download if file doesnt already exist
-				if (!file.exists())
-				{
-					toast("File " + currentDownload.filename + " doesnt exist. Attempting download.", Toast.LENGTH_SHORT);
-					httpClient.get(baseUrl + currentDownload.shortUrl, asyncHandler);
-				}
-				else {
-					toast("Download error");
-					toast(currentDownload.filename + " already exists");
-				}
-			}
-		}
-		
-	} */
-			
-		
+	
 	//--------------- onCreate (main) -----------------//
 	
 	@Override
@@ -281,7 +237,6 @@ public class MainActivity extends Activity
 		// Setup champ buttons
 		
 		File champListFile = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), CHAMPIONS_FILE);
-		/* File championJsonFile = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), CHAMPIONS_JSON); */
 		
 		if (champListFile.exists()) {
 			
@@ -343,10 +298,9 @@ public class MainActivity extends Activity
 				Iterator<String> champIterator = champList.listIterator();
 				LinearLayout ll = new LinearLayout(this);
 				TableLayout tl = (TableLayout)findViewById(R.id.button_layout);
-				/* TableRow tr = new TableRow(this); */
 				int count = 0;
 				
-				for (int i=0; i<161; i++) {
+				while (champIterator.hasNext()) {
 				
 					if (warningText != null) {
 						warningText.setVisibility(View.GONE);
@@ -367,18 +321,14 @@ public class MainActivity extends Activity
 					String champName = champIterator.next();
 					File championIconFile = new File(this.getDir("drawable", Context.MODE_PRIVATE), champName + ".png");
 					InputStream iconStream = new BufferedInputStream(new FileInputStream(championIconFile));
-					/* Resources res = getResources();
-					TypedArray champIcons = res.obtainTypedArray(R.array.champ_icons);
-					ib.setImageResource(champIcons.getResourceId(i, 0)); */
 					ib.setImageBitmap(BitmapFactory.decodeStream(iconStream));
-					/* champIcons.recycle(); */
 					
 					ib.setAdjustViewBounds(true);
 					ib.setScaleType(ScaleType.FIT_CENTER);
 					ib.setCropToPadding(false);
 					ib.setPadding(0,0,0,0);
 					ib.setOnClickListener(champButtonListener);
-					ib.setId(i);
+					ib.setId(count);
 					ll.addView(ib, 87, 87);
 					
 					LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(87, 87);
@@ -393,7 +343,6 @@ public class MainActivity extends Activity
 			catch (FileNotFoundException e) {
 				toast("Champ missing. Try updating");
 				log("FileNotFoundException");
-				/* showError(e); */
 				logError(e);
 			}
 			catch (IOException e) {
@@ -413,22 +362,7 @@ public class MainActivity extends Activity
 			warningText.setBackgroundColor(0xFFFF);
 			tl.addView(warningText);
 			log("Added.");
-			
-			/* 
-			
-				
-				
-			} catch (FileNotFoundException e) {
-				showError(e);
-			} catch (JSONException e) {
-				showError(e);
-			} catch (UnsupportedEncodingException e) {
-				toast("InputStream to String conversion failed");
-				showError(e);
-			} catch (IOException e) {
-				toast("InputStream to String conversion failed");
-				showError(e);
-			} */
+			toast("Tap update to fetch data");
 		}
 		
 		// Add data refresh button
@@ -439,12 +373,12 @@ public class MainActivity extends Activity
 		footer.addView(refreshButton);
 		refreshButton.setOnClickListener(refreshButtonListener);
 		
-		// Add data clear button
+		/* // Add data clear button
 		
 		clearButton = new Button(this);
 		clearButton.setText("clear data");
 		footer.addView(clearButton);
-		clearButton.setOnClickListener(clearButtonListener);
+		clearButton.setOnClickListener(clearButtonListener); */
 		
 		// Add log clear button
 		
@@ -458,125 +392,6 @@ public class MainActivity extends Activity
 		editText = (EditText) findViewById(R.id.search);
 		editText.setOnEditorActionListener(searchListener);
 	}
-	
-/*	void whatTheFuckIsThis() throws UnsupportedEncodingException, JSONException, IOException {
-		
-		// Load champlist into JSONObject
-		
-		File champListFile;
-		champListFile = new File(this.getDir("champs", Context.MODE_PRIVATE), "champion.json");
-		JSONObject json = null;
-		InputStream in = null;
-		in = new BufferedInputStream(new FileInputStream(champListFile));
-		
-	
-		// Convert input stream to a string (Android version of org.json requires this)
-		
-		BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-		StringBuilder responseStrBuilder = new StringBuilder();
-		String inputStr;
-		while ((inputStr = streamReader.readLine()) != null) {
-			responseStrBuilder.append(inputStr);
-		}	
-		json = new JSONObject(responseStrBuilder.toString());
-		JSONObject champData = json.getJSONObject("data");
-		
-		// Get champ list and put into alpha ordered list
-		
-		Iterator<String> champs = champData.keys();
-		ArrayList<StringStringhampList = new ArrayList();
-		int i = 0;
-		while (champs.hasNext())
-		{
-			champList.add(champs.next());
-			i++;
-		}
-		java.util.Collections.sort(champList);
-		
-		
-		// Download champ icons
-		
-		File drawableDir = this.getDir("drawable", Context.MODE_PRIVATE);
-		if (!drawableDir.exists())
-		{
-			toast("creating drawable directory");
-			drawableDir.mkdir();
-		}
-		download("Aatrox.png", "drawable", "img/champion/Aatrox.png");
-		
-	} */
-	
-/* 		} catch (UnsupportedEncodingException e) {
-			toast("UnsupportedEncodingException", Toast.LENGTH_LONG);
-			showError(e);
-		} catch (JSONException e) {
-			toast("JSONException", Toast.LENGTH_LONG);
-			showError(e);
-		} catch (IOException e) {
-			toast("IOException", Toast.LENGTH_LONG);
-			showError(e);
-		}
-	} */
-		
-	/* private AsyncHttpResponseHandler asyncHandler = new AsyncHttpResponseHandler() {
-		
-		@Override
-		public void onStart() {
-        // called before request is started
-		  toast("starting download...");
-		}
-
-		@Override
-		public synchronized void onSuccess(int statusCode, Header[] headers, byte[] response) {
-			// called when response HTTP status is "200 OK"
-			toast("download successful");
-			try {
-				storeFile(response, currentDownload.filename, currentDownload.directory);
-			}
-			catch (NullPointerException e) {
-				toast("Couldnt save file");
-				showError(e);
-			}
-		}
-
-		@Override
-		public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable e) {
-        // called when response HTTP status is "4XX" (eg. 401, 403, 404)
-		  toast("didnt work");
-		  toast(statusCode, Toast.LENGTH_LONG);
-		  toast(e.getMessage(), Toast.LENGTH_LONG);
-		}
-
-		@Override
-		public void onRetry(int retryNo) {
-        // called when request is retried
-		  toast("retrying...");
-		}
-	}; */
-	
-/* 	void storeFile(byte[] data, String filename)
-	{
-		File file = new File(this.getDir("drawable", Context.MODE_PRIVATE), "Aatrox.png");
-
-		// save file unless it already exists
-		if (!file.exists())
-		{
-			toast("storing file " + filename + "...", Toast.LENGTH_SHORT);
-			OutputStream out = null;
-			
-			// write to file
-			try {
-				out = new BufferedOutputStream(new FileOutputStream(file));
-				out.write(data);
-				out.close();
-				toast("file written");
-			}
-			catch (IOException e) {
-				toast("file write failure");
-				toast(e.getMessage(), Toast.LENGTH_LONG);
-			}
-		}
-	} */
 	
 	
 	//--------------- Class Methods -------------------//
@@ -853,9 +668,10 @@ public class MainActivity extends Activity
 				
 				log("Prepping data download...");
 				
-				for (int i=0; i<161; i++) {
+				while (champIterator.hasNext()) {
 				
 					champName = champIterator.next();
+					/* log(champName); */
 					
 					url = new URL(BASE_DOWNLOAD_URL + "img/champion/" + champName + ".png");
 					pack = new Pack(champName + ".png", ICONS_DIR, url);

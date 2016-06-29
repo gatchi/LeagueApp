@@ -14,26 +14,18 @@ import android.view.View;
 import android.view.MenuItem;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.util.JsonReader;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.lang.String;
-import java.io.Reader;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.InputStreamReader;
-import java.io.FileOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.File;
-import java.io.OutputStream;
-import org.json.JSONTokener;
 import org.json.JSONObject;
 import org.json.JSONException;
 
@@ -54,9 +46,11 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	 */
 
 	public static final short MAX_LEVEL = 18;
-	public static final short LARGE = 0;
+	public static final short LESS_PRECISE = 0;
 	public static final short PERCENT = 1;
-	public static final short SMALL = 2;
+	public static final short MORE_PRECISE = 2;
+	public static final short MAGIC_RESIST = 3;
+	public static final short MID_PRECISE = 4;
 	
 	//--------------- Public Objects ------------------//
 	
@@ -105,16 +99,6 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		// Load champ list from JSON
 		
 		champList = (ArrayList<String>) bundle.get("champ list");
-		/* File championListFile = new File(this.getDir(MainActivity.CHAMPIONS_DIR, Context.MODE_PRIVATE), "champion_list.txt");
-		if (championListFile.exists())
-		{
-			try {
-				InputStream in = new BufferedInputStream(new FileInputStream(championListFile));
-			}
-			catch (FileNotFoundException e) {
-				showError(e);
-			}
-		} */
 		champName = champList.get(champId);
 		TextView champNameView = (TextView) findViewById(R.id.champ_name);
 		if (champName.equals("MonkeyKing")) {
@@ -124,14 +108,6 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			champNameView.setText(champName);
 		}
 		/* toast(champName); */
-		
-		// Load champ list from string array resource.
-		
-		res = getResources();
-		String[] champs = res.getStringArray(R.array.champ_names);
-		/* champName = champs[champId];
-		TextView champNameView = (TextView) findViewById(R.id.champ_name);
-		champNameView.setText(champName); */
 		
 		// Load the JSON data
 		
@@ -233,12 +209,13 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			{
 				rangeTypeText.setText("ranged");
 			}
-			rangeText.setText(Double.toString(attackRange));
+			
+			rangeText.setText(String.format("%.0f", attackRange));
 			
 			// Set movespeed on stat page
 			
 			TextView movespeedText = (TextView) findViewById(R.id.movespeed);
-			movespeedText.setText(Double.toString(moveSpeed));
+			movespeedText.setText(String.format("%.0f" ,moveSpeed));
 		
 		} catch (UnsupportedEncodingException e) {
 			toast("UnsupportedEncodingException");
@@ -255,33 +232,16 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		}
 		
 	}
-
-	/* String inputStreamToString(InputStream in) {
-		
-		// Convert input stream to a string
-		BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-		StringBuilder responseStrBuilder = new StringBuilder();
-		String inputStr;
-		while ((inputStr = streamReader.readLine()) != null) {
-			responseStrBuilder.append(inputStr);
-		}	
-		return responseStrBuilder.toString();
-	} */
 	
 	private void statUpdate(String level) throws NullPointerException {
 		/* 
 		 * When any level or level range is selected from the spinner,
 		 * this method updates the stats displayed using that spinner entry.
 		 * 
-		 * Eventually REPLACE WITH JSON.
 		 */
-		
-
-		// keep this until you write AS JSON conversion method
-		// String[] asBase = res.getStringArray(R.array.champ_AS_base);
-		// String[] asGrowth = res.getStringArray(R.array.champ_AS_growth);
-		
+				
 		// TextViews for putting the stats into
+		
 		TextView healthText = (TextView) findViewById(R.id.health);
 		TextView healthRegenText = (TextView) findViewById(R.id.health_regen);
 		TextView resourceText = (TextView) findViewById(R.id.resource_points);
@@ -293,45 +253,45 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		
 		if (level.equals("n"))
 		{
-			setPerLevel(healthText, LARGE, hpBase, hpPerLevel);
-			setPerLevel(healthRegenText, SMALL, hpRegenBase, hpRegenPerLevel);
+			setPerLevel(healthText, LESS_PRECISE, hpBase, hpPerLevel);
+			setPerLevel(healthRegenText, MORE_PRECISE, hpRegenBase, hpRegenPerLevel);
 			if (parType.equals("MP") || parType.equals("Energy"))
 			{
-				setPerLevel(resourceText, LARGE, mpBase, mpPerLevel);
-				setPerLevel(resourceRegenText, SMALL, mpRegenBase, mpRegenPerLevel);
+				setPerLevel(resourceText, LESS_PRECISE, mpBase, mpPerLevel);
+				setPerLevel(resourceRegenText, MORE_PRECISE, mpRegenBase, mpRegenPerLevel);
 			}
-			setPerLevel(adText, SMALL, adBase, adPerLevel);
+			setPerLevel(adText, MORE_PRECISE, adBase, adPerLevel);
 			setPerLevel(asText, PERCENT, asBase, asPerLevel);
-			setPerLevel(armorText, SMALL, armorBase, armorPerLevel);
-			setPerLevel(mrText, SMALL, mrBase, mrPerLevel);
+			setPerLevel(armorText, MORE_PRECISE, armorBase, armorPerLevel);
+			setPerLevel(mrText, MAGIC_RESIST, mrBase, mrPerLevel);
 		}
 		else if (level.equals("1 – 18"))
 		{
-			setRange(hpBase, hpPerLevel, LARGE, healthText);
-			setRange(hpRegenBase, hpRegenPerLevel, LARGE, healthRegenText);
+			setRange(hpBase, hpPerLevel, LESS_PRECISE, healthText);
+			setRange(hpRegenBase, hpRegenPerLevel, MORE_PRECISE, healthRegenText);
 			if (parType.equals("MP") || parType.equals("Energy"))
 			{
-				setRange(mpBase, mpPerLevel, LARGE, resourceText);
-				setRange(mpRegenBase, mpRegenPerLevel, LARGE, resourceRegenText);
+				setRange(mpBase, mpPerLevel, LESS_PRECISE, resourceText);
+				setRange(mpRegenBase, mpRegenPerLevel, MID_PRECISE, resourceRegenText);
 			}
-			setRange(adBase, adPerLevel, LARGE, adText);
+			setRange(adBase, adPerLevel, MORE_PRECISE, adText);
 			setRange(asBase, asPerLevel, PERCENT, asText);
-			setRange(armorBase, armorPerLevel, LARGE, armorText);
-			setRange(mrBase, mrPerLevel, LARGE, mrText);
+			setRange(armorBase, armorPerLevel, MORE_PRECISE, armorText);
+			setRange(mrBase, mrPerLevel, LESS_PRECISE, mrText);
 		}
-		else // individual levels
+		else // selected level
 		{
-			setCurrentLevel(hpBase, hpPerLevel, LARGE, level, healthText);
-			setCurrentLevel(hpRegenBase, hpRegenPerLevel, LARGE, level, healthRegenText);
+			setCurrentLevel(hpBase, hpPerLevel, LESS_PRECISE, level, healthText);
+			setCurrentLevel(hpRegenBase, hpRegenPerLevel, MORE_PRECISE, level, healthRegenText);
 			if (parType.equals("MP") || parType.equals("Energy"))
 			{
-				setCurrentLevel(mpBase, mpPerLevel, LARGE, level, resourceText);
-				setCurrentLevel(mpRegenBase, mpRegenPerLevel, LARGE, level, resourceRegenText);
+				setCurrentLevel(mpBase, mpPerLevel, LESS_PRECISE, level, resourceText);
+				setCurrentLevel(mpRegenBase, mpRegenPerLevel, LESS_PRECISE, level, resourceRegenText);
 			}
-			setCurrentLevel(adBase, adPerLevel, LARGE, level, adText);
+			setCurrentLevel(adBase, adPerLevel, MORE_PRECISE, level, adText);
 			setCurrentLevel(asBase, asPerLevel, PERCENT, level, asText);
-			setCurrentLevel(armorBase, armorPerLevel, LARGE, level, armorText);
-			setCurrentLevel(mrBase, mrPerLevel, LARGE, level, mrText);
+			setCurrentLevel(armorBase, armorPerLevel, MORE_PRECISE, level, armorText);
+			setCurrentLevel(mrBase, mrPerLevel, MID_PRECISE, level, mrText);
 		}
 		
 	}
@@ -350,44 +310,45 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	 * still uses the methods that take Strings as input
 	 */
 	
-/* 	void setPerLevel(TextView text, int valueType, String[] baseValue, String[] growthValue) {
-		if (!baseValue[champId].isEmpty() && !growthValue[champId].isEmpty()) {
-			if (valueType == LARGE) {
-				text.setText(baseValue[champId] + " (+" + growthValue[champId] + ")");
-			} else if (valueType == PERCENT) {
-				text.setText(baseValue[champId] + " (+" + growthValue[champId] + "%)");
-			} else {
-				toast("whoops wrong function");
-			}
-		}
-	} */
 	
-	
-	void setPerLevel(TextView text, int valueType, double baseValue, double growthValue) {
+	void setPerLevel(TextView text, int valueType, double baseValue, double growthValue) {	
 		if ((baseValue != 0)) {
-			if (valueType == LARGE) {
+			if (valueType == LESS_PRECISE) {
 				text.setText(String.format("%.1f (+%.0f)", baseValue, growthValue));
-			} else if (valueType == SMALL) {
-				text.setText(String.format("%.2f (+%.1f)", baseValue, growthValue));
-			} else if (valueType == PERCENT) {
+			}
+			else if (valueType == MORE_PRECISE) {
+				text.setText(String.format("%.3f (+%.2f)", baseValue, growthValue));
+			}
+			else if (valueType == PERCENT) {
 				text.setText(String.format("%.3f (+%.1f%%)", baseValue, growthValue));
 			}
-		} else {
-			// toast("Set error");
-			// toast(Double.toString(baseValue));
-			// toast(Double.toString(growthValue));
+			else if (valueType == MAGIC_RESIST) {
+				text.setText(String.format("%.1f (+%.2f)", baseValue, growthValue));
+			}
+		}
+		else {
+		/* toast("Set error");
+			toast(Double.toString(baseValue));
+			toast(Double.toString(growthValue)); */
 		}
 	}
 	
 	void setCurrentLevel(double base, double growth, int valueType, String level, TextView view) {
+		
 		double levelValue = Double.parseDouble(level);
 		double stat = base + growth * (levelValue - 1);
+		
 		if (stat != 0) {
-			if (valueType == LARGE) {
+			if (valueType == LESS_PRECISE) {
 				view.setText(String.format("%.1f", stat));
-			} else if (valueType == SMALL) {
+			}
+			else if (valueType == MID_PRECISE) {
 				view.setText(String.format("%.2f", stat));
-			} else if (valueType == PERCENT) {
+			}
+			else if (valueType == MORE_PRECISE) {
+				view.setText(String.format("%.3f", stat));
+			}
+			else if (valueType == PERCENT) {
 				view.setText(String.format("%.3f (+%.1f%%)", base, (growth * (levelValue - 1))));
 			}
 		}
@@ -395,11 +356,16 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	
 	void setRange(double base, double growth, int rangeType, TextView view) {
 		if ((base != 0)) {
-			if (rangeType == LARGE) {
+			if (rangeType == LESS_PRECISE) {
 				view.setText(String.format("%.1f – %.1f", base, (base + 17 * growth)));
-			} else if (rangeType == SMALL) {
+			}
+			else if (rangeType == MID_PRECISE) {
 				view.setText(String.format("%.2f – %.2f", base, (base + 17 * growth)));
-			} else if (rangeType == PERCENT) {
+			}
+			else if (rangeType == MORE_PRECISE) {
+				view.setText(String.format("%.3f – %.3f", base, (base + 17 * growth)));
+			}
+			else if (rangeType == PERCENT) {
 				view.setText(String.format("%.3f (+0%% – +%.1f%%)", base, (growth * 17)));
 			}
 		}

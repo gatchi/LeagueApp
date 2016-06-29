@@ -1,18 +1,24 @@
 Goals for Today
 ===============
-+ get as many entries working as possible
+o test every champ entry for accuracy
+o test fresh download
+o clean up code
 
 Goals for Some Other Day
 ========================
-+ make it so main activity recreates after an update (or something like that)
++ progress bar or something
++ fix refresh issue
 + get downloads from latest version
 + add all the other champs
 	- put them all in their directories with proper names
 		o maybe make a script for this
 	- add all the buttons
-+ make it so champ icons are downloaded iteratively using champList
 + make it so that runtime reconfigurations (like screen orientation changes) dont fuck up async
 + add internet connectivity check
++ dark theme (themes in general eventually, w/ customization)
++ drops unecessary decimal zeroes
+o maybe make it so that decimal attack speed is updated per level
++ on ChampInfo: settings, verbose (more precision) or simple (less precision)
 
 Things Done Since Last Commit
 =============================
@@ -22,3 +28,6 @@ o tested maintaining of 100 champs
 o tested maintaining of 200 champs
 	! stopped loading/downloading at 160 (Poppy) for some reason, champList iterator "no such element"
 - removed unused library imports
+o code can now load all champs!! (changed for loops to whiles with iterator.hasNext()'s)
+o tweaked code for displaying stat precision (more precision)
+- disabled "clear data" button; easier & more efficient to just delete whole folders manually
