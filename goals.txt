@@ -1,33 +1,27 @@
 Goals for Today
 ===============
-o test every champ entry for accuracy
-o test fresh download
-o clean up code
 
 Goals for Some Other Day
 ========================
-+ progress bar or something
 + fix refresh issue
+	! problem is that download doesnt start automatically after champion.json download
 + get downloads from latest version
-+ add all the other champs
-	- put them all in their directories with proper names
-		o maybe make a script for this
-	- add all the buttons
 + make it so that runtime reconfigurations (like screen orientation changes) dont fuck up async
 + add internet connectivity check
 + dark theme (themes in general eventually, w/ customization)
 + drops unecessary decimal zeroes
-o maybe make it so that decimal attack speed is updated per level
++ maybe make it so that decimal attack speed is updated per level
 + on ChampInfo: settings, verbose (more precision) or simple (less precision)
+
+Major Features
+==============
+x champ selection
+x view basic stats
+- view champ skills
+- themes
 
 Things Done Since Last Commit
 =============================
-o tested maintaining of 5 champs
-+ TableLayout, parameters for adding rows (LinearLayouts)
-o tested maintaining of 100 champs
-o tested maintaining of 200 champs
-	! stopped loading/downloading at 160 (Poppy) for some reason, champList iterator "no such element"
-- removed unused library imports
-o code can now load all champs!! (changed for loops to whiles with iterator.hasNext()'s)
-o tweaked code for displaying stat precision (more precision)
-- disabled "clear data" button; easier & more efficient to just delete whole folders manually
+o changed one more for to a while (hasNext())
++ progress bar for downloading
+- more code clean up

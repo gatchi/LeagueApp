@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.ImageView.ScaleType;
+import android.widget.ProgressBar;
 import android.view.inputmethod.EditorInfo;
 import android.view.KeyEvent;
 import android.view.View;
@@ -93,17 +94,29 @@ public class MainActivity extends Activity
 		}
 	}
 	
-	class DownloadFilesTask extends AsyncTask<String, Object, InputStream> {
+	class DownloadFilesTask extends AsyncTask<String, Integer, InputStream> {
 		
 		String[] filenames;
 		String[] directories;
 		Queue<Pack> queue;
+		ProgressBar pBar;
 		
-		DownloadFilesTask(Queue<Pack> downloadQueue){
+		DownloadFilesTask(Queue<Pack> downloadQueue) {
 			
 			queue = downloadQueue;
 		}
-		int i = 0;
+		
+		protected void onPreExecute() {
+			
+			pBar = (ProgressBar)findViewById(R.id.update_progress);
+			
+			if (pBar != null) {
+				pBar.setVisibility(View.VISIBLE);
+			}
+			else {
+				log("Cant make progress bar visible as it doesnt exist");
+			}
+		}
 		
 		protected InputStream doInBackground(String... s) {
 			
@@ -113,13 +126,15 @@ public class MainActivity extends Activity
 			File file;
 			InputStream in = null;
 			byte[] buffer;
+			int queueLength;
+			int count=0;
 			
 			try {
 				
+				queueLength = queue.size();
+				
 				while (queue.peek() != null)
-				{
-					// Just some declarations
-					
+				{					
 					pack = queue.remove();
 					url = pack.url;
 					urlConnection = (HttpURLConnection) url.openConnection();
@@ -131,15 +146,16 @@ public class MainActivity extends Activity
 					{
 						// Download
 						
-						/* publishProgress("Downloading " + pack.filename + "...", null); */
-						log("Downloading " + pack.filename + "...");
+						/* log("Downloading " + pack.filename + "..."); */
 						in = new BufferedInputStream(urlConnection.getInputStream());
 					
 						// Convert to a byte buffer for filewriting
 						
 						buffer = new byte[1024];
 						int len;
+						
 						OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+						
 						while ((len = in.read(buffer)) != -1) {
 							out.write(buffer, 0, len);
 						}
@@ -147,13 +163,10 @@ public class MainActivity extends Activity
 						// Store file
 						
 						try {
-							/* publishProgress("Writing " +  pack.filename + "...", null); */
-							log("Writing " +  pack.filename + "...");
+							/* log("Writing " +  pack.filename + "..."); */
 							out.write(buffer);
 						}
 						catch (IOException e) {
-							/* publishProgress("Write failed", e); */
-							/* appendTextFile(null, LOG_FILE, e.getMessage()); */
 							log("Write failed");
 							logError(e);
 							return null;
@@ -163,54 +176,47 @@ public class MainActivity extends Activity
 								out.close();
 							}
 							catch (IOException e) {
-								/* publishProgress("Couldnt close file", e); */
-								/* appendTextFile(null, LOG_FILE, e.getMessage()); */
 								log("Couldnt close file");
 								logError(e);
 							}
 						}
 						
+						count++;
+						publishProgress(count, queueLength);
 					}
 				}
 				
 				return in;
 				
 			} catch (IOException e) {
-				publishProgress("Unexpected download error", e);
+				log("Unexpected download error");
+				logError(e);
 				return null;
 			}
 		}
 		
-		protected void onProgressUpdate(Object... objArray) {
+		protected void onProgressUpdate(Integer... progress) {
 			
 			/*
-			 * Takes in "params..." which means it can take in any amount of
-			 * arguments, which are put into an array that the method can use.
-			 * However, for this method, the following convention should be used:
+			 * progress[0] is how many things are processed
+			 * progress[1] is the size of the list of things to processed
 			 * 
-			 * param 1: a message (String)
-			 * param 2: an error (Exception)
-			 * 
-			 * Use null for unused elements.
-			 * 
-			 * Lastly, since the params is untyped (plain Objects), dont forget to cast each
-			 * member of the array before using.
-			 * 
+			 * Divide the two to get the percentage of completion
 			 */
 			
-			if (objArray[0] != null) {
-				String message = (String)objArray[0];
-				toast(message);
-			}
-			if (objArray[1] != null) {
-				Exception errorMesg = (Exception)objArray[1];
-				showError(errorMesg);
-			}
-			
+			/* log(Integer.toString(progress[0]));
+			log(Integer.toString(progress[1])); */
+			double percentage = (double)progress[0] / (double)progress[1] * 100;
+			pBar.setProgress((int)percentage);
+			log((int)percentage);
 		}
 		
 		protected void onPostExecute(InputStream in) {
 			
+			if (pBar != null) {
+				pBar.setVisibility(View.GONE);
+			}
+				
 			if (in != null) {
 				toast("Update complete");
 			}
@@ -413,15 +419,15 @@ public class MainActivity extends Activity
 				out = new BufferedOutputStream(new FileOutputStream(file));
 				out.write(data);
 				out.close();
-				toast("file written");
+				log(filename + " written");
 			}
 			catch (IOException e) {
-				toast("file write failure");
-				toast(e.getMessage(), Toast.LENGTH_LONG);
+				log(filename + " write failure");
+				logError(e);
 			}
 		}
 		else {
-			toast("file already on card");
+			log(filename + " already on card");
 		}
 	}
 	
@@ -439,7 +445,7 @@ public class MainActivity extends Activity
 		
 		if (!file.exists())
 		{
-			toast("storing file...", Toast.LENGTH_LONG);
+			log("storing file... " + filename);
 			BufferedWriter out = null;
 			
 			// Write
@@ -448,11 +454,11 @@ public class MainActivity extends Activity
 				out = new BufferedWriter(new FileWriter(file));
 				out.write(text);
 				out.close();
-				toast("file written");
+				log(filename + " written");
 			}
 			catch (IOException e) {
-				toast("file write failure");
-				toast(e.getMessage(), Toast.LENGTH_SHORT);
+				log(filename + " write failure");
+				logError(e);
 			}
 		}
 	}
@@ -527,7 +533,6 @@ public class MainActivity extends Activity
 					Iterator<String> champs = champData.keys();
 					
 					while (champs.hasNext()) {
-					/* for (int i=0; i<161; i++) { */
 						champList.add(champs.next());
 					}
 					
@@ -551,7 +556,7 @@ public class MainActivity extends Activity
 						
 						log("Prepping data download...");
 						
-						for (int i=0; i<161; i++) {
+						while (champIterator.hasNext()) {
 						
 							champName = champIterator.next();
 							
@@ -566,8 +571,12 @@ public class MainActivity extends Activity
 						
 						// Download data
 						
-						log("Attempting download");
+						log("Attempting data download");
 						new DownloadFilesTask(queue).execute();
+						/* startUpdate(queue); */
+						/* Intent intent = new Intent(this, ChampInfo.class);
+						intent.putExtra("downloadQueue", queue);
+						startActivity(intent); */
 						
 					}
 					catch (MalformedURLException e) {
@@ -637,8 +646,12 @@ public class MainActivity extends Activity
 					
 					// Download champion JSON
 					
-					log("Attempting download");
+					log("Attempting champ JSON download");
 					new DownloadFilesTask(queue).execute();
+					/* startUpdate(queue); */
+					/* Intent intent = new Intent(this, ChampInfo.class);
+					intent.putExtra("download queue", queue);
+					startActivity(intent); */
 				}
 				catch (MalformedURLException e) {
 					log("JSON download abandoned");
@@ -684,8 +697,9 @@ public class MainActivity extends Activity
 				
 				// Download data
 				
-				log("Attempting download");
+				log("Attempting data download");
 				new DownloadFilesTask(queue).execute();
+				/* startUpdate(queue); */
 				
 			}
 			catch (MalformedURLException e) {
@@ -707,6 +721,13 @@ public class MainActivity extends Activity
 				logError(e);
 			}
 		}
+	}
+	
+	void startUpdate(Queue<Pack> queue) {
+		
+		Intent intent = new Intent(this, ChampInfo.class);
+		/* intent.putExtra("downloadQueue", queue); */
+		startActivity(intent);
 	}
 	
 	void clearDownloads() {
@@ -906,7 +927,7 @@ public class MainActivity extends Activity
 	};
 	
 	
-	//----------- Temporary Debug Methods -------------//
+	//---------------- Debug Methods ------------------//
 	
 	void toast(String msg) {
 		Toast t = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
@@ -939,6 +960,10 @@ public class MainActivity extends Activity
 	
 	void log(String s) {
 		appendTextFile(null, LOG_FILE, s);
+	}
+	
+	void log(int i) {
+		appendTextFile(null, LOG_FILE, Integer.toString(i));
 	}
 	
 	void clearLog() {
