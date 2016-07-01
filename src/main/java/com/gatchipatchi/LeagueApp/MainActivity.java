@@ -2,6 +2,8 @@ package com.gatchipatchi.LeagueApp;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -62,6 +64,16 @@ public class MainActivity extends Activity
 	final static String BASE_DOWNLOAD_URL = "http://ddragon.leagueoflegends.com/cdn/6.11.1/";
 	final static int TABLE_ROW_WIDTH = 5;
 	
+	// Error codes
+	
+	final int DEC_NO_INTERNET = 1;
+	final int DEC_NO_AVAIL_UPDATES = 2;
+	final int DEC_IO_EXCEPTION = 3;
+	
+	// Settings 
+	
+	boolean SETT_RETRY = false;
+	
 	
 	//--------------- Public Objects ------------------//
 	
@@ -72,6 +84,7 @@ public class MainActivity extends Activity
 	Button logClearButton;
 	ArrayList<String> champList = new ArrayList();
 	int tvId = View.generateViewId();
+	int downloadErrorCode;
 
 	
 	//--------------- Nested Classes ------------------//
@@ -129,68 +142,80 @@ public class MainActivity extends Activity
 			int queueLength;
 			int count=0;
 			
-			try {
-				
-				queueLength = queue.size();
-				
-				while (queue.peek() != null)
-				{					
-					pack = queue.remove();
-					url = pack.url;
-					urlConnection = (HttpURLConnection) url.openConnection();
-					file = new File(getApplicationContext().getDir(pack.directory, Context.MODE_PRIVATE), pack.filename);
+			ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+			boolean isConnected = activeNetwork != null && activeNetwork.isConnectedOrConnecting();
+			
+			if (isConnected | SETT_RETRY) {
+			
+				try {
 					
-					// Check to see if files are even in need of downloading
+					queueLength = queue.size();
 					
-					if(!file.exists())
-					{
-						// Download
+					while (queue.peek() != null)
+					{					
+						pack = queue.remove();
+						url = pack.url;
+						urlConnection = (HttpURLConnection) url.openConnection();
+						file = new File(getApplicationContext().getDir(pack.directory, Context.MODE_PRIVATE), pack.filename);
 						
-						/* log("Downloading " + pack.filename + "..."); */
-						in = new BufferedInputStream(urlConnection.getInputStream());
-					
-						// Convert to a byte buffer for filewriting
+						// Check to see if files are even in need of downloading
 						
-						buffer = new byte[1024];
-						int len;
+						if(!file.exists())
+						{
+							// Download
+							
+							/* log("Downloading " + pack.filename + "..."); */
+							in = new BufferedInputStream(urlConnection.getInputStream());
 						
-						OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+							// Convert to a byte buffer for filewriting
+							
+							buffer = new byte[1024];
+							int len;
+							
+							OutputStream out = new BufferedOutputStream(new FileOutputStream(file));
+							
+							while ((len = in.read(buffer)) != -1) {
+								out.write(buffer, 0, len);
+							}
 						
-						while ((len = in.read(buffer)) != -1) {
-							out.write(buffer, 0, len);
-						}
-					
-						// Store file
-						
-						try {
-							/* log("Writing " +  pack.filename + "..."); */
-							out.write(buffer);
-						}
-						catch (IOException e) {
-							log("Write failed");
-							logError(e);
-							return null;
-						}
-						finally {
+							// Store file
+							
 							try {
-								out.close();
+								/* log("Writing " +  pack.filename + "..."); */
+								out.write(buffer);
 							}
 							catch (IOException e) {
-								log("Couldnt close file");
+								log("Write failed");
 								logError(e);
+								return null;
 							}
+							finally {
+								try {
+									out.close();
+								}
+								catch (IOException e) {
+									log("Couldnt close file");
+									logError(e);
+								}
+							}
+							
+							count++;
+							publishProgress(count, queueLength);
 						}
-						
-						count++;
-						publishProgress(count, queueLength);
 					}
+					
+					return in;
+					
+				} catch (IOException e) {
+					log("Unexpected download error");
+					downloadErrorCode = DEC_IO_EXCEPTION;
+					return null;
 				}
-				
-				return in;
-				
-			} catch (IOException e) {
-				log("Unexpected download error");
-				logError(e);
+			}
+			else {
+				log("No internet connection.");
+				downloadErrorCode = DEC_NO_INTERNET;
 				return null;
 			}
 		}
@@ -208,7 +233,7 @@ public class MainActivity extends Activity
 			log(Integer.toString(progress[1])); */
 			double percentage = (double)progress[0] / (double)progress[1] * 100;
 			pBar.setProgress((int)percentage);
-			log((int)percentage);
+			/* log((int)percentage); */
 		}
 		
 		protected void onPostExecute(InputStream in) {
@@ -218,10 +243,25 @@ public class MainActivity extends Activity
 			}
 				
 			if (in != null) {
-				toast("Update complete");
+				toast("Updated complete");
+				log("Update completed.");
+			}
+			else if (downloadErrorCode == DEC_NO_INTERNET) {
+				toast("Cant download, no internet");
+				log("Update canceled. No internet connection.");
+			}
+			/* else if (downloadErrorCode == DEC_NO_AVAIL_UPDATES) {
+				toast("Update not needed");
+				log("No updates to download.");
+				log("Update canceled.");
+			} */
+			else if (downloadErrorCode == DEC_IO_EXCEPTION) {
+				toast("Update fucked up");
+				log("Download canceled: IOException.");
 			}
 			else {
-				toast("Update failed or not needed");
+				toast("Update not needed");
+				log("Update canceled: no updates to download.");
 			}
 			recreate();
 		}
@@ -344,7 +384,7 @@ public class MainActivity extends Activity
 					/* log("Added button."); */
 					count++;
 				}
-				toast("Layout generated");
+				log("Layout generated");
 			}
 			catch (FileNotFoundException e) {
 				toast("Champ missing. Try updating");

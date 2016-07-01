@@ -1,13 +1,15 @@
 Goals for Today
 ===============
 
+
 Goals for Some Other Day
 ========================
-+ fix refresh issue
-	! problem is that download doesnt start automatically after champion.json download
++ update cancel button (maybe update button becomes cancel button once update has started)
++ show skills on champinfo page
++ setting: tabbed champinfo pages
++ setting: internet retry
 + get downloads from latest version
 + make it so that runtime reconfigurations (like screen orientation changes) dont fuck up async
-+ add internet connectivity check
 + dark theme (themes in general eventually, w/ customization)
 + drops unecessary decimal zeroes
 + maybe make it so that decimal attack speed is updated per level
@@ -22,6 +24,4 @@ x view basic stats
 
 Things Done Since Last Commit
 =============================
-o changed one more for to a while (hasNext())
-+ progress bar for downloading
-- more code clean up
++ add internet connectivity check
