@@ -35,7 +35,7 @@
 			<TextView
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
-				android:text="Statistics"
+				android:text="statistics"
 				android:textSize="16sp"/>
 
 			<Spinner
@@ -45,7 +45,7 @@
 
 			<TableLayout
 				android:layout_height="wrap_content"
-				android:layout_width="400sp"
+				android:layout_width="match_parent"
 				android:padding="10dp"
 				android:stretchColumns="*"
 				android:textSize="30sp">
@@ -166,7 +166,68 @@
 				</TableRow>
 
 			</TableLayout>
-
+	
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="Abilities"
+				android:textSize="16dp"/>
+				
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="passive"/>
+				
+			<TextView
+				android:id="@+id/passive"
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="missing info"/>
+				
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="q"/>
+				
+			<TextView
+				android:id="@+id/q"
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="missing info"/>
+				
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="w"/>
+			
+			<TextView
+				android:id="@+id/w"
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="missing info"/>
+				
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="e"/>
+				
+			<TextView
+				android:id="@+id/e"
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="missing info"/>
+				
+			<TextView
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="r"/>
+				
+			<TextView
+				android:id="@+id/r"
+				android:layout_height="wrap_content"
+				android:layout_width="wrap_content"
+				android:text="missing info"/>
+		
 		</LinearLayout>
 
 	</ScrollView>

@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Toast;
+import android.text.Html;
 import android.view.View;
 import android.view.MenuItem;
 import android.content.Intent;
@@ -22,10 +23,12 @@ import java.io.InputStream;
 import java.io.FileInputStream;
 import java.io.BufferedInputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.io.IOException;
 import java.io.FileNotFoundException;
 import java.io.File;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
@@ -44,13 +47,18 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	 * values on screen or compute values at a certain level all share
 	 * these objects.
 	 */
-
-	public static final short MAX_LEVEL = 18;
-	public static final short LESS_PRECISE = 0;
-	public static final short PERCENT = 1;
-	public static final short MORE_PRECISE = 2;
-	public static final short MAGIC_RESIST = 3;
-	public static final short MID_PRECISE = 4;
+	
+	final static String CHAMPIONS_FILE = "champ_list.txt";
+	final static String CHAMPIONS_JSON = "champion.json";
+	final static String CHAMPIONS_DIR = "champs";
+	final static String ICONS_DIR = "drawable";
+	final static int JSON_OBJECT = 1;
+	static final short MAX_LEVEL = 18;
+	static final short LESS_PRECISE = 0;
+	static final short PERCENT = 1;
+	static final short MORE_PRECISE = 2;
+	static final short MAGIC_RESIST = 3;
+	static final short MID_PRECISE = 4;
 	
 	//--------------- Public Objects ------------------//
 	
@@ -96,7 +104,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		Bundle bundle = intent.getExtras();
 		champId = bundle.getInt("button id");
 		
-		// Load champ list from JSON
+		// Load champb and set champ name on the view
 		
 		champList = (ArrayList<String>) bundle.get("champ list");
 		champName = champList.get(champId);
@@ -107,36 +115,13 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		else {
 			champNameView.setText(champName);
 		}
-		/* toast(champName); */
 		
 		// Load the JSON data
 		
-		InputStream in = null;
-		File championFile = new File(this.getDir(MainActivity.CHAMPIONS_DIR, Context.MODE_PRIVATE), champName + ".json");
-		try {
-			in = new BufferedInputStream(new FileInputStream(championFile));
-		}
-		catch (FileNotFoundException e) {
-			toast(e.getMessage(), Toast.LENGTH_LONG);
-		}
-		
-		// Put it into a JSONObject
-		
-		JSONObject json = null;
 		try {
 			
-			// Convert input stream to a string for older APIs.
-			
-			BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-			StringBuilder responseStrBuilder = new StringBuilder();
-			String inputStr;
-			
-			while ((inputStr = streamReader.readLine()) != null) {
-				responseStrBuilder.append(inputStr);
-			}
-			
-			json = new JSONObject(responseStrBuilder.toString());
-			JSONObject champData = json.getJSONObject("data");
+			JSONObject champJson = loadJson(this, CHAMPIONS_DIR, champName + ".json", JSON_OBJECT);
+			JSONObject champData = champJson.getJSONObject("data");
 			JSONObject champ = champData.getJSONObject(champName);
 			JSONObject champStats = champ.getJSONObject("stats");
 			
@@ -216,21 +201,165 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			
 			TextView movespeedText = (TextView) findViewById(R.id.movespeed);
 			movespeedText.setText(String.format("%.0f" ,moveSpeed));
-		
+			
 		} catch (UnsupportedEncodingException e) {
-			toast("UnsupportedEncodingException");
-			showError(e);
+			Debug.toast(this, "UnsupportedEncodingException");
+			Debug.logError(this, e);
+			
 		} catch (JSONException e) {
-			toast("JSONException");
-			showError(e);
+			Debug.toast(this, "JSONException");
+			Debug.logError(this, e);
+			
 		} catch (IOException e) {
-			toast("IOException");
-			showError(e);
+			Debug.toast(this, "IOException");
+			Debug.logError(this, e);
+			
 		} catch (NullPointerException e) {
-			toast("NullPointerException");
-			showError(e);
+			Debug.toast(this, "NullPointerException");
+			Debug.log(this, "NullPointerException in onCreate on stat set");
+		}
+			
+		// Load skills (champion spells)
+		
+		try {
+			JSONObject champJson = loadJson(this, CHAMPIONS_DIR, champName + ".json", JSON_OBJECT);
+			JSONObject champData = champJson.getJSONObject("data");
+			JSONObject champ = champData.getJSONObject(champName);
+			
+			JSONArray spells = champ.getJSONArray("spells");
+			JSONObject qSpell = (JSONObject)spells.get(0);
+			JSONObject wSpell = (JSONObject)spells.get(1);
+			JSONObject eSpell = (JSONObject)spells.get(2);
+			JSONObject rSpell = (JSONObject)spells.get(3);
+			JSONObject passive = champ.getJSONObject("passive");
+			
+			TextView qView = (TextView)findViewById(R.id.q);
+			TextView wView = (TextView)findViewById(R.id.w);
+			TextView eView = (TextView)findViewById(R.id.e);
+			TextView rView = (TextView)findViewById(R.id.r);
+			TextView passiveView = (TextView)findViewById(R.id.passive);
+			
+			/* qView.setText(Html.fromHtml(q.getString("tooltip")));
+			wView.setText(Html.fromHtml(w.getString("tooltip")));
+			eView.setText(Html.fromHtml(e.getString("tooltip")));
+			rView.setText(Html.fromHtml(r.getString("tooltip"))); */
+			passiveView.setText(Html.fromHtml(passive.getString("description")));
+			
+			String qtt = qSpell.getString("tooltip");
+			String wtt = wSpell.getString("tooltip");
+			String ett = eSpell.getString("tooltip");
+			String rtt = rSpell.getString("tooltip");
+			String parsedQtt = "";
+			String parsedWtt = "";
+			String parsedEtt = "";
+			String parsedRtt = "";
+
+			try {
+				parsedQtt = ttParser(qtt);
+				parsedWtt = ttParser(wtt);
+				parsedEtt = ttParser(ett);
+				parsedRtt = ttParser(rtt);
+			} catch (IOException e) {
+				Debug.log(this, e.getMessage());
+			}
+			
+			qView.setText(Html.fromHtml(parsedQtt));
+			wView.setText(Html.fromHtml(parsedWtt));
+			eView.setText(Html.fromHtml(parsedEtt));
+			rView.setText(Html.fromHtml(parsedRtt));
+		
+		} catch (JSONException e) {
+			Debug.log(this, e.getMessage());
+		} catch (FileNotFoundException e) {
+			Debug.log(this, e.getMessage());
+		} catch (IOException e) {
+			Debug.log(this, e.getMessage());
 		}
 		
+		
+	}
+	
+	
+	//--------------- Class Methods -------------------//
+	
+	String ttParser(String input) throws IOException {
+		/*
+		 * Spell JSON arrays use codes in their tooltips.
+		 * The codes translate to numbers found in other parts of the
+		 * champion JSON object.
+		 * This method generates a new string with codes replaced with numbers
+		 * using the inputted string.
+		 * 
+		 * Depends on method ChampInfo.translate()
+		 */
+		
+		StringReader sr = new StringReader(input);
+		int rawChar = 0;
+		char c = 0;
+		String result = "";
+		String code = "";
+		String word = "";
+		
+		do
+		{
+			rawChar = sr.read();
+			if (rawChar != -1)
+			{
+				c = (char)rawChar;
+				if (c == '{')
+				{
+					sr.mark(1);
+					c = (char)sr.read();
+					
+					if (c == '{')
+					{
+						sr.skip(1);
+						c = (char)sr.read();
+						code = code + c;
+						c = (char)sr.read();
+						code = code + c;
+						word = translate(code);
+						result = result + word;
+						sr.skip(3);
+					}
+					else
+					{
+						sr.reset();
+						c = (char)sr.read();
+						result = result + c;
+					}
+				}
+				else result = result + c;
+			}
+		} while (rawChar != -1);
+		
+		return result;
+	}
+	
+	String translate(String code) {
+		/*
+		 * Looks up the code and returns the value.
+		 */
+		return "0";
+	}
+	
+	static JSONObject loadJson(Context context, String directory, String filename, int type) throws FileNotFoundException, IOException, JSONException {
+		
+		InputStream in = null;
+		File jsonFile = new File(context.getDir(directory, Context.MODE_PRIVATE), filename);
+		in = new BufferedInputStream(new FileInputStream(jsonFile));
+	
+		JSONObject json = null;			
+		BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+		StringBuilder responseStrBuilder = new StringBuilder();
+		String inputStr;
+		
+		while ((inputStr = streamReader.readLine()) != null) {
+			responseStrBuilder.append(inputStr);
+		}
+		
+		json = new JSONObject(responseStrBuilder.toString());
+		return json;
 	}
 	
 	private void statUpdate(String level) throws NullPointerException {
@@ -296,21 +425,6 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		
 	}
 	
-	/* 
-	 * Stat Calculations
-	 * 
-	 * All these calc methods are outdated.
-	 * They use a mix of ints and floats for... performance reasons?
-	 * Anyway new functions will use doubles for everything cause thats what
-	 * the JSON data uses.  Also it's simpler, and no need to go change shit
-	 * later cause you need a decimal point or more precision or whatever.
-	 * PRUNE LATER.
-	 * 
-	 * Keep the double methods until AS is fixed.  Thats the only function that
-	 * still uses the methods that take Strings as input
-	 */
-	
-	
 	void setPerLevel(TextView text, int valueType, double baseValue, double growthValue) {	
 		if ((baseValue != 0)) {
 			if (valueType == LESS_PRECISE) {
@@ -325,11 +439,6 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			else if (valueType == MAGIC_RESIST) {
 				text.setText(String.format("%.1f (+%.2f)", baseValue, growthValue));
 			}
-		}
-		else {
-		/* toast("Set error");
-			toast(Double.toString(baseValue));
-			toast(Double.toString(growthValue)); */
 		}
 	}
 	
@@ -389,8 +498,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	
 	// back button handler
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item)
-	{
+	public boolean onOptionsItemSelected(MenuItem item) {
 		// back button
 		if (item.getItemId() == android.R.id.home) finish();
 		// auto generated code
@@ -400,8 +508,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	
 	// spinner handler
 	@Override
-	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
-	{
+	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 		// An item was selected. You can retrieve the selected item using
 		// parent.getItemAtPosition(pos)
 		String item = (String) parent.getItemAtPosition(pos);
@@ -409,49 +516,20 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			statUpdate(item);
 		}
 		catch (NullPointerException e) {
-			showError(e);
+			Debug.log(getApplicationContext(), "NullPointerException in statUpdate");
 		}
 		
 	}
 
 	@Override
-	public void onNothingSelected(AdapterView<?> parent)
-	{
+	public void onNothingSelected(AdapterView<?> parent) {
 		// not used
 	}
 	
-	public void stubMethod()
-	{
+	public void stubMethod() {
 		// Simple test method for stubs.
 		Toast toast = Toast.makeText(this, "Tada!", Toast.LENGTH_SHORT);
 		toast.show();
 	}
 	
-	public void showError(Exception e)
-	{
-		Toast t = Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
-		t.show();
-	}
-	
-	void toast(String msg) {
-		Toast t = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
-		t.show();
-	}
-	
-	void toast(String msg, int length) {
-		Toast t = Toast.makeText(this, msg, length);
-		t.show();
-	}
-	
-	void toast(int i, int length) {
-		String msg = Integer.toString(i);
-		Toast t = Toast.makeText(this, msg, length);
-		t.show();
-	}
-	
-	void toast(double d, int length) {
-		String msg = Double.toString(d);
-		Toast t = Toast.makeText(this, msg, length);
-		t.show();
-	}
 }

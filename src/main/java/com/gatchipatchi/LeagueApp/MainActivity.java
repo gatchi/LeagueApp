@@ -55,12 +55,6 @@ import org.json.JSONException;
 
 public class MainActivity extends Activity 
 {
-	final static String CHAMPIONS_FILE = "champ_list.txt";
-	final static String CHAMPIONS_JSON = "champion.json";
-	final static String CHAMPIONS_DIR = "champs";
-	final static String ICONS_DIR = "drawable";
-	final static String ERROR_LOG = "error.log";
-	final static String LOG_FILE = "log";
 	final static String BASE_DOWNLOAD_URL = "http://ddragon.leagueoflegends.com/cdn/6.11.1/";
 	final static int TABLE_ROW_WIDTH = 5;
 	
@@ -85,7 +79,7 @@ public class MainActivity extends Activity
 	ArrayList<String> champList = new ArrayList();
 	int tvId = View.generateViewId();
 	int downloadErrorCode;
-
+	
 	
 	//--------------- Nested Classes ------------------//
 	
@@ -127,7 +121,7 @@ public class MainActivity extends Activity
 				pBar.setVisibility(View.VISIBLE);
 			}
 			else {
-				log("Cant make progress bar visible as it doesnt exist");
+				Debug.log(getApplicationContext(), "Cant make progress bar visible as it doesnt exist");
 			}
 		}
 		
@@ -153,7 +147,7 @@ public class MainActivity extends Activity
 					queueLength = queue.size();
 					
 					while (queue.peek() != null)
-					{					
+					{	
 						pack = queue.remove();
 						url = pack.url;
 						urlConnection = (HttpURLConnection) url.openConnection();
@@ -165,7 +159,7 @@ public class MainActivity extends Activity
 						{
 							// Download
 							
-							/* log("Downloading " + pack.filename + "..."); */
+							/* Debug.log(this, "Downloading " + pack.filename + "..."); */
 							in = new BufferedInputStream(urlConnection.getInputStream());
 						
 							// Convert to a byte buffer for filewriting
@@ -182,12 +176,12 @@ public class MainActivity extends Activity
 							// Store file
 							
 							try {
-								/* log("Writing " +  pack.filename + "..."); */
+								/* Debug.log(this, "Writing " +  pack.filename + "..."); */
 								out.write(buffer);
 							}
 							catch (IOException e) {
-								log("Write failed");
-								logError(e);
+								Debug.log(getApplicationContext(), "Write failed");
+								Debug.logError(getApplicationContext(), e);
 								return null;
 							}
 							finally {
@@ -195,8 +189,8 @@ public class MainActivity extends Activity
 									out.close();
 								}
 								catch (IOException e) {
-									log("Couldnt close file");
-									logError(e);
+									Debug.log(getApplicationContext(), "Couldnt close file");
+									Debug.logError(getApplicationContext(), e);
 								}
 							}
 							
@@ -207,14 +201,15 @@ public class MainActivity extends Activity
 					
 					return in;
 					
-				} catch (IOException e) {
-					log("Unexpected download error");
+				}
+				catch (IOException e) {
+					Debug.log(getApplicationContext(), "Unexpected download error");
 					downloadErrorCode = DEC_IO_EXCEPTION;
 					return null;
 				}
 			}
 			else {
-				log("No internet connection.");
+				Debug.log(getApplicationContext(), "No internet connection.");
 				downloadErrorCode = DEC_NO_INTERNET;
 				return null;
 			}
@@ -229,11 +224,11 @@ public class MainActivity extends Activity
 			 * Divide the two to get the percentage of completion
 			 */
 			
-			/* log(Integer.toString(progress[0]));
-			log(Integer.toString(progress[1])); */
+			/* Debug.log(Integer.toString(progress[0]));
+			Debug.log(Integer.toString(progress[1])); */
 			double percentage = (double)progress[0] / (double)progress[1] * 100;
 			pBar.setProgress((int)percentage);
-			/* log((int)percentage); */
+			/* Debug.log((int)percentage); */
 		}
 		
 		protected void onPostExecute(InputStream in) {
@@ -243,25 +238,25 @@ public class MainActivity extends Activity
 			}
 				
 			if (in != null) {
-				toast("Updated complete");
-				log("Update completed.");
+				Debug.toast(getApplicationContext(), "Updated complete");
+				Debug.log(getApplicationContext(), "Update completed.");
 			}
 			else if (downloadErrorCode == DEC_NO_INTERNET) {
-				toast("Cant download, no internet");
-				log("Update canceled. No internet connection.");
+				Debug.toast(getApplicationContext(), "Cant download, no internet");
+				Debug.log(getApplicationContext(), "Update canceled. No internet connection.");
 			}
 			/* else if (downloadErrorCode == DEC_NO_AVAIL_UPDATES) {
-				toast("Update not needed");
-				log("No updates to download.");
-				log("Update canceled.");
+				Debug.toast(getApplicationContext(), "Update not needed");
+				Debug.log(getApplicationContext(), "No updates to download.");
+				Debug.log(getApplicationContext(), "Update canceled.");
 			} */
 			else if (downloadErrorCode == DEC_IO_EXCEPTION) {
-				toast("Update fucked up");
-				log("Download canceled: IOException.");
+				Debug.toast(getApplicationContext(), "Update fucked up");
+				Debug.log(getApplicationContext(), "Download canceled: IOException.");
 			}
 			else {
-				toast("Update not needed");
-				log("Update canceled: no updates to download.");
+				Debug.toast(getApplicationContext(), "Update not needed");
+				Debug.log(getApplicationContext(), "Update canceled: no updates to download.");
 			}
 			recreate();
 		}
@@ -282,15 +277,15 @@ public class MainActivity extends Activity
 		
 		// Setup champ buttons
 		
-		File champListFile = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), CHAMPIONS_FILE);
-		
+		File champListFile = new File(this.getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), ChampInfo.CHAMPIONS_FILE);
 		if (champListFile.exists()) {
 			
 			// Load champ list
-			/* toast("Champ list found.  Loading..."); */
-			log("Champ list found.  Loading...");
+			
+			Debug.log(this, "Champ list found.  Loading...");
 			
 			try {
+				// Champ list parser (comma is delimiter)
 				
 				BufferedReader listReader = new BufferedReader(new FileReader(champListFile));
 				int ic = 0;
@@ -298,17 +293,11 @@ public class MainActivity extends Activity
 				int d = 0;
 				String word = "";
 				
-				/* log("Entering loop..."); */
-				
-				while ((c != ']') & (ic != -1)) {
-					
-					// Comma is the delimiter
-					
+				while ((c != ']') & (ic != -1))
+				{
 					do {
-					
 						ic = listReader.read();
 						c = (char)ic;
-						/* log(String.valueOf(c)); */
 						
 						if ((c != '[') & (c != ',') & (c != ']')) {
 							word = word + c;
@@ -316,28 +305,27 @@ public class MainActivity extends Activity
 					} while ((c != ',') & (c != ']') & (ic != -1));
 					
 					champList.add(word);
-					/* log("Made word"); */
-					/* log(word); */
 					
-					if (c != ']') {
+					if (c != ']')
+					{
 						listReader.skip(1);
 						word = "";
 						c = 0;
 					}
 					
 					// To prevent hanging
-					if (d > 600) {
-						log("Force break of list-reading loop");
+					
+					if (d > 600)
+					{
+						Debug.log(this, "Force break of list-reading loop");
 						break;
 					}
-					else {
-						d++;
-					}
+					else d++;
 				}
 			
-				/* log("Left loop."); */
+				/* Debug.log(this, "Left loop."); */
 				/* java.util.Collections.sort(champList); */
-				log("Champ list generated");
+				Debug.log(this, "Champ list generated");
 				
 				// Add champ buttons iteratively
 					
@@ -356,7 +344,7 @@ public class MainActivity extends Activity
 						ll = new LinearLayout(this);
 						ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 						ll.setGravity(Gravity.CENTER_HORIZONTAL);
-						/* log("Added row"); */
+						/* Debug.log(this, "Added row"); */
 						tl.addView(ll);
 					}
 					
@@ -381,34 +369,34 @@ public class MainActivity extends Activity
 					params.setMargins(2,2,2,2);
 					ib.setLayoutParams(params);
 					
-					/* log("Added button."); */
+					/* Debug.log(this, "Added button."); */
 					count++;
 				}
-				log("Layout generated");
+				Debug.log(this, "Layout generated");
 			}
 			catch (FileNotFoundException e) {
-				toast("Champ missing. Try updating");
-				log("FileNotFoundException");
-				logError(e);
+				Debug.toast(this, "Champ missing. Try updating");
+				Debug.log(this, "FileNotFoundException");
+				Debug.logError(this, e);
 			}
 			catch (IOException e) {
-				log("IOException");
-				showError(e);
-				logError(e);
+				Debug.log(this, "IOException");
+				Debug.showError(this, e);
+				Debug.logError(this, e);
 			}
 		}
 		else {
 			
 			// Ask to update
 			
-			log("Adding simple TextView to empty View...");
+			Debug.log(this, "Adding simple TextView to empty View...");
 			TableLayout tl = (TableLayout)findViewById(R.id.button_layout);
 			warningText = new TextView(this);
 			warningText.setText("No data");
 			warningText.setBackgroundColor(0xFFFF);
 			tl.addView(warningText);
-			log("Added.");
-			toast("Tap update to fetch data");
+			Debug.log(this, "Added.");
+			Debug.toast(this, "Tap update to fetch data");
 		}
 		
 		// Add data refresh button
@@ -417,7 +405,7 @@ public class MainActivity extends Activity
 		refreshButton = new Button(this);
 		refreshButton.setText("update");
 		footer.addView(refreshButton);
-		refreshButton.setOnClickListener(refreshButtonListener);
+		refreshButton.setOnClickListener(updateButtonListener);
 		
 		/* // Add data clear button
 		
@@ -448,9 +436,9 @@ public class MainActivity extends Activity
 
 		// Save file unless it already exists
 		
-		if (!file.exists())
-		{
-			toast("storing file " + filename + "...", Toast.LENGTH_SHORT);
+		if (!file.exists()) {
+		
+			Debug.toast(this, "storing file " + filename + "...", Toast.LENGTH_SHORT);
 			OutputStream out = null;
 			
 			// Write to file
@@ -459,20 +447,20 @@ public class MainActivity extends Activity
 				out = new BufferedOutputStream(new FileOutputStream(file));
 				out.write(data);
 				out.close();
-				log(filename + " written");
+				Debug.log(this, filename + " written");
 			}
 			catch (IOException e) {
-				log(filename + " write failure");
-				logError(e);
+				Debug.log(this, filename + " write failure");
+				Debug.logError(this, e);
 			}
 		}
 		else {
-			log(filename + " already on card");
+			Debug.log(this, filename + " already on card");
 		}
 	}
 	
-	void writeTextFile(String directory, String filename, String text)
-	{	
+	void writeTextFile(String directory, String filename, String text) {
+		
 		File file;
 		if (directory == null) {
 			file = new File(getApplicationContext().getFilesDir(), filename);
@@ -483,9 +471,9 @@ public class MainActivity extends Activity
 
 		// Save file unless it already exists
 		
-		if (!file.exists())
-		{
-			log("storing file... " + filename);
+		if (!file.exists()) {
+		
+			Debug.log(this, "storing file... " + filename);
 			BufferedWriter out = null;
 			
 			// Write
@@ -494,50 +482,12 @@ public class MainActivity extends Activity
 				out = new BufferedWriter(new FileWriter(file));
 				out.write(text);
 				out.close();
-				log(filename + " written");
+				Debug.log(this, filename + " written");
 			}
 			catch (IOException e) {
-				log(filename + " write failure");
-				logError(e);
+				Debug.log(this, filename + " write failure");
+				Debug.logError(this, e);
 			}
-		}
-	}
-	
-	void appendTextFile(String directory, String filename, String text)
-	{
-		/* toast("Attempting to append log..."); */
-		File file;
-		if (directory == null) {
-			file = new File(getApplicationContext().getFilesDir(), filename);
-		}
-		else {
-			file = new File(getApplicationContext().getDir(directory, Context.MODE_PRIVATE), filename);
-		}
-
-		// Save file unless it already exists
-		
-		/* toast("storing file...", Toast.LENGTH_LONG); */
-		PrintWriter out;
-		
-		// Write
-
-		try {
-			out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
-			out.println(text);
-			
-			if (out.checkError()) {
-				/* toast("Oops, PrintWriter error'd"); */
-			}
-			else {
-				/* toast("PrintWriter claimed it worked..."); */
-			}
-			
-			out.close();
-			/* toast("file written"); */
-		}
-		catch (IOException e) {
-			toast("file write failure");
-			toast(e.getMessage(), Toast.LENGTH_SHORT);
 		}
 	}
 	
@@ -545,18 +495,18 @@ public class MainActivity extends Activity
 		
 		// Check for to see if champ list exists
 		
-		File champListFile = new File(getApplicationContext().getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), CHAMPIONS_FILE);
-		File championJsonFile = new File(getApplicationContext().getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), CHAMPIONS_JSON);
+		File champListFile = new File(getApplicationContext().getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), ChampInfo.CHAMPIONS_FILE);
+		File championJsonFile = new File(getApplicationContext().getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), ChampInfo.CHAMPIONS_JSON);
 		
 		if (!champListFile.exists()) {
 			
-			log("Champ list not found.");
+			Debug.log(this, "Champ list not found.");
 			
 			// If champ file doesnt exist, check for champ json and generate the list from it
 			
 			if (championJsonFile.exists()) {
 				
-				log("Champ JSON found.  Generating list...");
+				Debug.log(this, "Champ JSON found.  Generating list...");
 				
 				JSONObject json = null;
 				InputStream in = null;
@@ -577,12 +527,12 @@ public class MainActivity extends Activity
 					}
 					
 					java.util.Collections.sort(champList);
-					log("Champ list generated");
+					Debug.log(this, "Champ list generated");
 					
 					// Save champ list
 					
 					writeTextFile("champs", "champ_list.txt", champList.toString());
-					log("Champ list saved");
+					Debug.log(this, "Champ list saved");
 					
 					// Make & prepare download queue
 			
@@ -594,24 +544,24 @@ public class MainActivity extends Activity
 					
 					try {
 						
-						log("Prepping data download...");
+						Debug.log(this, "Prepping data download...");
 						
 						while (champIterator.hasNext()) {
 						
 							champName = champIterator.next();
 							
 							url = new URL(BASE_DOWNLOAD_URL + "img/champion/" + champName + ".png");
-							pack = new Pack(champName + ".png", ICONS_DIR, url);
+							pack = new Pack(champName + ".png", ChampInfo.ICONS_DIR, url);
 							queue.add(pack);
 							
 							url = new URL(BASE_DOWNLOAD_URL + "data/en_US/champion/" + champName + ".json");
-							pack = new Pack(champName + ".json", CHAMPIONS_DIR, url);
+							pack = new Pack(champName + ".json", ChampInfo.CHAMPIONS_DIR, url);
 							queue.add(pack);
 						}
 						
 						// Download data
 						
-						log("Attempting data download");
+						Debug.log(this, "Attempting data download");
 						new DownloadFilesTask(queue).execute();
 						/* startUpdate(queue); */
 						/* Intent intent = new Intent(this, ChampInfo.class);
@@ -620,53 +570,53 @@ public class MainActivity extends Activity
 						
 					}
 					catch (MalformedURLException e) {
-						log("Download abandoned");
-						log("you fucked up the url");
-						showError(e);
-						logError(e);
+						Debug.log(this, "Download abandoned");
+						Debug.log(this, "you fucked up the url");
+						Debug.showError(this, e);
+						Debug.logError(this, e);
 					}
 					catch (NullPointerException e) {
-						log("Download abandoned");
-						log("NullPointerException");
-						showError(e);
-						logError(e);
+						Debug.log(this, "Download abandoned");
+						Debug.log(this, "NullPointerException");
+						Debug.showError(this, e);
+						Debug.logError(this, e);
 					}
 					catch (NoSuchElementException e) {
-						log("Download abandoned");
-						log("champList not initialized");
-						showError(e);
-						logError(e);
+						Debug.log(this, "Download abandoned");
+						Debug.log(this, "champList not initialized");
+						Debug.showError(this, e);
+						Debug.logError(this, e);
 					}
 				}
 				catch (FileNotFoundException e) {
-					log("List generation failed");
-					log("FileNotFoundException");
-					showError(e);
-					logError(e);
+					Debug.log(this, "List generation failed");
+					Debug.log(this, "FileNotFoundException");
+					Debug.showError(this, e);
+					Debug.logError(this, e);
 				}
 				catch (NoSuchElementException e) {
-					log("List generation failed");
-					log("Cant get keys from champion.json");
-					showError(e);
-					logError(e);
+					Debug.log(this, "List generation failed");
+					Debug.log(this, "Cant get keys from champion.json");
+					Debug.showError(this, e);
+					Debug.logError(this, e);
 				}
 				catch (UnsupportedEncodingException e) {
-					log("List generation failed");
-					log("Something is wrong with the champion json file");
-					showError(e);
-					logError(e);
+					Debug.log(this, "List generation failed");
+					Debug.log(this, "Something is wrong with the champion json file");
+					Debug.showError(this, e);
+					Debug.logError(this, e);
 				}
 				catch (JSONException e) {
-					log("List generation failed");
-					log("JSONException");
-					showError(e);
-					logError(e);
+					Debug.log(this, "List generation failed");
+					Debug.log(this, "JSONException");
+					Debug.showError(this, e);
+					Debug.logError(this, e);
 				}
 				catch (IOException e) {
-					log("List generation failed");
-					log("IOException");
-					showError(e);
-					logError(e);
+					Debug.log(this, "List generation failed");
+					Debug.log(this, "IOException");
+					Debug.showError(this, e);
+					Debug.logError(this, e);
 				}
 			}
 			
@@ -674,19 +624,19 @@ public class MainActivity extends Activity
 
 				// If neither exists, download champ json and restart activity
 				
-				log("No champ list or JSON");
+				Debug.log(this, "No champ list or JSON");
 				
 				try {
-					log("Prepping champ JSON download...");
+					Debug.log(this, "Prepping champ JSON download...");
 					
 					Queue<Pack> queue = new ArrayDeque<Pack>(1);
 					URL url = new URL(BASE_DOWNLOAD_URL + "data/en_US/champion.json");
-					Pack pack = new Pack(CHAMPIONS_JSON, CHAMPIONS_DIR, url);
+					Pack pack = new Pack(ChampInfo.CHAMPIONS_JSON, ChampInfo.CHAMPIONS_DIR, url);
 					queue.add(pack);
 					
 					// Download champion JSON
 					
-					log("Attempting champ JSON download");
+					Debug.log(this, "Attempting champ JSON download");
 					new DownloadFilesTask(queue).execute();
 					/* startUpdate(queue); */
 					/* Intent intent = new Intent(this, ChampInfo.class);
@@ -694,16 +644,16 @@ public class MainActivity extends Activity
 					startActivity(intent); */
 				}
 				catch (MalformedURLException e) {
-					log("JSON download abandoned");
-					log("you fucked up the url buddy");
-					showError(e);
-					logError(e);
+					Debug.log(this, "JSON download abandoned");
+					Debug.log(this, "you fucked up the url buddy");
+					Debug.showError(this, e);
+					Debug.logError(this, e);
 				}
 			}
 			
 			else {
-				toast("how did you even get here");
-				toast("nothing downloaded everything is fucked");
+				Debug.toast(this, "how did you even get here");
+				Debug.toast(this, "nothing downloaded everything is fucked");
 			}
 			
 		}
@@ -719,46 +669,46 @@ public class MainActivity extends Activity
 			
 			try {
 				
-				log("Prepping data download...");
+				Debug.log(this, "Prepping data download...");
 				
 				while (champIterator.hasNext()) {
 				
 					champName = champIterator.next();
-					/* log(champName); */
+					/* Debug.log(champName); */
 					
 					url = new URL(BASE_DOWNLOAD_URL + "img/champion/" + champName + ".png");
-					pack = new Pack(champName + ".png", ICONS_DIR, url);
+					pack = new Pack(champName + ".png", ChampInfo.ICONS_DIR, url);
 					queue.add(pack);
 					
 					url = new URL(BASE_DOWNLOAD_URL + "data/en_US/champion/" + champName + ".json");
-					pack = new Pack(champName + ".json", CHAMPIONS_DIR, url);
+					pack = new Pack(champName + ".json", ChampInfo.CHAMPIONS_DIR, url);
 					queue.add(pack);
 				}
 				
 				// Download data
 				
-				log("Attempting data download");
+				Debug.log(this, "Attempting data download");
 				new DownloadFilesTask(queue).execute();
 				/* startUpdate(queue); */
 				
 			}
 			catch (MalformedURLException e) {
-				log("Download abandoned");
-				log("you fucked up the url");
-				showError(e);
-				logError(e);
+				Debug.log(this, "Download abandoned");
+				Debug.log(this, "you fucked up the url");
+				Debug.showError(this, e);
+				Debug.logError(this, e);
 			}
 			catch (NullPointerException e) {
-				log("Download abandoned");
-				log("NullPointerException");
-				showError(e);
-				logError(e);
+				Debug.log(this, "Download abandoned");
+				Debug.log(this, "NullPointerException");
+				Debug.showError(this, e);
+				Debug.logError(this, e);
 			}
 			catch (NoSuchElementException e) {
-				log("Download abandoned");
-				log("champList not initialized");
-				showError(e);
-				logError(e);
+				Debug.log(this, "Download abandoned");
+				Debug.log(this, "champList not initialized");
+				Debug.showError(this, e);
+				Debug.logError(this, e);
 			}
 		}
 	}
@@ -777,95 +727,95 @@ public class MainActivity extends Activity
 		File file;
 		File dir;
 		
-		file = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), "champ_list.txt");
+		file = new File(this.getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), "champ_list.txt");
 		if (file.exists())
 		{
 			file.delete();
-			log("Deleted champ_list.txt");
+			Debug.log(this, "Deleted champ_list.txt");
 		}
 		
-		file = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), "champion.json");
+		file = new File(this.getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), "champion.json");
 		if (file.exists())
 		{
 			file.delete();
-			log("Deleted champion.json");
+			Debug.log(this, "Deleted champion.json");
 		}
 		
-		file = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), "Aatrox.json");
+		file = new File(this.getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), "Aatrox.json");
 		if (file.exists())
 		{
 			file.delete();
-			log("Deleted Aatrox.json");
+			Debug.log(this, "Deleted Aatrox.json");
 		}
 		
-		file = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), "Ahri.json");
+		file = new File(this.getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), "Ahri.json");
 		if (file.exists())
 		{
 			file.delete();
-			log("Deleted Ahri.json");
+			Debug.log(this, "Deleted Ahri.json");
 		}
 		
-		file = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), "Akali.json");
+		file = new File(this.getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), "Akali.json");
 		if (file.exists())
 		{
 			file.delete();
-			log("Deleted Akali.json");
+			Debug.log(this, "Deleted Akali.json");
 		}
 		
-		file = new File(this.getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), "Alistar.json");
+		file = new File(this.getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), "Alistar.json");
 		if (file.exists())
 		{
 			file.delete();
-			log("Deleted Alistar.json");
+			Debug.log(this, "Deleted Alistar.json");
 		}
 		
-		file = new File(this.getDir(ICONS_DIR, Context.MODE_PRIVATE), "Aatrox.png");
+		file = new File(this.getDir(ChampInfo.ICONS_DIR, Context.MODE_PRIVATE), "Aatrox.png");
 		if (file.exists())
 		{
 			file.delete();
-			log("Deleted Aatrox.png");
+			Debug.log(this, "Deleted Aatrox.png");
 		}
 		
-		file = new File(this.getDir(ICONS_DIR, Context.MODE_PRIVATE), "Ahri.png");
+		file = new File(this.getDir(ChampInfo.ICONS_DIR, Context.MODE_PRIVATE), "Ahri.png");
 		if (file.exists())
 		{
 			file.delete();
-			log("Deleted Ahri.png");
+			Debug.log(this, "Deleted Ahri.png");
 		}
 		
-		file = new File(this.getDir(ICONS_DIR, Context.MODE_PRIVATE), "Akali.png");
+		file = new File(this.getDir(ChampInfo.ICONS_DIR, Context.MODE_PRIVATE), "Akali.png");
 		if (file.exists())
 		{
 			file.delete();
-			log("Deleted Akali.png");
+			Debug.log(this, "Deleted Akali.png");
 		}
 		
-		file = new File(this.getDir(ICONS_DIR, Context.MODE_PRIVATE), "Alistar.png");
+		file = new File(this.getDir(ChampInfo.ICONS_DIR, Context.MODE_PRIVATE), "Alistar.png");
 		if (file.exists())
 		{
 			file.delete();
-			log("Deleted Alistar.png");
+			Debug.log(this, "Deleted Alistar.png");
 		}
 		
-		file = new File(getApplicationContext().getDir(CHAMPIONS_DIR, Context.MODE_PRIVATE), CHAMPIONS_FILE);
+		file = new File(getApplicationContext().getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), ChampInfo.CHAMPIONS_FILE);
 		dir = file.getParentFile();
-		log(dir.toString());
+		Debug.log(this, dir.toString());
 		if (dir.exists())
 		{
 			dir.delete();
-			log("Deleted app_champs directory");
+			Debug.log(this, "Deleted app_champs directory");
 		}
 		
-		file = new File(getApplicationContext().getDir(ICONS_DIR, Context.MODE_PRIVATE), "Aatrox.png");
+		file = new File(getApplicationContext().getDir(ChampInfo.ICONS_DIR, Context.MODE_PRIVATE), "Aatrox.png");
 		dir = file.getParentFile();
-		log(dir.toString());
+		Debug.log(this, dir.toString());
 		if (dir.exists())
 		{
 			dir.delete();
-			log("Deleted app_drawable directory");
+			Debug.log(this, "Deleted app_drawable directory");
 		}
 		
-		toast("Data deleted");
+		Debug.toast(this, "Data deleted");
 		recreate();
 	}
 	
@@ -888,13 +838,13 @@ public class MainActivity extends Activity
 		
 		File championDirectory = this.getDir("champs", Context.MODE_PRIVATE);
 		if (!championDirectory.exists()) {
-			toast("making champ directory");
+			Debug.toast(this, "making champ directory");
 			championDirectory.mkdir();
 		}
 		
 		File drawableDir = this.getDir("drawable", Context.MODE_PRIVATE);
 		if (!drawableDir.exists()) {
-			toast("creating drawable directory");
+			Debug.toast(this, "creating drawable directory");
 			drawableDir.mkdir();
 		}
 		
@@ -903,14 +853,14 @@ public class MainActivity extends Activity
 	
 	//----------------- Listeners ---------------------//
 	
-	private OnClickListener refreshButtonListener = new OnClickListener() {
+	private OnClickListener updateButtonListener = new OnClickListener() {
 		
 		@Override
 		public void onClick(View p1)
 		{
 			// button click action
 			/* download("champion.json", "champs", "data/en_US/champion.json"); */
-			toast("Updating...");
+			Debug.toast(getApplicationContext(), "Updating...");
 			downloadData();
 		}
 	};
@@ -939,9 +889,6 @@ public class MainActivity extends Activity
 		@Override
 		public void onClick(View p1)
 		{
-		/* button click action
-			Toast toast = Toast.makeText(getApplicationContext(), Integer.toString(p1.getId()), Toast.LENGTH_LONG);
-			toast.show(); */
 			Intent intent = new Intent(MainActivity.this, ChampInfo.class);
 			intent.putExtra("button id", p1.getId());
 			intent.putExtra("champ list", champList);
@@ -969,48 +916,80 @@ public class MainActivity extends Activity
 	
 	//---------------- Debug Methods ------------------//
 	
-	void toast(String msg) {
-		Toast t = Toast.makeText(this, msg, Toast.LENGTH_SHORT);
+	/* static void toast(Context context, String msg) {
+		Toast t = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
 		t.show();
 	}
 	
-	void toast(String msg, int length) {
-		Toast t = Toast.makeText(this, msg, length);
+	static void toast(Context context, String msg, int length) {
+		Toast t = Toast.makeText(context, msg, length);
 		t.show();
 	}
 	
-	void toast(int i, int length) {
+	static void toast(Context context, int i, int length) {
 		String msg = Integer.toString(i);
-		Toast t = Toast.makeText(this, msg, length);
+		Toast t = Toast.makeText(context, msg, length);
 		t.show();
-	}
+	} */
 	
-	void showError(Exception e) {
+	/* static void showError(Context context, Exception e) {
 		if (e != null) {
-			Toast t = Toast.makeText(this, e.getMessage(), Toast.LENGTH_LONG);
+			Toast t = Toast.makeText(context, e.getMessage(), Toast.LENGTH_LONG);
 			t.show();
 		}
-	}
+	} */
 	
-	void logError(Exception e) {
+	/* static void appendTextFile(Context context, String directory, String filename, String text)
+	{	
+		File file;
+		if (directory == null) {
+			file = new File(context.getFilesDir(), filename);
+		}
+		else {
+			file = new File(context.getDir(directory, Context.MODE_PRIVATE), filename);
+		}
+
+		// Save file unless it already exists
+		
+		PrintWriter out;
+		
+		// Write
+
+		try {
+			out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
+			out.println(text);
+			
+			if (out.checkError()) {
+				Debug.show(getApplicationContext(), "Oops, PrintWriter error'd");
+			}
+			
+			out.close();
+		}
+		catch (IOException e) {
+			Debug.toast(context, "file write failure");
+			Debug.toast(context, e.getMessage(), Toast.LENGTH_SHORT);
+		}
+	} */
+	
+	/* static void logError(Context context, Exception e) {
 		if (e != null) {
-			appendTextFile(null, LOG_FILE, e.getMessage());
+			appendTextFile(context, null, Debug.LOG_FILE, e.getMessage());
 		}
 	}
 	
-	void log(String s) {
-		appendTextFile(null, LOG_FILE, s);
+	static void log(Context context, String s) {
+		appendTextFile(context, null, Debug.LOG_FILE, s);
 	}
 	
-	void log(int i) {
-		appendTextFile(null, LOG_FILE, Integer.toString(i));
-	}
+	static void log(Context context, int i) {
+		appendTextFile(context, null, Debug.LOG_FILE, Integer.toString(i));
+	} */
 	
 	void clearLog() {
-		File file = new File(getApplicationContext().getFilesDir(), LOG_FILE);
+		File file = new File(getApplicationContext().getFilesDir(), Debug.LOG_FILE);
 		if (file.exists()) {
 			file.delete();
-			toast("Log cleared");
+			Debug.toast(getApplicationContext(), "Log cleared");
 		}
 	}
 	

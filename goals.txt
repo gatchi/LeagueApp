@@ -1,11 +1,10 @@
 Goals for Today
 ===============
-
++ show skills on champinfo page
+	+ make string parser for replacing variables in descriptions
 
 Goals for Some Other Day
 ========================
-+ update cancel button (maybe update button becomes cancel button once update has started)
-+ show skills on champinfo page
 + setting: tabbed champinfo pages
 + setting: internet retry
 + get downloads from latest version
@@ -24,4 +23,7 @@ x view basic stats
 
 Things Done Since Last Commit
 =============================
-+ add internet connectivity check
+o refactored JSON loading code (put into a static method)
+o changed debug methods into static (considering putting into own class)
++ added Debug class, moved debug methods into it
++ added tooltip parser (tooltips contain important info about spell numbers)
