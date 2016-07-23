@@ -20,9 +20,20 @@ class Debug {
 		t.show();
 	}
 	
+	static void toast(Context context, int i) {
+		String msg = Integer.toString(i);
+		Toast t = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
+		t.show();
+	}
+	
 	static void toast(Context context, int i, int length) {
 		String msg = Integer.toString(i);
 		Toast t = Toast.makeText(context, msg, length);
+		t.show();
+	}
+	
+	static void toast(Context context, char c) {
+		Toast t = Toast.makeText(context, "" + c, Toast.LENGTH_SHORT);
 		t.show();
 	}
 	

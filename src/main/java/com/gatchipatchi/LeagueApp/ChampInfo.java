@@ -59,6 +59,10 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	static final short MORE_PRECISE = 2;
 	static final short MAGIC_RESIST = 3;
 	static final short MID_PRECISE = 4;
+	final int SPELL_Q = 0;
+	final int SPELL_W = 1;
+	final int SPELL_E = 2;
+	final int SPELL_R = 3;
 	
 	//--------------- Public Objects ------------------//
 	
@@ -85,6 +89,8 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	double asOffset;
 	double asPerLevel;
 	double asBase;
+	JSONObject champJson;
+	JSONObject champ;
 	
 	ArrayList<String> champList = new ArrayList();
 	
@@ -99,13 +105,11 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		aestheticSetup();
 		
 		// Get champ ID (button pressed ID)
-		
 		Intent intent = getIntent();
 		Bundle bundle = intent.getExtras();
 		champId = bundle.getInt("button id");
 		
-		// Load champb and set champ name on the view
-		
+		// Load champ and set champ name on the view
 		champList = (ArrayList<String>) bundle.get("champ list");
 		champName = champList.get(champId);
 		TextView champNameView = (TextView) findViewById(R.id.champ_name);
@@ -120,9 +124,9 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		
 		try {
 			
-			JSONObject champJson = loadJson(this, CHAMPIONS_DIR, champName + ".json", JSON_OBJECT);
+			champJson = loadJson(this, CHAMPIONS_DIR, champName + ".json", JSON_OBJECT);
 			JSONObject champData = champJson.getJSONObject("data");
-			JSONObject champ = champData.getJSONObject(champName);
+			champ = champData.getJSONObject(champName);
 			JSONObject champStats = champ.getJSONObject("stats");
 			
 			// Get stats
@@ -171,7 +175,8 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			{
 				resourceTypeText.setText("ferocity");
 			}
-			else if (champName.equals("RekSai") || champName.equals("Renekton") || champName.equals("Shyvana") || champName.equals("Tryndamere") || champName.equals("Gnar")) {
+			else if (champName.equals("RekSai") || champName.equals("Renekton") || champName.equals("Shyvana") || champName.equals("Tryndamere") || champName.equals("Gnar"))
+			{
 				resourceTypeText.setText("fury");
 			}
 			else if (champName.equals("Rumble")) {
@@ -218,14 +223,12 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			Debug.toast(this, "NullPointerException");
 			Debug.log(this, "NullPointerException in onCreate on stat set");
 		}
-			
+		
 		// Load skills (champion spells)
 		
-		try {
-			JSONObject champJson = loadJson(this, CHAMPIONS_DIR, champName + ".json", JSON_OBJECT);
-			JSONObject champData = champJson.getJSONObject("data");
-			JSONObject champ = champData.getJSONObject(champName);
-			
+		try
+		{
+			// Pull spells from JSON
 			JSONArray spells = champ.getJSONArray("spells");
 			JSONObject qSpell = (JSONObject)spells.get(0);
 			JSONObject wSpell = (JSONObject)spells.get(1);
@@ -233,10 +236,16 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			JSONObject rSpell = (JSONObject)spells.get(3);
 			JSONObject passive = champ.getJSONObject("passive");
 			
+			// Get TextView handles
+			TextView qNameView = (TextView)findViewById(R.id.q_name);
+			TextView wNameView = (TextView)findViewById(R.id.w_name);
+			TextView eNameView = (TextView)findViewById(R.id.e_name);
+			TextView rNameView = (TextView)findViewById(R.id.r_name);
 			TextView qView = (TextView)findViewById(R.id.q);
 			TextView wView = (TextView)findViewById(R.id.w);
 			TextView eView = (TextView)findViewById(R.id.e);
 			TextView rView = (TextView)findViewById(R.id.r);
+			TextView passiveNameView = (TextView)findViewById(R.id.passive_name);
 			TextView passiveView = (TextView)findViewById(R.id.passive);
 			
 			/* qView.setText(Html.fromHtml(q.getString("tooltip")));
@@ -245,50 +254,73 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			rView.setText(Html.fromHtml(r.getString("tooltip"))); */
 			passiveView.setText(Html.fromHtml(passive.getString("description")));
 			
+			// Grab full raw descriptions from spells
 			String qtt = qSpell.getString("tooltip");
 			String wtt = wSpell.getString("tooltip");
 			String ett = eSpell.getString("tooltip");
 			String rtt = rSpell.getString("tooltip");
+			String passiveName = passive.getString("name");
+			String qName = qSpell.getString("name");
+			String wName = wSpell.getString("name");
+			String eName = eSpell.getString("name");
+			String rName = rSpell.getString("name");
+			
 			String parsedQtt = "";
 			String parsedWtt = "";
 			String parsedEtt = "";
 			String parsedRtt = "";
 
-			try {
-				parsedQtt = ttParser(qtt);
-				parsedWtt = ttParser(wtt);
-				parsedEtt = ttParser(ett);
-				parsedRtt = ttParser(rtt);
-			} catch (IOException e) {
+			// Try to parse the descriptions
+			try
+			{
+				parsedQtt = ttParser(qtt, 1);
+				parsedWtt = ttParser(wtt, 2);
+				parsedEtt = ttParser(ett, 3);
+				parsedRtt = ttParser(rtt, 4);
+			} 
+			catch (IOException e) {
+				Debug.log(this, "IOException while parsing spell tooltips");
+				Debug.log(this, e.getMessage());
+			} catch (JSONException e) {
+				Debug.log(this, "JSONException while translating codes");
 				Debug.log(this, e.getMessage());
 			}
 			
+			// Throw onto TextViews
 			qView.setText(Html.fromHtml(parsedQtt));
 			wView.setText(Html.fromHtml(parsedWtt));
 			eView.setText(Html.fromHtml(parsedEtt));
 			rView.setText(Html.fromHtml(parsedRtt));
+			qNameView.setText("q:  " + qName);
+			wNameView.setText("w:  " + wName);
+			eNameView.setText("e:  " + eName);
+			rNameView.setText("r:  " + rName);
+			passiveNameView.setText("Passive:  " + passiveName);
 		
 		} catch (JSONException e) {
-			Debug.log(this, e.getMessage());
-		} catch (FileNotFoundException e) {
-			Debug.log(this, e.getMessage());
-		} catch (IOException e) {
+			Debug.log(this, "JSONException in Load Skills");
 			Debug.log(this, e.getMessage());
 		}
-		
-		
 	}
 	
 	
 	//--------------- Class Methods -------------------//
 	
-	String ttParser(String input) throws IOException {
+	String ttParser(String input, int spellNum) throws IOException, JSONException {
 		/*
 		 * Spell JSON arrays use codes in their tooltips.
 		 * The codes translate to numbers found in other parts of the
 		 * champion JSON object.
 		 * This method generates a new string with codes replaced with numbers
 		 * using the inputted string.
+		 * 
+		 * "spellNum" is which spell is being parsed (required for ChampInfo.translate
+		 * to work.  So if it's the first spell (q), you put 1.  Second (w), 2.  And so on.
+		 * 
+		 * This method also translates bad HTML supplied by DataDragon that's supposed to
+		 * be fore syntax highlighting.  It replaces <span class="colorclass"></span> with
+		 * <font color="#hexval"></font>.  This is possible since the color classes are
+		 * named after the hex colors they represent (for example, #ff9900 is class "colorFF9900").
 		 * 
 		 * Depends on method ChampInfo.translate()
 		 */
@@ -299,6 +331,9 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		String result = "";
 		String code = "";
 		String word = "";
+		int lilCounter = 0;
+		int bigCounter = 0;
+		int biggerCounter = 0;
 		
 		do
 		{
@@ -306,24 +341,79 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			if (rawChar != -1)
 			{
 				c = (char)rawChar;
-				if (c == '{')
+				sr.mark(1);
+				
+				// If html
+				if (c == '<')
+				{
+					result = result + c;
+					
+					// Run until end bracket
+					while (c != '>')
+					{
+						c = (char)sr.read();
+						
+						// Look for words
+						while ( (c != ' ') && (c != '=') && (c != '>') )
+						{
+							word = word + c;
+							if (word.equals("span"))
+							{
+								word = "font";
+							}
+							else if (word.equals("/span"))
+							{
+								word = "/font";
+							}
+							else if (word.equals("class"))
+							{
+								word = "color";
+							}
+							else if (word.equals("\"color"))
+							{
+								word = "\"#";
+								while (c != '\"')
+								{
+									c = (char)sr.read();
+									word = word + c;
+								}
+							}
+							c = (char)sr.read();
+						}
+
+						result = result + word + c;
+						word = "";
+					}
+				}
+				
+				// If a dd code
+				else if (c == '{')
 				{
 					sr.mark(1);
 					c = (char)sr.read();
 					
 					if (c == '{')
 					{
+						// Skip first space char
 						sr.skip(1);
+						
 						c = (char)sr.read();
-						code = code + c;
-						c = (char)sr.read();
-						code = code + c;
-						word = translate(code);
+						while (c != ' ')
+						{
+							// Loop until hitting second space char
+							code = code + c;
+							c = (char)sr.read();
+						}
+						word = translate(code, spellNum);
 						result = result + word;
-						sr.skip(3);
+						
+						// Skip the two closing curly braces and clear code
+						sr.skip(2);
+						code = "";
 					}
 					else
 					{
+						// False alarm; not a code, so return and add brace normally
 						sr.reset();
 						c = (char)sr.read();
 						result = result + c;
@@ -331,15 +421,810 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				}
 				else result = result + c;
 			}
+			word = "";
 		} while (rawChar != -1);
 		
 		return result;
 	}
 	
-	String translate(String code) {
+	String translate(String code, int spellNum) throws JSONException {
 		/*
 		 * Looks up the code and returns the value.
+		 * 
+		 * CODES
+		 * =====
+		 * en		nth element of "effectburn"
+		 * an		"coeff" value of element of "vars" with "key" "an"
+		 * fn		same as for an
 		 */
+		
+		String result = "";
+		JSONArray spells = champ.getJSONArray("spells");
+		JSONObject selSpell = (JSONObject)spells.get(spellNum - 1);
+		
+		if (code.equals("maxammo"))
+		{
+			if (selSpell.has("maxammo"))
+			{
+				String maxAmmo = selSpell.getString("maxammo");
+				return maxAmmo;
+			}
+			Debug.toast(this, "missing maxammo");
+			return "0";
+		}
+		
+		if (code.equals("cost"))
+		{
+			String cost = selSpell.getString("costBurn");
+			return cost;
+		}	
+
+		char alpha = code.charAt(0);
+		int num;
+		if (code.length() == 3) num = Integer.valueOf("" + code.charAt(1) + code.charAt(2));
+		else num = Integer.valueOf("" + code.charAt(1));
+	
+		// This top block is here for champs with values that need overwritten
+		if(champName.equals("Illaoi"))
+		{
+			if(spellNum == 2)
+			{
+				if(code.equals("f1")) return "";
+				if(code.equals("f2")) return "0.5";
+			}
+		}
+		if(champName.equals("Shyvana"))
+		{
+			if(spellNum == 1)
+			{
+				if(code.equals("f1")) return "0.4/0.55/0.7/0.85/1.0 AD";
+			}
+		}
+		if (alpha == 'e')
+		{
+			JSONArray effectBurn = selSpell.getJSONArray("effectBurn");
+			result = (String)effectBurn.get(num);
+			return result;
+		}
+		else if (alpha == 'a')
+		{
+			JSONArray vars = selSpell.getJSONArray("vars");
+			
+			int index = 0;
+			JSONObject holder;
+			double coeff;
+			String type;
+			String fullType = "";
+			
+			// Step through the vars array, find the object with the key
+			while (!vars.isNull(index))
+			{
+				holder = (JSONObject)vars.get(index);
+				
+				if (holder.getString("key").equals(code))
+				{
+					coeff = holder.getDouble("coeff");
+					if(holder.has("link")) type = holder.getString("link");
+					else type = null;
+					
+					if (type.equals("attackdamage")) fullType = "AD";
+					if (type.equals("bonusattackdamage")) fullType = "bonus AD";
+					if (type.equals("spelldamage")) fullType = "AP";
+					if (type.equals("armor")) fullType = "armor";
+					if (type.equals("mana")) fullType = "mana";
+					if (type.equals("health")) fullType = "health";
+					if (type.equals("bonushealth")) fullType = "bonus health";
+					
+					String fullString = Double.toString(coeff) + " " + fullType;
+					return fullString;
+				}
+				else
+				{
+					index++;
+				}
+			}
+			
+			Debug.toast(this, "something fucky happened with the coeff");
+			Debug.log(this, "cant find " + code);
+		}
+		else if (alpha == 'f')
+		{
+			JSONArray vars = selSpell.getJSONArray("vars");
+			
+			int index = 0;
+			JSONObject holder;
+			String type;
+			String fullType = "";
+			
+			// Step through the vars array, find the object with the key
+			while (!vars.isNull(index))
+			{
+				holder = (JSONObject)vars.get(index);
+				
+				if(holder.getString("key").equals(code))
+				{
+					if(holder.has("link")) type = holder.getString("link");
+					else type = "";
+					
+					if(type.equals("@text") || type.equals("@cooldownchampion"))
+					{
+						JSONArray coeff = holder.getJSONArray("coeff");
+						String coeffString = "";
+						int coeffI = 0;
+						coeffString = coeffString + Integer.toString(coeff.getInt(coeffI));
+						coeffI++;
+						while(coeffI < coeff.length())
+						{
+							coeffString = coeffString + "/" + Integer.toString(coeff.getInt(coeffI));
+							coeffI++;
+						}
+						return coeffString;
+					}
+					else
+					{
+						double coeff = holder.getDouble("coeff");
+						
+						if (type.equals("attackdamage")) fullType = "AD";
+						if (type.equals("bonusattackdamage")) fullType = "bonus AD";
+						if (type.equals("magicdamage")) fullType = "AP";
+						if (type.equals("armor")) fullType = "armor";
+						if (type.equals("mana")) fullType = "mana";
+						if (type.equals("health")) fullType = "health";
+						if (type.equals("bonushealth")) fullType = "bonus health";
+						
+						String fullString = Double.toString(coeff) + " " + fullType;
+						return fullString;
+					}
+				}
+				else
+				{
+					index++;
+				}
+			}
+			
+			if (result.isEmpty())
+			{
+				// This is the list of missing data and the rules that go with them
+				
+				if (champName.equals("Aatrox"))
+				{
+					if (code.equals("f5")) return "";
+					if (code.equals("f4")) return "a portion of his";
+				}
+				if (champName.equals("Ahri"))
+				{
+					if (code.equals("f1")) return "1.60 damage";
+				}
+				if (champName.equals("Anivia"))
+				{
+					if (code.equals("f1")) return ", based on Glacial Storm's rank, 20/20/30/40";
+				}
+				if (champName.equals("Annie"))
+				{
+					if (code.equals("f1")) return ".15 AP";
+				}
+				if (champName.equals("Ashe"))
+				{
+					if (code.equals("f1")) return "1.15/1.20/1.25/1.30/1.35 AD";
+				}
+				if (champName.equals("AurelionSol"))
+				{
+					if (code.equals("f1")) return "30-145.5 (based on level) (+15/30/45/60//75)";
+					if (code.equals("f2")) return "(+0.27-0.525 (based on level) AP)";
+				}
+				if (champName.equals("Azir"))
+				{
+					if (spellNum == 2)
+					{
+						if (code.equals("f2")) return "50-70 (based on level) (+0.6 AP)";
+						if (code.equals("f1")) return "12/11/10/9/8";
+					}
+				}
+				if (champName.equals("Bard"))
+				{
+					if (code.equals("f1")) return "N";
+					if (code.equals("f2")) return "A";
+				}
+				if (champName.equals("Braum"))
+				{
+					if (code.equals("f1")) return "0";
+				}
+				if (champName.equals("Caitlyn"))
+				{
+					if (spellNum == 1)
+					{
+						if (code.equals("f1")) return "1.30/1.40/1.50/1.60/1.70 AD";
+					}
+					if (spellNum == 2)
+					{
+						if (code.equals("f1")) return "0.7 AD";
+					}
+				}
+				if (champName.equals("Cassiopeia"))
+				{
+					if (code.equals("f2")) return "0.1 AP";
+				}
+				if (champName.equals("Corki"))
+				{
+					if (spellNum == 1)
+					{
+						if (code.equals("f1")) return "0.5 AD";
+					}
+					if (spellNum == 2)
+					{
+						if (code.equals("f1")) return "60/90/120/150/180";
+						if (code.equals("f2")) return "0.2 AP";
+					}
+				}
+				if (champName.equals("Darius"))
+				{
+					if (code.equals("f1")) return "0.4 AD bonus";
+				}
+				if (champName.equals("Evelynn"))
+				{
+					if (code.equals("f2")) return "0.35/0.4/0.45/0.5/0.55 AP";
+				}
+				if (champName.equals("Ezreal"))
+				{
+					if (spellNum == 1)
+					{
+						if (code.equals("f3")) return "1.1 AD";
+					}
+					if (spellNum == 3)
+					{
+						if (code.equals("f1")) return "0.5 bonus AD";
+					}
+				}
+				if (champName.equals("FiddleSticks"))
+				{
+					if (spellNum == 2)
+					{
+						if (code.equals("f1")) return "300/450/600/750/900";
+						if (code.equals("f2")) return "2.25 AP";
+					}
+					if (spellNum == 4)
+					{
+						if(code.equals("f1")) return "625/1125/1625";
+						if(code.equals("f2")) return "2.25 AP";
+					}
+				}
+				if(champName.equals("Fiora"))
+				{
+					if(spellNum == 2)
+					{
+						if(code.equals("f1")) return "1.0 AP";
+						
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f4")) return "140/155/170/185/200%";
+					}
+					if (spellNum == 4)
+					{
+						if(code.equals("f8")) return "bonus (8 + 18 per 100 bonus AD)";
+						if(code.equals("f6")) return "20/30/40/50";
+						if(code.equals("f9")) return "0.6 bonus AD";
+					}
+				}
+				if(champName.equals("Gangplank"))
+				{
+					if (spellNum == 3)
+					{
+						if(code.equals("f5")) return "2/1/0.5";
+					}
+					if(spellNum == 4)
+					{
+						if(code.equals("f3")) return "12";
+					}
+				}
+				if(champName.equals("Garen"))
+				{
+					if(spellNum == 2)
+					{
+						if(code.equals("f2")) return "0.25";
+						if(code.equals("f1")) return "";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f3")) return "1 per every 3 levels";
+						if(code.equals("f1")) return "5-10";
+						if(code.equals("f2")) return "5";
+					}
+				}
+				if(champName.equals("Gnar"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f1")) return "45/50/55/60";
+					}
+					if(spellNum == 2)
+					{
+						if(code.equals("f1")) return "30/45/60/75";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "";
+					}
+				}
+				if(champName.equals("Gragas"))
+				{
+					if(code.equals("f1")) return "3";
+				}
+				if(champName.equals("Graves"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f1")) return "0.75 bonus AD";
+						if(code.equals("f2")) return "0.4/0.6/0.8/1.0/1.2 bonus AD";
+					}
+					if(spellNum == 4)
+					{
+						if(code.equals("f1")) return "1.5 bonus AD";
+						if(code.equals("f2")) return "1.2 bonus AD";
+					}
+				}
+				if(champName.equals("Illaoi"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f1")) return "";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f5")) return "(8 per 100 AD)";
+						if(code.equals("f1")) return "5/4/3";
+					}
+				}
+				if(champName.equals("Irelia"))
+				{
+					if(code.equals("f1")) return "1.2 AD";
+				}
+				if(champName.equals("Jayce"))
+				{
+					if(code.equals("f3")) return "10/15/20/25";
+				}
+				if(champName.equals("Jhin"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f1")) return "0.3/0.35/0.4/0.45/0.5 AD";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "28/27/26/25/24";
+					}
+					if(spellNum == 4)
+					{
+						if (code.equals("f1")) return "(1 + bonus crit damage) x 100";
+					}
+				}
+				if(champName.equals("Jinx"))
+				{
+					if(code.equals("f4")) return "0-70";
+				}
+				if(champName.equals("Kalista"))
+				{
+					if(code.equals("f1")) return "(based on level) 10-27";
+				}
+				if(champName.equals("Karma"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f3")) return "25";
+					}
+					if(spellNum == 2)
+					{
+						if(code.equals("f3")) return "for every 100 AP, 1";
+						if(code.equals("f2")) return "0.5/0.75/1/1.25";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f2")) return "50";
+						if(code.equals("f3")) return "60";
+					}
+				}
+				if(champName.equals("Kassadin"))
+				{
+					if(code.equals("f2")) return "2% maximum mana";
+					if(code.equals("f1")) return "1% maximum mana";
+					if(code.equals("f3")) return "0.1 AP";
+				}
+				if(champName.equals("Khazix"))
+				{
+					if(code.equals("f3")) return "(based on level) 10-180";
+					if(code.equals("f2")) return "1.04 AD";
+				}
+				if(champName.equals("Kindred"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f2")) return "55/75/95/115/135 + 5 damage per stack of Mark of the Kindred";
+						if(code.equals("f1")) return "0.2 AD";
+					}
+					if(spellNum == 2)
+					{
+						if(code.equals("f2")) return "0.4 AD";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "0.2 AD";
+					}
+				}
+				if(champName.equals("KogMaw"))
+				{
+					if(spellNum == 2)
+					{
+						if(code.equals("f1")) return "0.75% per 100 AP";
+					}
+					if(spellNum == 4)
+					{
+						if(code.equals("f3")) return "1.3 AD";
+						if(code.equals("f2")) return "0.5 AP";
+						if(code.equals("f4")) return "210/330/450";
+						if(code.equals("f6")) return "1.95 AD";
+						if(code.equals("f5")) return "0.75 AP";
+					}
+				}
+				if(champName.equals("Lulu"))
+				{
+					if(code.equals("f4")) return "56/87.5/119/150.5/182";
+					if(code.equals("f5")) return "0.35 AP";
+					if(code.equals("f6")) return "80/125/170/215/260 + 0.5 AP";
+				}
+				if(champName.equals("Malphite"))
+				{
+					if(code.equals("f1")) return "";
+					if(code.equals("f2")) return "0.1 armor";
+				}
+				if(champName.equals("Malzahar"))
+				{
+					if(spellNum == 2)
+					{
+						if(code.equals("f1")) return "0.3/0.325/0.35/0.375/0.40 AD";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "";
+					}
+				}
+				if(champName.equals("MasterYi"))
+				{
+					if(code.equals("f1")) return "(while on cooldown)";
+				}
+				if(champName.equals("MissFortune"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f1")) return "0.85 AD";
+						if(code.equals("f2")) return "1.0 AD";
+					}
+					if(spellNum == 2)
+					{
+						if(code.equals("f2")) return "(affected by cooldown reduction) 2";
+					}
+					if(spellNum == 4)
+					{
+						if(code.equals("f3")) return "(1 + bonus crit damage) x 20%";
+						if(code.equals("f2")) return "N/A";
+					}
+				}
+				if(champName.equals("Mordekaiser"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f5")) return "20/40/60/80/100";
+						if(code.equals("f3")) return "2.0/2.4/2.8/3.2/3.6 AD";
+						if(code.equals("f4")) return "2.4 AP";
+					}
+					if(spellNum == 2)
+					{
+						if(code.equals("f3")) return "N/A";
+					}
+					if(spellNum == 4)
+					{
+						if(code.equals("f1")) return "100% of Morde's bonus attack damage as ";
+						if(code.equals("f2")) return "15% of Morde's max health as bonus ";
+					}
+				}
+				if(champName.equals("Nami"))
+				{
+					if(code.equals("f1")) return "for every 100 AP, 7.5% + 85";
+				}
+				if(champName.equals("Nunu"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f3")) return "10";
+						if(code.equals("f4")) return "15";
+						if(code.equals("f5")) return "1";
+					}
+					if(spellNum == 4)
+					{
+						if(code.equals("f2")) return "78.1/109.4/140.6 (+0.3125 AP)";
+					}
+				}
+				if(champName.equals("Poppy"))
+				{
+					if(code.equals("f1")) return "0.12";
+					if(code.equals("f2")) return "0.12";
+				}
+				if(champName.equals("Quinn"))
+				{
+					if(code.equals("f2")) return "0.8/0.9/1.0/1.1/1.2 AD";
+				}
+				if(champName.equals("RekSai"))
+				{
+					if(spellNum == 2)
+					{
+						if(code.equals("f1")) return "15/20/25/30";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "0.8/0.9/1.0/1.1/1.2 AD";
+						if(code.equals("f2")) return "1.6/1.8/2.0/2.2/2.4 AD";
+					}
+				}
+				if(champName.equals("Renekton"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f3")) return "this whole";
+						if(code.equals("f4")) return "fucking bullshit";
+						if(code.equals("f5")) return "needs to be";
+						if(code.equals("f6")) return "overridden";
+					}
+					if(spellNum == 2)
+					{
+						if(code.equals("f3")) return "2.25 AD";
+					}
+				}
+				if(champName.equals("Rengar"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f3")) return "0/0.5/0.1/0.15/0.2 AD";
+						if(code.equals("f2")) return "30-240";
+						if(code.equals("f4")) return "50-102";
+					}
+					if(spellNum == 2)
+					{
+						if(code.equals("f2")) return "40-240";
+						if(code.equals("f1")) return "12-80";
+						if(code.equals("f3")) return "75-500";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "50-340";
+					}
+				}
+				if(champName.equals("Ryze"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f1")) return "+3% bonus mana";
+						if(code.equals("f3")) return "60-200 (based on level)";
+						if(code.equals("f2")) return "+3% bonus mana";
+					}
+					if(spellNum == 2)
+					{
+						if(code.equals("f1")) return "1% bonus mana";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "2% bonus mana";
+					}
+				}
+				if(champName.equals("Shen"))
+				{
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "30/35/40";
+						if(code.equals("f2")) return "12% bonus health";
+					}
+					if(spellNum == 4)
+					{
+						if(code.equals("f1")) return "3";
+					}
+				}
+				if(champName.equals("Shyvana"))
+				{
+					if(code.equals("f2")) return "1.0 AD";
+				}
+				if(champName.equals("Sion"))
+				{
+					if(code.equals("f2")) return "";
+				}
+				if(champName.equals("Skarner"))
+				{
+					if(code.equals("f1")) return "";
+				}
+				if(champName.equals("Soraka"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f1")) return "0.05 AP";
+					}
+					if(spellNum == 2)
+					{
+						if(code.equals("f1")) return "3/3.5/4/4.5/5";
+					}
+				}
+				if(champName.equals("Swain"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f1")) return "60/96/130/166/200";
+						if(code.equals("f2")) return "120/190/260/330/400";
+						if(code.equals("f3")) return "1.2 AP";
+						if(code.equals("f4")) return "240/380/520/660/800";
+						if(code.equals("f5")) return "2.4 AP";
+					}
+					if(spellNum == 4)
+					{
+						if(code.equals("f9")) return "0.12 AP";
+						if(code.equals("f10")) return "0.08 AP";
+					}
+				}
+				if(champName.equals("Syndra"))
+				{
+					if(code.equals("f1")) return "6";
+				}
+				if(champName.equals("Taliyah"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f1")) return "(affected by cooldown reduction) 140-77";
+						if(code.equals("f2")) return "(based on level) 10-20%";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f2")) return "(20 + 4 per 100 AP)";
+						if(code.equals("f3")) return "40/52.5/65/77.5/90";
+						if(code.equals("f1")) return "0.2 AP";
+						if(code.equals("f4")) return "15";
+					}
+					
+				}
+				if(champName.equals("Taric"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f1")) return "1.5% bonus health";
+						if(code.equals("f2")) return "4.5% bonus health";
+						if(code.equals("f3")) return "(affected by cooldown reduction) 6-3.3";
+					}
+					if(spellNum == 2)
+					{
+						if(code.equals("f1")) return "10/12.5/15/17.5/20 bonus armor";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "30% bonus armor";
+					}
+				}
+				if(champName.equals("Teemo"))
+				{
+					if(spellNum == 4)
+					{
+						if(code.equals("f1")) return "(affected by cooldown reduction) 30/25/20";
+					}
+				}
+				if(champName.equals("Thresh"))
+				{
+					if(spellNum == 2)
+					{
+						if(code.equals("f6")) return "+1 per soul collected";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f3")) return "# of collected souls";
+						if(code.equals("f2")) return "8.0/1.1/1.4/1.7/2.0 AD";
+					}
+				}
+				if(champName.equals("Tristana"))
+				{
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "0.5/0.65/0.8/0.95/1.1 AD";
+					}
+				}
+				if(champName.equals("Tryndamere"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f2")) return "0.012 AP";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "1.2 bonus AD";
+					}
+				}
+				if(champName.equals("Twitch"))
+				{
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "0.25 bonus AD";
+					}
+				}
+				if(champName.equals("Urgot"))
+				{
+					if(spellNum == 2)
+					{
+						if(code.equals("f1")) return "";
+					}
+				}
+				if(champName.equals("Viktor"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f1")) return "8% maximum mana";
+						if(code.equals("f2")) return "0.15 AP";
+					}
+				}
+				if(champName.equals("Vladimir"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f7")) return "(based on level) 40-240";
+						if(code.equals("f6")) return "for every 100 AP, 4";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f3")) return "10% of max health";
+						if(code.equals("f2")) return "2.5% of max health";
+					}
+					if(spellNum == 4)
+					{
+						if(code.equals("f4")) return "150/250/350";
+						if(code.equals("f3")) return "0.7 AP";
+					}
+				}
+				if(champName.equals("Xerath"))
+				{
+					if(spellNum == 2)
+					{
+						if(code.equals("f1")) return "90/135/180/225/270";
+						if(code.equals("f2")) return "0.9 AP";
+					}
+				}
+				if(champName.equals("XinZhao"))
+				{
+					if(spellNum == 2)
+					{
+						if(code.equals("f1")) return "0.20 bonus AD";
+					}
+				}
+				if(champName.equals("Zed"))
+				{
+					if(spellNum == 2)
+					{
+						if(code.equals("f3")) return "0.04/0.08/0.12/0.16/0.2 bonus AD";
+					}
+				}
+				if(champName.equals("Zyra"))
+				{
+					if(spellNum == 1)
+					{
+						if(code.equals("f1")) return "(based on level) 29-114";
+						if(code.equals("f2")) return "(based on level) 5-7.5";
+					}
+					if(spellNum == 2)
+					{
+						if(code.equals("ammorechargetime")) return "20/18/16/14/12";
+					}
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "(based on level) 29-114";
+						if(code.equals("f2")) return "(based on level) 5-7.5";
+					}
+				}
+			}
+			
+			// Code should not get here
+			Debug.toast(this, "something fucky happened with the coeff");
+			Debug.log(this, "cant find " + code);
+		}
+		
 		return "0";
 	}
 	
@@ -509,8 +1394,10 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	// spinner handler
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
-		// An item was selected. You can retrieve the selected item using
-		// parent.getItemAtPosition(pos)
+		/*
+		 * An item was selected. You can retrieve the selected item using
+		 * parent.getItemAtPosition(pos)
+		 */
 		String item = (String) parent.getItemAtPosition(pos);
 		try {
 			statUpdate(item);
@@ -523,11 +1410,11 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 
 	@Override
 	public void onNothingSelected(AdapterView<?> parent) {
-		// not used
+		/* not used */
 	}
 	
 	public void stubMethod() {
-		// Simple test method for stubs.
+		// Simple test method for stubs
 		Toast toast = Toast.makeText(this, "Tada!", Toast.LENGTH_SHORT);
 		toast.show();
 	}

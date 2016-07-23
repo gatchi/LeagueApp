@@ -994,7 +994,7 @@ public class MainActivity extends Activity
 	}
 	
 	void stubMethod() {
-		Toast toast = Toast.makeText(getApplicationContext(), "Tada!", Toast.LENGTH_SHORT);
+		Toast toast = Toast.makeText(getApplicationContext(), "Not implemented", Toast.LENGTH_SHORT);
 		toast.show();
 	}
 }

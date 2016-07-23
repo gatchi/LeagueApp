@@ -182,6 +182,7 @@
 				android:textSize="16dp"/>
 				
 			<TextView
+				android:id="@+id/passive_name"
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:text="passive"/>
@@ -190,10 +191,12 @@
 				android:id="@+id/passive"
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
+				android:layout_margin="10dp"
 				android:gravity="center"
 				android:text="missing info"/>
 				
 			<TextView
+				android:id="@+id/q_name"
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:text="q"/>
@@ -202,10 +205,12 @@
 				android:id="@+id/q"
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
+				android:layout_margin="10dp"
 				android:gravity="center"
 				android:text="missing info"/>
 				
 			<TextView
+				android:id="@+id/w_name"
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:text="w"/>
@@ -214,10 +219,12 @@
 				android:id="@+id/w"
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
+				android:layout_margin="10dp"
 				android:gravity="center"
 				android:text="missing info"/>
 				
 			<TextView
+				android:id="@+id/e_name"
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:text="e"/>
@@ -226,18 +233,21 @@
 				android:id="@+id/e"
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
+				android:layout_margin="10dp"
 				android:gravity="center"
 				android:text="missing info"/>
 				
 			<TextView
+				android:id="@+id/r_name"
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
 				android:text="r"/>
-				
+			
 			<TextView
 				android:id="@+id/r"
 				android:layout_height="wrap_content"
 				android:layout_width="wrap_content"
+				android:layout_margin="10dp"
 				android:gravity="center"
 				android:text="missing info"/>
 		
