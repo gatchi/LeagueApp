@@ -121,16 +121,14 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		}
 		
 		// Load the JSON data
-		
-		try {
-			
+		try
+		{
 			champJson = loadJson(this, CHAMPIONS_DIR, champName + ".json", JSON_OBJECT);
 			JSONObject champData = champJson.getJSONObject("data");
 			champ = champData.getJSONObject(champName);
 			JSONObject champStats = champ.getJSONObject("stats");
 			
 			// Get stats
-			
 			parType = champ.getString("partype");
 			hpBase = champStats.getDouble("hp");
 			hpPerLevel = champStats.getDouble("hpperlevel");
@@ -153,57 +151,53 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			asBase = calcAs(asOffset);
 
 			// Set resource type on stat page
-			
 			TextView resourceTypeText = (TextView) findViewById(R.id.champ_resource_type);
 			TextView resourceRegenTypeText = (TextView) findViewById(R.id.resource_regen_type);
 			
 			if (parType.equals("MP"))
 			{
-				resourceTypeText.setText("mana");
-				resourceRegenTypeText.setText("mana regen");
+				resourceTypeText.setText("Mana");
+				resourceRegenTypeText.setText("Mana regen");
 			}
 			else if (parType.equals("Energy"))
 			{
-				resourceTypeText.setText("energy");
-				resourceRegenTypeText.setText("energy regen");
+				resourceTypeText.setText("Energy");
+				resourceRegenTypeText.setText("Energy regen");
 			}
 			else if (champName.equals("Aatrox") || champName.equals("Vladimir") || champName.equals("DrMundo") || champName.equals("Mordekaiser") || champName.equals("Zac"))
 			{
-				resourceTypeText.setText("uses health");
+				resourceTypeText.setText("Uses health");
 			}
 			else if (champName.equals("Rengar"))
 			{
-				resourceTypeText.setText("ferocity");
+				resourceTypeText.setText("Ferocity");
 			}
 			else if (champName.equals("RekSai") || champName.equals("Renekton") || champName.equals("Shyvana") || champName.equals("Tryndamere") || champName.equals("Gnar"))
 			{
-				resourceTypeText.setText("fury");
+				resourceTypeText.setText("Fury");
 			}
 			else if (champName.equals("Rumble")) {
-				resourceTypeText.setText("heat");
+				resourceTypeText.setText("Heat");
 			}
 			else {
-				resourceTypeText.setText("no resource");
+				resourceTypeText.setText("No resource");
 			}
 
 			// Set range on stat page
-			
 			TextView rangeTypeText = (TextView) findViewById(R.id.range_type);
 			TextView rangeText = (TextView) findViewById(R.id.range);
 			
 			if (attackRange < 300)
 			{
-				rangeTypeText.setText("melee");
+				rangeTypeText.setText("Melee");
 			}
 			else if (attackRange >= 300)
 			{
-				rangeTypeText.setText("ranged");
+				rangeTypeText.setText("Ranged");
 			}
-			
 			rangeText.setText(String.format("%.0f", attackRange));
 			
 			// Set movespeed on stat page
-			
 			TextView movespeedText = (TextView) findViewById(R.id.movespeed);
 			movespeedText.setText(String.format("%.0f" ,moveSpeed));
 			
@@ -225,7 +219,6 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		}
 		
 		// Load skills (champion spells)
-		
 		try
 		{
 			// Pull spells from JSON
@@ -452,19 +445,40 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			Debug.toast(this, "missing maxammo");
 			return "0";
 		}
-		
 		if (code.equals("cost"))
 		{
 			String cost = selSpell.getString("costBurn");
 			return cost;
-		}	
-
+		}
+		
 		char alpha = code.charAt(0);
-		int num;
-		if (code.length() == 3) num = Integer.valueOf("" + code.charAt(1) + code.charAt(2));
-		else num = Integer.valueOf("" + code.charAt(1));
+		int num = 0;
+		try
+		{
+			if (code.length() == 3) num = Integer.valueOf("" + code.charAt(1) + code.charAt(2));
+			else num = Integer.valueOf("" + code.charAt(1));
+		}
+		catch(java.lang.NumberFormatException e)
+		{
+			Debug.log(this, e.getMessage());
+			Debug.log(this, "code: " + code);
+		}
 	
 		// This top block is here for champs with values that need overwritten
+		if(champName.equals("Darius"))
+		{
+			if(spellNum == 4)
+			{
+				if(code.equals("f3")) return "0";
+			}
+		}
+		if(champName.equals("Ekko"))
+		{
+			if(spellNum == 4)
+			{
+				if(code.equals("a2")) return "(for every 100AP) 0.06667";
+			}
+		}
 		if(champName.equals("Illaoi"))
 		{
 			if(spellNum == 2)
@@ -473,11 +487,40 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				if(code.equals("f2")) return "0.5";
 			}
 		}
+		if(champName.equals("Jax"))
+		{
+			if(spellNum == 4)
+			{
+				if(code.equals("f2")) return "";
+				if(code.equals("f1")) return "";
+			}
+		}
+		if(champName.equals("Nasus"))
+		{
+			if(spellNum == 1)
+			{
+				if(code.equals("f1")) return "0";
+			}
+		}
 		if(champName.equals("Shyvana"))
 		{
 			if(spellNum == 1)
 			{
 				if(code.equals("f1")) return "0.4/0.55/0.7/0.85/1.0 AD";
+			}
+		}
+		if(champName.equals("Ziggs"))
+		{
+			if(spellNum == 2)
+			{
+				if(code.equals("f1")) return "25/27.5/30/32.5/35";
+			}
+		}
+		if(champName.equals("Zyra"))
+		{
+			if(spellNum == 2)
+			{
+				if(code.equals("ammorechargetime")) return "20/18/16/14/12";
 			}
 		}
 		if (alpha == 'e')
@@ -492,18 +535,37 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			
 			int index = 0;
 			JSONObject holder;
-			double coeff;
 			String type;
+			String coeff;
 			String fullType = "";
 			
 			// Step through the vars array, find the object with the key
 			while (!vars.isNull(index))
 			{
 				holder = (JSONObject)vars.get(index);
-				
 				if (holder.getString("key").equals(code))
 				{
-					coeff = holder.getDouble("coeff");
+					if (holder.get("coeff") instanceof String)
+					{
+						coeff = holder.getString("coeff");
+					}
+					else if (holder.get("coeff") instanceof Double)
+					{
+						coeff = Double.toString(holder.getDouble("coeff"));
+					}
+					else if (holder.get("coeff") instanceof JSONArray)
+					{
+						JSONArray coeffArray = holder.getJSONArray("coeff");
+						coeff = "";
+						for(int i=0; i<coeffArray.length(); i++)
+						{
+							coeff = coeff + Double.toString(coeffArray.getDouble(i)) + "/";
+						}
+					}
+					else {
+						coeff = "error";
+					}
+					
 					if(holder.has("link")) type = holder.getString("link");
 					else type = null;
 					
@@ -515,7 +577,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 					if (type.equals("health")) fullType = "health";
 					if (type.equals("bonushealth")) fullType = "bonus health";
 					
-					String fullString = Double.toString(coeff) + " " + fullType;
+					String fullString = coeff + " " + fullType;
 					return fullString;
 				}
 				else
@@ -533,6 +595,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			
 			int index = 0;
 			JSONObject holder;
+			String coeff;
 			String type;
 			String fullType = "";
 			
@@ -540,41 +603,52 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			while (!vars.isNull(index))
 			{
 				holder = (JSONObject)vars.get(index);
-				
 				if(holder.getString("key").equals(code))
 				{
+					if (holder.get("coeff") instanceof String)
+					{
+						coeff = holder.getString("coeff");
+					}
+					else if (holder.get("coeff") instanceof Integer)
+					{
+						coeff = Integer.toString(holder.getInt("coeff"));
+					}
+					else if (holder.get("coeff") instanceof Double)
+					{
+						coeff = Double.toString(holder.getDouble("coeff"));
+					}
+					else if (holder.get("coeff") instanceof JSONArray)
+					{
+						JSONArray coeffArray = holder.getJSONArray("coeff");
+						coeff = "";
+						for(int i=0; i<coeffArray.length()-1; i++)
+						{
+							coeff = coeff + Double.toString(coeffArray.getDouble(i)) + "/";
+						}
+						coeff = coeff + Double.toString(coeffArray.getDouble(coeffArray.length() - 1));
+					}
+					else {
+						coeff = "error";
+					}
+					
 					if(holder.has("link")) type = holder.getString("link");
 					else type = "";
 					
-					if(type.equals("@text") || type.equals("@cooldownchampion"))
-					{
-						JSONArray coeff = holder.getJSONArray("coeff");
-						String coeffString = "";
-						int coeffI = 0;
-						coeffString = coeffString + Integer.toString(coeff.getInt(coeffI));
-						coeffI++;
-						while(coeffI < coeff.length())
-						{
-							coeffString = coeffString + "/" + Integer.toString(coeff.getInt(coeffI));
-							coeffI++;
-						}
-						return coeffString;
-					}
-					else
-					{
-						double coeff = holder.getDouble("coeff");
-						
-						if (type.equals("attackdamage")) fullType = "AD";
-						if (type.equals("bonusattackdamage")) fullType = "bonus AD";
-						if (type.equals("magicdamage")) fullType = "AP";
-						if (type.equals("armor")) fullType = "armor";
-						if (type.equals("mana")) fullType = "mana";
-						if (type.equals("health")) fullType = "health";
-						if (type.equals("bonushealth")) fullType = "bonus health";
-						
-						String fullString = Double.toString(coeff) + " " + fullType;
-						return fullString;
-					}
+					// Units
+					if (type.equals("attackdamage")) fullType = "AD";
+					if (type.equals("bonusattackdamage")) fullType = "bonus AD";
+					if (type.equals("magicdamage")) fullType = "AP";
+					if (type.equals("spelldamage")) fullType = "AP";
+					if (type.equals("armor")) fullType = "armor";
+					if (type.equals("bonusarmor")) fullType = "of bonus armor";
+					if (type.equals("bonusspellblock")) fullType = "of bonus magic resist";
+					if (type.equals("mana")) fullType = "mana";
+					if (type.equals("health")) fullType = "health";
+					if (type.equals("bonushealth")) fullType = "of bonus health";
+					if (type.equals("@dynamic.abilitypower")) fullType = "AP";
+					
+					String fullString = coeff + " " + fullType;
+					return fullString;
 				}
 				else
 				{
@@ -616,14 +690,18 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				{
 					if (spellNum == 2)
 					{
-						if (code.equals("f2")) return "50-70 (based on level) (+0.6 AP)";
+						if (code.equals("f2")) return "(based on level) 50-70";
 						if (code.equals("f1")) return "12/11/10/9/8";
+					}
+					if (spellNum == 3)
+					{
+						if (code.equals("f1")) return "0";
 					}
 				}
 				if (champName.equals("Bard"))
 				{
-					if (code.equals("f1")) return "N";
-					if (code.equals("f2")) return "A";
+					if (code.equals("f1")) return "0";
+					if (code.equals("f2")) return "0";
 				}
 				if (champName.equals("Braum"))
 				{
@@ -659,6 +737,18 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				if (champName.equals("Darius"))
 				{
 					if (code.equals("f1")) return "0.4 AD bonus";
+				}
+				if (champName.equals("DrMundo"))
+				{
+					if(spellNum == 3)
+					{
+						if(code.equals("f1")) return "0";
+						if(code.equals("f2")) return "0";
+					}
+					if(spellNum == 4)
+					{
+						if(code.equals("f1")) return "0";
+					}
 				}
 				if (champName.equals("Evelynn"))
 				{
@@ -698,6 +788,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 					if(spellNum == 3)
 					{
 						if(code.equals("f4")) return "140/155/170/185/200%";
+						if(code.equals("f3")) return "0";
 					}
 					if (spellNum == 4)
 					{
@@ -727,7 +818,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 					if(spellNum == 3)
 					{
 						if(code.equals("f3")) return "1 per every 3 levels";
-						if(code.equals("f1")) return "5-10";
+						if(code.equals("f1")) return "0";
 						if(code.equals("f2")) return "5";
 					}
 				}
@@ -743,7 +834,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 					}
 					if(spellNum == 3)
 					{
-						if(code.equals("f1")) return "";
+						if(code.equals("f1")) return "0";
 					}
 				}
 				if(champName.equals("Gragas"))
@@ -767,7 +858,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				{
 					if(spellNum == 1)
 					{
-						if(code.equals("f1")) return "";
+						if(code.equals("f1")) return "0";
 					}
 					if(spellNum == 3)
 					{
@@ -804,7 +895,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				}
 				if(champName.equals("Kalista"))
 				{
-					if(code.equals("f1")) return "(based on level) 10-27";
+					if(code.equals("f1")) return "10-27 (based on level)";
 				}
 				if(champName.equals("Karma"))
 				{
@@ -869,11 +960,11 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				{
 					if(code.equals("f4")) return "56/87.5/119/150.5/182";
 					if(code.equals("f5")) return "0.35 AP";
-					if(code.equals("f6")) return "80/125/170/215/260 + 0.5 AP";
+					if(code.equals("f6")) return "80/125/170/215/260 +0.5 AP";
 				}
 				if(champName.equals("Malphite"))
 				{
-					if(code.equals("f1")) return "";
+					if(code.equals("f1")) return "0";
 					if(code.equals("f2")) return "0.1 armor";
 				}
 				if(champName.equals("Malzahar"))
@@ -889,7 +980,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				}
 				if(champName.equals("MasterYi"))
 				{
-					if(code.equals("f1")) return "(while on cooldown)";
+					if(code.equals("f1")) return "0";
 				}
 				if(champName.equals("MissFortune"))
 				{
@@ -904,8 +995,8 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 					}
 					if(spellNum == 4)
 					{
-						if(code.equals("f3")) return "(1 + bonus crit damage) x 20%";
-						if(code.equals("f2")) return "N/A";
+						if(code.equals("f3")) return "(1 + bonus crit damage) x 20";
+						if(code.equals("f2")) return "0";
 					}
 				}
 				if(champName.equals("Mordekaiser"))
@@ -918,7 +1009,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 					}
 					if(spellNum == 2)
 					{
-						if(code.equals("f3")) return "N/A";
+						if(code.equals("f3")) return "0";
 					}
 					if(spellNum == 4)
 					{
@@ -928,7 +1019,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				}
 				if(champName.equals("Nami"))
 				{
-					if(code.equals("f1")) return "for every 100 AP, 7.5% + 85";
+					if(code.equals("f1")) return "85 (+0.075 AP)";
 				}
 				if(champName.equals("Nunu"))
 				{
@@ -945,8 +1036,8 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				}
 				if(champName.equals("Poppy"))
 				{
-					if(code.equals("f1")) return "0.12";
-					if(code.equals("f2")) return "0.12";
+					if(code.equals("f1")) return "0";
+					if(code.equals("f2")) return "0";
 				}
 				if(champName.equals("Quinn"))
 				{
@@ -1001,9 +1092,9 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				{
 					if(spellNum == 1)
 					{
-						if(code.equals("f1")) return "+3% bonus mana";
+						if(code.equals("f1")) return "3% bonus mana";
 						if(code.equals("f3")) return "60-200 (based on level)";
-						if(code.equals("f2")) return "+3% bonus mana";
+						if(code.equals("f2")) return "3% bonus mana";
 					}
 					if(spellNum == 2)
 					{
@@ -1032,7 +1123,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				}
 				if(champName.equals("Sion"))
 				{
-					if(code.equals("f2")) return "";
+					if(code.equals("f2")) return "0";
 				}
 				if(champName.equals("Skarner"))
 				{
@@ -1113,7 +1204,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				{
 					if(spellNum == 2)
 					{
-						if(code.equals("f6")) return "+1 per soul collected";
+						if(code.equals("f6")) return "1 per soul collected";
 					}
 					if(spellNum == 3)
 					{
@@ -1150,7 +1241,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				{
 					if(spellNum == 2)
 					{
-						if(code.equals("f1")) return "";
+						if(code.equals("f1")) return "0";
 					}
 				}
 				if(champName.equals("Viktor"))
@@ -1208,10 +1299,6 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 						if(code.equals("f1")) return "(based on level) 29-114";
 						if(code.equals("f2")) return "(based on level) 5-7.5";
 					}
-					if(spellNum == 2)
-					{
-						if(code.equals("ammorechargetime")) return "20/18/16/14/12";
-					}
 					if(spellNum == 3)
 					{
 						if(code.equals("f1")) return "(based on level) 29-114";
@@ -1225,7 +1312,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			Debug.log(this, "cant find " + code);
 		}
 		
-		return "0";
+		return "error";
 	}
 	
 	static JSONObject loadJson(Context context, String directory, String filename, int type) throws FileNotFoundException, IOException, JSONException {

@@ -1,11 +1,16 @@
 Goals for Today
 ===============
 
+
 Goals for Some Other Day
 ========================
-o test all the champ abilities
+o custom passive text
 + custom rule for Jayce (missing half his skills)
++ custom rule for Elise (missing half her skills)
 + custom rule for Renekton (Q has incorrect hard coded values)
+o fix weird shit on shyvana's page
+o passives are almost all too vague and missing numbers, do something about this
+? what the fuck is dynamic ability power? heimer issues
 + setting: tabbed champinfo pages
 + setting: internet retry
 + get downloads from latest version
@@ -16,6 +21,8 @@ o test all the champ abilities
 + on ChampInfo: settings, verbose (more precision) or simple (less precision)
 + custom colors for spell text syntax highlighting
 + setting: turn off syntax highlighting
++ setting: auto-updating
+o get Wukong to show up in the proper location on the list
 
 Major Features
 ==============
@@ -26,7 +33,8 @@ x view basic stats
 
 Things Done Since Last Commit
 =============================
-+ made a string parser for putting text + values together from datadragon
-+ implemented custom rules for fn values that are missing (and a few to be overwritten)
-+ string parser for converting bad html into good html (datadragon colors)
-o fixed error loading akali's ultimate
+o changed theme to dark theme
+o added champ icon row size adjusting wrt phone orientation changes
++ added code that can handle different f1 and a1 types (spell data variables)
+o testing champ pages
+	o fixed some values and also some retrieval methods

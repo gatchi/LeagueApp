@@ -22,6 +22,7 @@ import android.view.View.OnClickListener;
 import android.view.Gravity;
 import android.content.Intent;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.graphics.BitmapFactory;
@@ -55,17 +56,17 @@ import org.json.JSONException;
 
 public class MainActivity extends Activity 
 {
-	final static String BASE_DOWNLOAD_URL = "http://ddragon.leagueoflegends.com/cdn/6.11.1/";
-	final static int TABLE_ROW_WIDTH = 5;
+	final static String BASE_DOWNLOAD_URL = "http://ddragon.leagueoflegends.com/cdn/6.14.2/";
+	final static int TABLE_ROW_WIDTH_DEFAULT = 5;
+	final static int TABLE_ROW_WIDTH_PORTRAIT = 5;
+	final static int TABLE_ROW_WIDTH_LANDSCAPE = 8;
 	
 	// Error codes
-	
 	final int DEC_NO_INTERNET = 1;
 	final int DEC_NO_AVAIL_UPDATES = 2;
 	final int DEC_IO_EXCEPTION = 3;
 	
 	// Settings 
-	
 	boolean SETT_RETRY = false;
 	
 	
@@ -272,21 +273,18 @@ public class MainActivity extends Activity
       setContentView(R.layout.main);
 		
 		// Make sure this directory exists
-		
 		initDirectories();
 		
 		// Setup champ buttons
-		
 		File champListFile = new File(this.getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), ChampInfo.CHAMPIONS_FILE);
 		if (champListFile.exists()) {
 			
 			// Load champ list
-			
 			Debug.log(this, "Champ list found.  Loading...");
 			
-			try {
+			try
+			{
 				// Champ list parser (comma is delimiter)
-				
 				BufferedReader listReader = new BufferedReader(new FileReader(champListFile));
 				int ic = 0;
 				char c = 0;
@@ -314,7 +312,6 @@ public class MainActivity extends Activity
 					}
 					
 					// To prevent hanging
-					
 					if (d > 600)
 					{
 						Debug.log(this, "Force break of list-reading loop");
@@ -323,12 +320,9 @@ public class MainActivity extends Activity
 					else d++;
 				}
 			
-				/* Debug.log(this, "Left loop."); */
-				/* java.util.Collections.sort(champList); */
 				Debug.log(this, "Champ list generated");
 				
 				// Add champ buttons iteratively
-					
 				Iterator<String> champIterator = champList.listIterator();
 				LinearLayout ll = new LinearLayout(this);
 				TableLayout tl = (TableLayout)findViewById(R.id.button_layout);
@@ -340,23 +334,30 @@ public class MainActivity extends Activity
 						warningText.setVisibility(View.GONE);
 					}
 					
-					if (count % TABLE_ROW_WIDTH == 0) {
+					// Check orientation, adjust row size if needed
+					int width = TABLE_ROW_WIDTH_DEFAULT;
+					int orientation = getResources().getConfiguration().orientation;
+					if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+						width = TABLE_ROW_WIDTH_PORTRAIT;
+					}
+					else if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+						width = TABLE_ROW_WIDTH_LANDSCAPE;
+					}
+						
+					if (count % width == 0) {
 						ll = new LinearLayout(this);
 						ll.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT));
 						ll.setGravity(Gravity.CENTER_HORIZONTAL);
-						/* Debug.log(this, "Added row"); */
 						tl.addView(ll);
 					}
 					
 					ImageButton ib = new ImageButton(this);
 					
 					// Populate icons
-					
 					String champName = champIterator.next();
 					File championIconFile = new File(this.getDir("drawable", Context.MODE_PRIVATE), champName + ".png");
 					InputStream iconStream = new BufferedInputStream(new FileInputStream(championIconFile));
 					ib.setImageBitmap(BitmapFactory.decodeStream(iconStream));
-					
 					ib.setAdjustViewBounds(true);
 					ib.setScaleType(ScaleType.FIT_CENTER);
 					ib.setCropToPadding(false);
@@ -369,7 +370,6 @@ public class MainActivity extends Activity
 					params.setMargins(2,2,2,2);
 					ib.setLayoutParams(params);
 					
-					/* Debug.log(this, "Added button."); */
 					count++;
 				}
 				Debug.log(this, "Layout generated");
@@ -388,19 +388,17 @@ public class MainActivity extends Activity
 		else {
 			
 			// Ask to update
-			
 			Debug.log(this, "Adding simple TextView to empty View...");
 			TableLayout tl = (TableLayout)findViewById(R.id.button_layout);
 			warningText = new TextView(this);
-			warningText.setText("No data");
-			warningText.setBackgroundColor(0xFFFF);
+			warningText.setText("Welcome to LeagueApp!  If this is your first use, please update twice.");
+			warningText.setGravity(Gravity.CENTER);
 			tl.addView(warningText);
 			Debug.log(this, "Added.");
 			Debug.toast(this, "Tap update to fetch data");
 		}
 		
 		// Add data refresh button
-		
 		LinearLayout footer = (LinearLayout) findViewById(R.id.footer);
 		refreshButton = new Button(this);
 		refreshButton.setText("update");
@@ -415,14 +413,12 @@ public class MainActivity extends Activity
 		clearButton.setOnClickListener(clearButtonListener); */
 		
 		// Add log clear button
-		
 		logClearButton = new Button(this);
 		logClearButton.setText("clear log");
 		footer.addView(logClearButton);
 		logClearButton.setOnClickListener(logClearButtonListener);
 		
 		// Add listener to search bar
-		
 		editText = (EditText) findViewById(R.id.search);
 		editText.setOnEditorActionListener(searchListener);
 	}
@@ -494,7 +490,6 @@ public class MainActivity extends Activity
 	void downloadData() {
 		
 		// Check for to see if champ list exists
-		
 		File champListFile = new File(getApplicationContext().getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), ChampInfo.CHAMPIONS_FILE);
 		File championJsonFile = new File(getApplicationContext().getDir(ChampInfo.CHAMPIONS_DIR, Context.MODE_PRIVATE), ChampInfo.CHAMPIONS_JSON);
 		
@@ -503,7 +498,6 @@ public class MainActivity extends Activity
 			Debug.log(this, "Champ list not found.");
 			
 			// If champ file doesnt exist, check for champ json and generate the list from it
-			
 			if (championJsonFile.exists()) {
 				
 				Debug.log(this, "Champ JSON found.  Generating list...");
@@ -519,7 +513,6 @@ public class MainActivity extends Activity
 					JSONObject champData = championJson.getJSONObject("data");
 					
 					// Get champ list from JSON object and put into alpha ordered list
-					
 					Iterator<String> champs = champData.keys();
 					
 					while (champs.hasNext()) {
@@ -530,12 +523,10 @@ public class MainActivity extends Activity
 					Debug.log(this, "Champ list generated");
 					
 					// Save champ list
-					
 					writeTextFile("champs", "champ_list.txt", champList.toString());
 					Debug.log(this, "Champ list saved");
 					
 					// Make & prepare download queue
-			
 					Pack pack;
 					URL url;
 					Iterator<String> champIterator = champList.iterator();
@@ -623,7 +614,6 @@ public class MainActivity extends Activity
 			else if (!champListFile.exists() & !championJsonFile.exists()) {
 
 				// If neither exists, download champ json and restart activity
-				
 				Debug.log(this, "No champ list or JSON");
 				
 				try {
@@ -635,7 +625,6 @@ public class MainActivity extends Activity
 					queue.add(pack);
 					
 					// Download champion JSON
-					
 					Debug.log(this, "Attempting champ JSON download");
 					new DownloadFilesTask(queue).execute();
 					/* startUpdate(queue); */
@@ -660,7 +649,6 @@ public class MainActivity extends Activity
 		else {
 			
 			// Make & prepare download queue
-			
 			Pack pack;
 			URL url;
 			Iterator<String> champIterator = champList.iterator();
@@ -686,7 +674,6 @@ public class MainActivity extends Activity
 				}
 				
 				// Download data
-				
 				Debug.log(this, "Attempting data download");
 				new DownloadFilesTask(queue).execute();
 				/* startUpdate(queue); */

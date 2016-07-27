@@ -54,7 +54,7 @@
 					android:layout_width="wrap_content">
 
 					<TextView
-						android:text="health"/>
+						android:text="Health"/>
 
 					<TextView
 						android:id="@+id/health"
@@ -68,7 +68,7 @@
 					android:layout_width="wrap_content">
 
 					<TextView
-						android:text="health regen"/>
+						android:text="Health regen"/>
 
 					<TextView
 						android:id="@+id/health_regen"
@@ -81,7 +81,7 @@
 
 					<TextView
 						android:id="@+id/champ_resource_type"
-						android:text="uses health"/>
+						android:text="Uses health"/>
 
 					<TextView
 						android:id="@+id/resource_points"
@@ -103,7 +103,7 @@
 				<TableRow>
 				
 					<TextView
-						android:text="attack damage"/>
+						android:text="Attack damage"/>
 					
 					<TextView
 						android:id="@+id/attack_damage"
@@ -115,7 +115,7 @@
 				<TableRow>
 				
 					<TextView
-						android:text="attack speed"/>
+						android:text="Attack speed"/>
 					
 					<TextView
 						android:id="@+id/attack_speed"
@@ -127,7 +127,7 @@
 				<TableRow>
 				
 					<TextView
-						android:text="armor"/>
+						android:text="Armor"/>
 					
 					<TextView
 						android:id="@+id/armor"
@@ -139,7 +139,7 @@
 				<TableRow>
 				
 					<TextView
-						android:text="magic resist"/>
+						android:text="Magic resist"/>
 					
 					<TextView
 						android:id="@+id/magic_resist"
@@ -151,7 +151,7 @@
 				<TableRow>
 				
 					<TextView
-						android:text="movespeed"/>
+						android:text="Movespeed"/>
 					
 					<TextView
 						android:id="@+id/movespeed"
@@ -164,7 +164,7 @@
 						
 						<TextView
 						android:id="@+id/range_type"
-						android:text="melee"/>
+						android:text="Melee"/>
 						
 						<TextView
 						android:id="@+id/range"
