@@ -7,8 +7,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-class Debug {
+class Debug
+{
+	/*
+	 * Debug Class Definition
+	 * 
+	 * Custom debug class for logging and toasting.  Will probably replace
+	 * with android.util.Log or a better third party application (im tired of
+	 * making every method pass context in and out just to use logging).
+	 */
+	
+	final static String TAG = "LeagueApp";
 	final static String LOG_FILE = "log";
+	final static int TOAST_LENGTH_SHORT = Toast.LENGTH_SHORT;
+	final static int TOAST_LENGTH_LONG = Toast.LENGTH_LONG;
 	
 	static void toast(Context context, String msg) {
 		Toast t = Toast.makeText(context, msg, Toast.LENGTH_SHORT);
@@ -54,11 +66,9 @@ class Debug {
 		}
 
 		// Save file unless it already exists
-		
 		PrintWriter out;
 		
 		// Write
-
 		try {
 			out = new PrintWriter(new BufferedWriter(new FileWriter(file, true)));
 			out.println(text);

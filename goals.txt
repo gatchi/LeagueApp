@@ -4,6 +4,15 @@ Goals for Today
 
 Goals for Some Other Day
 ========================
+o refactor ChampInfoActivity
++ add string resources for MainActivity
++ add old plugins to lenovo npp
++ implement search
+	o swap out custom icon grid code for GridView and a ListAdapter (so you can use Filterable)
+		! jk, cant uset ListAdapter, must implement Filterable
+			o implement getFilter()
+o fix ImageAdapter
+o maybe combine Updater and ChampOps classes?
 o custom passive text
 + custom rule for Jayce (missing half his skills)
 + custom rule for Elise (missing half her skills)
@@ -23,6 +32,7 @@ o passives are almost all too vague and missing numbers, do something about this
 + setting: turn off syntax highlighting
 + setting: auto-updating
 o get Wukong to show up in the proper location on the list
+o move hardcoded strings to strings.xml (for translation aid)
 
 Major Features
 ==============
@@ -30,11 +40,25 @@ x champ selection
 x view basic stats
 - view champ skills
 - themes
+- items
 
 Things Done Since Last Commit
 =============================
-o changed theme to dark theme
-o added champ icon row size adjusting wrt phone orientation changes
-+ added code that can handle different f1 and a1 types (spell data variables)
-o testing champ pages
-	o fixed some values and also some retrieval methods
+o fix shyvana
+- removed data clear button code
+- removed clearDownloads() method from MainActivity
++ created Updater class
++ created Setup class
++ created FileOps class
++ created ChampOps class
+o renamed ChampInfo activity class to ChampInfoActivity
+o moved around a lot of code
+o move filereading code in MainActivity to FileOps
+o changed DownloadFilesTask to DownloadTask
+o replaced Pack and Queue system with an ArrayList system
+o simplified checkInventory() code (there were redundant "new DownloadTask" lines, moved to end of method)
+- finally deleted all that commented out old code under "Class Methods" in MainActivity.java
+o massive refactor on MainActivity
+o replaced Debug suite with official Android log library
+o tested new logging
++ added some string resources for MainActivity

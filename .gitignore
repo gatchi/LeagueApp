@@ -3,3 +3,5 @@
 local.properties
 workspace
 lib
+*.old
+*.ws

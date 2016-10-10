@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Toast;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.view.MenuItem;
 import android.content.Intent;
@@ -32,7 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-public class ChampInfo extends Activity implements OnItemSelectedListener
+public class ChampInfoActivity extends Activity implements OnItemSelectedListener
 {
 	/*
 	 * ChampInfo Class Info
@@ -48,10 +49,6 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	 * these objects.
 	 */
 	
-	final static String CHAMPIONS_FILE = "champ_list.txt";
-	final static String CHAMPIONS_JSON = "champion.json";
-	final static String CHAMPIONS_DIR = "champs";
-	final static String ICONS_DIR = "drawable";
 	final static int JSON_OBJECT = 1;
 	static final short MAX_LEVEL = 18;
 	static final short LESS_PRECISE = 0;
@@ -63,6 +60,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 	final int SPELL_W = 1;
 	final int SPELL_E = 2;
 	final int SPELL_R = 3;
+	final String COLOR_HEALTH = "#cc3300";
 	
 	//--------------- Public Objects ------------------//
 	
@@ -111,10 +109,21 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		
 		// Load champ and set champ name on the view
 		champList = (ArrayList<String>) bundle.get("champ list");
-		champName = champList.get(champId);
+		try {
+			champName = champList.get(champId);
+		}
+		catch (NullPointerException e)
+		{
+			Log.e(Debug.TAG, "NullPointerException in ChampInfoActivity onCreate:");
+			Log.e(Debug.TAG, "either champId or champList is null, or champList is incomplete");
+			Debug.toast(this, "Whoops, cant open champ info page");
+			finish();
+			return;
+		}
+		
 		TextView champNameView = (TextView) findViewById(R.id.champ_name);
 		if (champName.equals("MonkeyKing")) {
-			champNameView.setText("Wukong");
+			champNameView.setText(R.string.wukong);
 		}
 		else {
 			champNameView.setText(champName);
@@ -123,7 +132,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 		// Load the JSON data
 		try
 		{
-			champJson = loadJson(this, CHAMPIONS_DIR, champName + ".json", JSON_OBJECT);
+			champJson = loadJson(this, FileOps.CHAMP_DIR, champName + ".json", JSON_OBJECT);
 			JSONObject champData = champJson.getJSONObject("data");
 			champ = champData.getJSONObject(champName);
 			JSONObject champStats = champ.getJSONObject("stats");
@@ -156,31 +165,31 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			
 			if (parType.equals("MP"))
 			{
-				resourceTypeText.setText("Mana");
-				resourceRegenTypeText.setText("Mana regen");
+				resourceTypeText.setText(R.string.mana);
+				resourceRegenTypeText.setText(R.string.mana_regen);
 			}
 			else if (parType.equals("Energy"))
 			{
-				resourceTypeText.setText("Energy");
-				resourceRegenTypeText.setText("Energy regen");
+				resourceTypeText.setText(R.string.energy);
+				resourceRegenTypeText.setText(R.string.energy_regen);
 			}
 			else if (champName.equals("Aatrox") || champName.equals("Vladimir") || champName.equals("DrMundo") || champName.equals("Mordekaiser") || champName.equals("Zac"))
 			{
-				resourceTypeText.setText("Uses health");
+				resourceTypeText.setText(R.string.uses_health);
 			}
 			else if (champName.equals("Rengar"))
 			{
-				resourceTypeText.setText("Ferocity");
+				resourceTypeText.setText(R.string.ferocity);
 			}
 			else if (champName.equals("RekSai") || champName.equals("Renekton") || champName.equals("Shyvana") || champName.equals("Tryndamere") || champName.equals("Gnar"))
 			{
-				resourceTypeText.setText("Fury");
+				resourceTypeText.setText(R.string.fury);
 			}
 			else if (champName.equals("Rumble")) {
-				resourceTypeText.setText("Heat");
+				resourceTypeText.setText(R.string.heat);
 			}
 			else {
-				resourceTypeText.setText("No resource");
+				resourceTypeText.setText(R.string.no_resource);
 			}
 
 			// Set range on stat page
@@ -189,11 +198,11 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			
 			if (attackRange < 300)
 			{
-				rangeTypeText.setText("Melee");
+				rangeTypeText.setText(R.string.melee);
 			}
 			else if (attackRange >= 300)
 			{
-				rangeTypeText.setText("Ranged");
+				rangeTypeText.setText(R.string.ranged);
 			}
 			rangeText.setText(String.format("%.0f", attackRange));
 			
@@ -241,12 +250,6 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			TextView passiveNameView = (TextView)findViewById(R.id.passive_name);
 			TextView passiveView = (TextView)findViewById(R.id.passive);
 			
-			/* qView.setText(Html.fromHtml(q.getString("tooltip")));
-			wView.setText(Html.fromHtml(w.getString("tooltip")));
-			eView.setText(Html.fromHtml(e.getString("tooltip")));
-			rView.setText(Html.fromHtml(r.getString("tooltip"))); */
-			passiveView.setText(Html.fromHtml(passive.getString("description")));
-			
 			// Grab full raw descriptions from spells
 			String qtt = qSpell.getString("tooltip");
 			String wtt = wSpell.getString("tooltip");
@@ -267,7 +270,9 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			try
 			{
 				parsedQtt = ttParser(qtt, 1);
-				parsedWtt = ttParser(wtt, 2);
+				/* parsedWtt = ttParser(wtt, 2); */
+				if(champName.equals("Shyvana")) parsedWtt = "Shyvana deals 20/32/45//57 <font color=\"#FF8C00\">(+0.2 bonus AD)</font> <font class=\"#99FF99\">(+0.1 AP)</font> magic damage per second to nearby enemies and gains a bonus 30/35/40/45/50% movement speed that decays over 3 seconds.<br><br>While Burnout is active, basic attacks deal 5/8/11.25/14.25/17.5 <font color=\"#FF8C00\">(+0.2 bonus AD)</font> <font color=\"#99FF99\">(+0.1 AP)</font> magic damage to nearby enemies and extend its duration by 1 second.<br><br><font color=\"#FF3300\">Dragon Form: </font>Burnout scorches the earth, continuing to damage enemies that stand on it.<br><br><font color=\"#919191\"><i>Burnout deals +20% damage to monsters.<br>Burnout has a maximum duration of 7 seconds.</i></font>";
+				else parsedWtt = ttParser(wtt, 2);
 				parsedEtt = ttParser(ett, 3);
 				parsedRtt = ttParser(rtt, 4);
 			} 
@@ -279,7 +284,7 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 				Debug.log(this, e.getMessage());
 			}
 			
-			// Throw onto TextViews
+			// Write spell text to screen
 			qView.setText(Html.fromHtml(parsedQtt));
 			wView.setText(Html.fromHtml(parsedWtt));
 			eView.setText(Html.fromHtml(parsedEtt));
@@ -288,7 +293,10 @@ public class ChampInfo extends Activity implements OnItemSelectedListener
 			wNameView.setText("w:  " + wName);
 			eNameView.setText("e:  " + eName);
 			rNameView.setText("r:  " + rName);
+			if (champName.equals("Aatrox")) passiveView.setText(Html.fromHtml("Whenever Aatrox consumes <font color=\"" + COLOR_HEALTH + "\"> a portion of his health</font>, he stores it into his Blood Well. which can hold up to 105 - 870 (based on level) health. The Blood Well depletes by 2% per second if Aatrox hasn't dealt or received damage in the last 5 seconds.<br/><br/>Aatrox gains 0.3 - 0.55 (based on level)% bonus attack speed for every 1% in his Blood Well, up to a maximum of 30 - 55 (based on level)% bonus attack speed.<br/><br/>Upon taking fatal damage, Aatrox is cleansed of all debuffs, enters Stasis icon stasis and drains his Blood Well, healing himself for 35% of Blood Well's maximum capacity over the next 3 seconds for 36.75 - 304.5 (based on level) health (+100% of Blood Well's stored health) up to a maximum of 141.75 - 1174.5 (based on level) health."));
+			else passiveView.setText(Html.fromHtml(passive.getString("description")));
 			passiveNameView.setText("Passive:  " + passiveName);
+			
 		
 		} catch (JSONException e) {
 			Debug.log(this, "JSONException in Load Skills");

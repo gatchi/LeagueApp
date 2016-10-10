@@ -2,6 +2,21 @@
 <resources>
 
 	<string name="app_name">LeagueApp</string>
+	<string name="wukong">Wukong</string>
+	<string name="mana">Mana</string>
+	<string name="mana_regen">Mana regen</string>
+	<string name="energy">Energy</string>
+	<string name="energy_regen">Energy regen</string>
+	<string name="uses_health">Uses health</string>
+	<string name="ferocity">Ferocity</string>
+	<string name="fury">Fury</string>
+	<string name="heat">Heat</string>
+	<string name="no_resource">No resource</string>
+	<string name="melee">Melee</string>
+	<string name="ranged">Ranged</string>
+	<string name="passive">Passive: </string>
+	<string name="welcome_text">Welcome to LeagueApp!  If this is your first use, please update twice.</string>
+	<string name="update_button_text">update</string>
 	
 	<string-array name="champ_level_select">
 		<item>1 – 18</item>
@@ -26,6 +41,7 @@
 		<item>18</item>
 	</string-array>
 	
+	<!--
 	<string-array name="champ_names">
 		<item>Aatrox</item>
 		<item>Ahri</item>
@@ -49,7 +65,6 @@
 		<item>Diana</item>		
 	</string-array>
 	
-	<!--
 	<string-array name="champ_icons">
 		<item>@drawable/aatrox_icon</item>
 		<item>@drawable/ahri_icon</item>
