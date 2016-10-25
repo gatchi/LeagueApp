@@ -1,6 +1,8 @@
 package com.gatchipatchi.LeagueApp;
 
+import android.util.Log;
 import android.widget.TextView;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 class ChampStatsModule
@@ -42,8 +44,23 @@ class ChampStatsModule
 		 * Sets up the module.
 		 */
 		
-		setValues(1);
-		setResource();
+		try {
+			setValues(1);
+		}
+		catch(JSONException e)
+		{
+			Log.e(Debug.TAG, "JSONException in ChampStatModule:");
+			Log.e(Debug.TAG, "setValues() failed in init()");
+		}
+		
+		try {
+			setResource();
+		}
+		catch(JSONException e)
+		{
+			Log.e(Debug.TAG, "JSONException in ChampStatModule:");
+			Log.e(Debug.TAG, "setResource() failed in init()");
+		}
 	}
 	
 	void publish()
@@ -56,7 +73,7 @@ class ChampStatsModule
 		
 	}
 	
-	void setValues(int level)
+	void setValues(int level) throws JSONException
 	{
 		maxHealth = ChampOps.calcStat(champ.getDouble("hp"), champ.getDouble("hpperlevel"), level);
 		maxResource = ChampOps.calcStat(champ.getDouble("mp"), champ.getDouble("mpperlevel"), level);
@@ -80,7 +97,7 @@ class ChampStatsModule
 		else range = champ.getDouble("movespeed");
 	}
 	
-	private void setResource()
+	private void setResource() throws JSONException
 	{
 		String parType = champ.getString("partype");
 		if (parType.equals("MP"))
