@@ -5,3 +5,4 @@ workspace
 lib
 *.old
 *.ws
+*.note

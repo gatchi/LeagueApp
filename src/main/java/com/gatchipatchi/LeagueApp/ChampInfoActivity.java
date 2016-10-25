@@ -41,13 +41,17 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 	 * This class is for the screen that shows all the stats for a champ.
 	 * It should only display after tapping on a champ icon on the main
 	 * activity.
-	 * Once this activity starts, the first thing it does is pull from
-	 * the corresponding champion JSON file.  It pulls whatever
-	 * JSON objects and arrays (and therefore champ data) it needs and
-	 * puts them into objects.  Code that does things like update the
-	 * values on screen or compute values at a certain level all share
-	 * these objects.
+	 * 
+	 * The activity can be broken down into three main sections: the
+	 * champ name, the champ stats, and the champ abilitios (more
+	 * modules may be added in the future).
+	 *
+	 * This file needs heavy refactoring as it's too long.  Many of these
+	 * functions should be made methods in ChampOps.  Delete this section
+	 * when this is done.
 	 */
+	
+	//--------------- Class Constants ------------------//
 	
 	final static int JSON_OBJECT = 1;
 	static final short MAX_LEVEL = 18;
@@ -62,7 +66,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 	final int SPELL_R = 3;
 	final String COLOR_HEALTH = "#cc3300";
 	
-	//--------------- Public Objects ------------------//
+	//---------------- Class Objects ------------------//
 	
 	Resources res;
 	int champId;
@@ -102,6 +106,8 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		
 		aestheticSetup();
 		
+		//------------- Champ Name ------------//
+		
 		// Get champ ID (button pressed ID)
 		Intent intent = getIntent();
 		Bundle bundle = intent.getExtras();
@@ -121,6 +127,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			return;
 		}
 		
+		// Set and display champ name at the top of the activity
 		TextView champNameView = (TextView) findViewById(R.id.champ_name);
 		if (champName.equals("MonkeyKing")) {
 			champNameView.setText(R.string.wukong);
@@ -129,41 +136,53 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			champNameView.setText(champName);
 		}
 		
-		// Load the JSON data
-		try
-		{
-			champJson = loadJson(this, FileOps.CHAMP_DIR, champName + ".json", JSON_OBJECT);
-			JSONObject champData = champJson.getJSONObject("data");
-			champ = champData.getJSONObject(champName);
-			JSONObject champStats = champ.getJSONObject("stats");
-			
-			// Get stats
-			parType = champ.getString("partype");
-			hpBase = champStats.getDouble("hp");
-			hpPerLevel = champStats.getDouble("hpperlevel");
-			mpBase = champStats.getDouble("mp");
-			mpPerLevel = champStats.getDouble("mpperlevel");
-			moveSpeed = champStats.getDouble("movespeed");
-			armorBase = champStats.getDouble("armor");
-			armorPerLevel = champStats.getDouble("armorperlevel");
-			mrBase = champStats.getDouble("spellblock");
-			mrPerLevel = champStats.getDouble("spellblockperlevel");
-			attackRange = champStats.getDouble("attackrange");
-			hpRegenBase = champStats.getDouble("hpregen");
-			hpRegenPerLevel = champStats.getDouble("hpregenperlevel");
-			mpRegenBase = champStats.getDouble("mpregen");
-			mpRegenPerLevel = champStats.getDouble("mpregenperlevel");
-			adBase = champStats.getDouble("attackdamage");
-			adPerLevel = champStats.getDouble("attackdamageperlevel");
-			asOffset = champStats.getDouble("attackspeedoffset");
-			asPerLevel = champStats.getDouble("attackspeedperlevel");
-			asBase = calcAs(asOffset);
+		//------------ Champ Stats --------------//
+		
 
-			// Set resource type on stat page
-			TextView resourceTypeText = (TextView) findViewById(R.id.champ_resource_type);
-			TextView resourceRegenTypeText = (TextView) findViewById(R.id.resource_regen_type);
+		/* champJson = loadJson(this, FileOps.CHAMP_DIR, champName + ".json", JSON_OBJECT); */
+		champJson = FileOps.retrieveJson(this, FileOps.CHAMP_DIR, champName);
+		JSONObject champData = champJson.getJSONObject("data");
+		champ = champData.getJSONObject(champName);
+		JSONObject champStats = champ.getJSONObject("stats");
+		ChampStatsModule champStatsMod = new ChampStatsModule(champName, champStats);
+		champStatsMod.configure();
+		
+		TextView healthText = (TextView) findViewById(R.id.health);
+		TextView healthRegenText = (TextView) findViewById(R.id.health_regen);
+		TextView resourceText = (TextView) findViewById(R.id.resource_points);
+		TextView resourceRegenText = (TextView) findViewById(R.id.resource_regen);
+		TextView adText = (TextView) findViewById(R.id.attack_damage);
+		TextView asText = (TextView) findViewById(R.id.attack_speed);
+		TextView armorText = (TextView) findViewById(R.id.armor);
+		TextView mrText = (TextView) findViewById(R.id.magic_resist);
+		
+		/* // Get stats
+		parType = champ.getString("partype");
+		hpBase = champStats.getDouble("hp");
+		hpPerLevel = champStats.getDouble("hpperlevel");
+		mpBase = champStats.getDouble("mp");
+		mpPerLevel = champStats.getDouble("mpperlevel");
+		moveSpeed = champStats.getDouble("movespeed");
+		armorBase = champStats.getDouble("armor");
+		armorPerLevel = champStats.getDouble("armorperlevel");
+		mrBase = champStats.getDouble("spellblock");
+		mrPerLevel = champStats.getDouble("spellblockperlevel");
+		attackRange = champStats.getDouble("attackrange");
+		hpRegenBase = champStats.getDouble("hpregen");
+		hpRegenPerLevel = champStats.getDouble("hpregenperlevel");
+		mpRegenBase = champStats.getDouble("mpregen");
+		mpRegenPerLevel = champStats.getDouble("mpregenperlevel");
+		adBase = champStats.getDouble("attackdamage");
+		adPerLevel = champStats.getDouble("attackdamageperlevel");
+		asOffset = champStats.getDouble("attackspeedoffset");
+		asPerLevel = champStats.getDouble("attackspeedperlevel");
+		asBase = calcAs(asOffset); */
+
+		// Set resource type on stat page
+		TextView resourceTypeText = (TextView) findViewById(R.id.champ_resource_type);
+		TextView resourceRegenTypeText = (TextView) findViewById(R.id.resource_regen_type);
 			
-			if (parType.equals("MP"))
+			/* if (parType.equals("MP"))
 			{
 				resourceTypeText.setText(R.string.mana);
 				resourceRegenTypeText.setText(R.string.mana_regen);
@@ -190,27 +209,27 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			}
 			else {
 				resourceTypeText.setText(R.string.no_resource);
-			}
+			} */
 
-			// Set range on stat page
-			TextView rangeTypeText = (TextView) findViewById(R.id.range_type);
-			TextView rangeText = (TextView) findViewById(R.id.range);
-			
-			if (attackRange < 300)
-			{
-				rangeTypeText.setText(R.string.melee);
-			}
-			else if (attackRange >= 300)
-			{
-				rangeTypeText.setText(R.string.ranged);
-			}
-			rangeText.setText(String.format("%.0f", attackRange));
-			
-			// Set movespeed on stat page
-			TextView movespeedText = (TextView) findViewById(R.id.movespeed);
-			movespeedText.setText(String.format("%.0f" ,moveSpeed));
-			
-		} catch (UnsupportedEncodingException e) {
+		// Set range on stat page
+		TextView rangeTypeText = (TextView) findViewById(R.id.range_type);
+		TextView rangeText = (TextView) findViewById(R.id.range);
+		
+		if (attackRange < 300)
+		{
+			rangeTypeText.setText(R.string.melee);
+		}
+		else if (attackRange >= 300)
+		{
+			rangeTypeText.setText(R.string.ranged);
+		}
+		rangeText.setText(String.format("%.0f", attackRange));
+		
+		// Set movespeed on stat page
+		TextView movespeedText = (TextView) findViewById(R.id.movespeed);
+		movespeedText.setText(String.format("%.0f" ,moveSpeed));
+		
+		/* catch (UnsupportedEncodingException e) {
 			Debug.toast(this, "UnsupportedEncodingException");
 			Debug.logError(this, e);
 			
@@ -225,7 +244,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		} catch (NullPointerException e) {
 			Debug.toast(this, "NullPointerException");
 			Debug.log(this, "NullPointerException in onCreate on stat set");
-		}
+		} */
 		
 		// Load skills (champion spells)
 		try
@@ -270,7 +289,6 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			try
 			{
 				parsedQtt = ttParser(qtt, 1);
-				/* parsedWtt = ttParser(wtt, 2); */
 				if(champName.equals("Shyvana")) parsedWtt = "Shyvana deals 20/32/45//57 <font color=\"#FF8C00\">(+0.2 bonus AD)</font> <font class=\"#99FF99\">(+0.1 AP)</font> magic damage per second to nearby enemies and gains a bonus 30/35/40/45/50% movement speed that decays over 3 seconds.<br><br>While Burnout is active, basic attacks deal 5/8/11.25/14.25/17.5 <font color=\"#FF8C00\">(+0.2 bonus AD)</font> <font color=\"#99FF99\">(+0.1 AP)</font> magic damage to nearby enemies and extend its duration by 1 second.<br><br><font color=\"#FF3300\">Dragon Form: </font>Burnout scorches the earth, continuing to damage enemies that stand on it.<br><br><font color=\"#919191\"><i>Burnout deals +20% damage to monsters.<br>Burnout has a maximum duration of 7 seconds.</i></font>";
 				else parsedWtt = ttParser(wtt, 2);
 				parsedEtt = ttParser(ett, 3);
@@ -1323,7 +1341,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		return "error";
 	}
 	
-	static JSONObject loadJson(Context context, String directory, String filename, int type) throws FileNotFoundException, IOException, JSONException {
+	/* static JSONObject loadJson(Context context, String directory, String filename, int type) throws FileNotFoundException, IOException, JSONException {
 		
 		InputStream in = null;
 		File jsonFile = new File(context.getDir(directory, Context.MODE_PRIVATE), filename);
@@ -1340,7 +1358,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		
 		json = new JSONObject(responseStrBuilder.toString());
 		return json;
-	}
+	} */
 	
 	private void statUpdate(String level) throws NullPointerException {
 		/* 
@@ -1348,17 +1366,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		 * this method updates the stats displayed using that spinner entry.
 		 * 
 		 */
-				
-		// TextViews for putting the stats into
 		
-		TextView healthText = (TextView) findViewById(R.id.health);
-		TextView healthRegenText = (TextView) findViewById(R.id.health_regen);
-		TextView resourceText = (TextView) findViewById(R.id.resource_points);
-		TextView resourceRegenText = (TextView) findViewById(R.id.resource_regen);
-		TextView adText = (TextView) findViewById(R.id.attack_damage);
-		TextView asText = (TextView) findViewById(R.id.attack_speed);
-		TextView armorText = (TextView) findViewById(R.id.armor);
-		TextView mrText = (TextView) findViewById(R.id.magic_resist);
 		
 		if (level.equals("n"))
 		{
@@ -1464,7 +1472,6 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		return (0.625 / (1 + offset));
 	}
 	
-	
 	void aestheticSetup() {
 		ActionBar actionBar = getActionBar();
 		actionBar.setTitle("Champ Stats");
@@ -1505,7 +1512,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 
 	@Override
 	public void onNothingSelected(AdapterView<?> parent) {
-		/* not used */
+		/* not used but necessary? t*/
 	}
 	
 	public void stubMethod() {

@@ -15,6 +15,32 @@ import org.json.JSONObject;
 
 class ChampOps
 {
+	/*
+	 * ChampOps Class Definition
+	 *
+	 * Class for miscellaneous champ-related operations.
+	 */
+	
+	static double calcCassMoveSpeed(double speed, int level)
+	{
+		return speed + 4 * level;
+	}
+	
+	static double calcTristanaRange(double range, int level)
+	{
+		return range + 7 * (level - 1);
+	}
+	
+	static double calcStat(double base, double growth, int level)
+	{
+		return base + growth x (level - 1) x (0.685 + 0.0175 x level);
+	}
+	
+	static double calcBaseAs(double offset)
+	{
+		return (0.625 / (1 + offset));
+	}
+	
 	static ArrayList<String> generateChampList(Activity activity, String dirName, String jsonFilename)
 	{
 		// Retrieve JSON object from given JSON file
