@@ -1,13 +1,123 @@
 package com.gatchipatchi.LeagueApp;
 
+import android.util.Log;
+import android.widget.TextView;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 class Champion
 {
-	JSONObject champJson;
+	/*
+	 * ChampStatModule Class Definition
+	 *
+	 * Class for displaying base stats and stats per level.
+	 */
+		
+	String champName;
+	JSONObject champ;
+	double maxHealth;
+	double maxResource;
+	double healthRegen;
+	double resourceRegen;
+	double attackDamage;
+	double armor;
+	double magicResist;
+	double attackSpeed;
+	double moveSpeed;
+	double range;
+	String resourceType;
+	String resourceRegenType;
 	
-	Champion(JSONObject champJson)
+	
+	Champion(String champName, JSONObject champ)
 	{
-		this.champJson = champJson;
+		this.champ = champ;
+		this.champName = champName;
+		
+		// Set the default values, which will adustable in settings
+		
+	}
+	
+	void init()
+	{
+		/*
+		 * Sets up the module.
+		 */
+		
+		try {
+			setValues(1);
+		}
+		catch(JSONException e)
+		{
+			Log.e(Debug.TAG, "JSONException in ChampStatModule:");
+			Log.e(Debug.TAG, "setValues() failed in init()");
+		}
+		
+		try {
+			setResource();
+		}
+		catch(JSONException e)
+		{
+			Log.e(Debug.TAG, "JSONException in ChampStatModule:");
+			Log.e(Debug.TAG, "setResource() failed in init()");
+		}
+	}
+	
+	void setValues(int level) throws JSONException
+	{
+		maxHealth = ChampOps.calcStat(champ.getDouble("hp"), champ.getDouble("hpperlevel"), level);
+		maxResource = ChampOps.calcStat(champ.getDouble("mp"), champ.getDouble("mpperlevel"), level);
+		healthRegen = ChampOps.calcStat(champ.getDouble("hpregen"), champ.getDouble("hpregenperlevel"), level);
+		resourceRegen = ChampOps.calcStat(champ.getDouble("mpregen"), champ.getDouble("mpregenperlevel"), level);
+		attackDamage = ChampOps.calcStat(champ.getDouble("ad"), champ.getDouble("adperlevel"), level);
+		attackSpeed = ChampOps.calcStat(ChampOps.calcBaseAs(champ.getDouble("attackspeedoffset")), champ.getDouble("attackspeedperlevel"), level);
+		armor = ChampOps.calcStat(champ.getDouble("armor"), champ.getDouble("armorperlevel"), level);
+		magicResist = ChampOps.calcStat(champ.getDouble("spellblock"), champ.getDouble("spellblockperlevel"), level);
+		
+		if (champName.equals("Tristana"))
+		{
+			range = ChampOps.calcTristanaRange(champ.getDouble("attackrange"), level);
+		}
+		else range = champ.getDouble("attackrange");
+		
+		if (champName.equals("Cassiopeia"))
+		{
+			moveSpeed = ChampOps.calcCassMoveSpeed(champ.getDouble("movespeed"), level);
+		}
+		else range = champ.getDouble("movespeed");
+	}
+	
+	private void setResource() throws JSONException
+	{
+		String parType = champ.getString("partype");
+		if (parType.equals("MP"))
+		{
+			resourceType = "Mana";
+			resourceRegenType = "Mana regen";
+		}
+		else if (parType.equals("Energy"))
+		{
+			resourceType = "Energy";
+			resourceRegenType = "Energy regen";
+		}
+		else if (champName.equals("Aatrox") || champName.equals("Vladimir") || champName.equals("DrMundo") || champName.equals("Mordekaiser") || champName.equals("Zac"))
+		{
+			resourceType = "Uses health";
+		}
+		else if (champName.equals("Rengar"))
+		{
+			resourceType = "Ferocity";
+		}
+		else if (champName.equals("RekSai") || champName.equals("Renekton") || champName.equals("Shyvana") || champName.equals("Tryndamere") || champName.equals("Gnar"))
+		{
+			resourceType = "Fury";
+		}
+		else if (champName.equals("Rumble")) {
+			resourceType = "Heat";
+		}
+		else {
+			resourceType = "No resource";
+		}
 	}
 }
+

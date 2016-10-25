@@ -71,28 +71,9 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 	Resources res;
 	int champId;
 	String champName;
-	String parType;
-	double hpBase;
-	double hpPerLevel;
-	double mpBase;
-	double mpPerLevel;
-	double moveSpeed;
-	double armorBase;
-	double armorPerLevel;
-	double mrBase;
-	double mrPerLevel;
-	double attackRange;
-	double hpRegenBase;
-	double hpRegenPerLevel;
-	double mpRegenBase;
-	double mpRegenPerLevel;
-	double adBase;
-	double adPerLevel;
-	double asOffset;
-	double asPerLevel;
-	double asBase;
+	Champion champion;
 	JSONObject champJson;
-	JSONObject champ;
+	JSONObject subChampJson;
 	
 	TextView healthText;
 	TextView healthRegenText;
@@ -155,11 +136,11 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		// Open JSON
 		/* champJson = loadJson(this, FileOps.CHAMP_DIR, champName + ".json", JSON_OBJECT); */
 		champJson = FileOps.retrieveJson(this, FileOps.CHAMP_DIR, champName);
-		JSONObject champStats;
+		JSONObject statsJson;
 		try {
-			JSONObject champData = champJson.getJSONObject("data");
-			champ = champData.getJSONObject(champName);
-			champStats = champ.getJSONObject("stats");
+			JSONObject dataJson = champJson.getJSONObject("data");
+			subChampJson = dataJson.getJSONObject(champName);
+			statsJson = subChampJson.getJSONObject("stats");
 		}
 		catch (JSONException e)
 		{
@@ -169,9 +150,9 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			return;
 		}
 		
-		// Create module
-		ChampStatsModule champStatMod = new ChampStatsModule(champName, champStats);
-		champStatMod.init();
+		// Instantiate module
+		champion = new Champion(champName, statsJson);
+		champion.init();
 		
 		// Create views
 		healthText = (TextView) findViewById(R.id.health);
@@ -188,8 +169,8 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		rangeText = (TextView) findViewById(R.id.range);
 		
 		// Set resource type
-		resourceTypeText.setText(champStatMod.resourceType);
-		resourceRegenTypeText.setText(champStatMod.resourceRegenType);
+		resourceTypeText.setText(champion.resourceType);
+		resourceRegenTypeText.setText(champion.resourceRegenType);
 		/*
 
 		// Set range on stat page
@@ -230,12 +211,12 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		try
 		{
 			// Pull spells from JSON
-			JSONArray spells = champ.getJSONArray("spells");
+			JSONArray spells = subChampJson.getJSONArray("spells");
 			JSONObject qSpell = (JSONObject)spells.get(0);
 			JSONObject wSpell = (JSONObject)spells.get(1);
 			JSONObject eSpell = (JSONObject)spells.get(2);
 			JSONObject rSpell = (JSONObject)spells.get(3);
-			JSONObject passive = champ.getJSONObject("passive");
+			JSONObject passive = subChampJson.getJSONObject("passive");
 			
 			// Get TextView handles
 			TextView qNameView = (TextView)findViewById(R.id.q_name);
@@ -438,7 +419,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		 */
 		
 		String result = "";
-		JSONArray spells = champ.getJSONArray("spells");
+		JSONArray spells = subChampJson.getJSONArray("spells");
 		JSONObject selSpell = (JSONObject)spells.get(spellNum - 1);
 		
 		if (code.equals("maxammo"))
@@ -1350,45 +1331,22 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		
 		if (level.equals("n"))
 		{
-			setPerLevel(healthText, LESS_PRECISE, hpBase, hpPerLevel);
-			setPerLevel(healthRegenText, MORE_PRECISE, hpRegenBase, hpRegenPerLevel);
-			if (parType.equals("MP") || parType.equals("Energy"))
-			{
-				setPerLevel(resourceText, LESS_PRECISE, mpBase, mpPerLevel);
-				setPerLevel(resourceRegenText, MORE_PRECISE, mpRegenBase, mpRegenPerLevel);
-			}
-			setPerLevel(adText, MORE_PRECISE, adBase, adPerLevel);
-			setPerLevel(asText, PERCENT, asBase, asPerLevel);
-			setPerLevel(armorText, MORE_PRECISE, armorBase, armorPerLevel);
-			setPerLevel(mrText, MAGIC_RESIST, mrBase, mrPerLevel);
+			// Some special textview update
 		}
 		else if (level.equals("1 – 18"))
 		{
-			setRange(hpBase, hpPerLevel, LESS_PRECISE, healthText);
-			setRange(hpRegenBase, hpRegenPerLevel, MORE_PRECISE, healthRegenText);
-			if (parType.equals("MP") || parType.equals("Energy"))
-			{
-				setRange(mpBase, mpPerLevel, LESS_PRECISE, resourceText);
-				setRange(mpRegenBase, mpRegenPerLevel, MID_PRECISE, resourceRegenText);
-			}
-			setRange(adBase, adPerLevel, MORE_PRECISE, adText);
-			setRange(asBase, asPerLevel, PERCENT, asText);
-			setRange(armorBase, armorPerLevel, MORE_PRECISE, armorText);
-			setRange(mrBase, mrPerLevel, LESS_PRECISE, mrText);
+			// Set champ to lvl 1, make a copy at lvl 18, and use both for the textview update
 		}
 		else // selected level
 		{
-			setCurrentLevel(hpBase, hpPerLevel, LESS_PRECISE, level, healthText);
-			setCurrentLevel(hpRegenBase, hpRegenPerLevel, MORE_PRECISE, level, healthRegenText);
-			if (parType.equals("MP") || parType.equals("Energy"))
-			{
-				setCurrentLevel(mpBase, mpPerLevel, LESS_PRECISE, level, resourceText);
-				setCurrentLevel(mpRegenBase, mpRegenPerLevel, LESS_PRECISE, level, resourceRegenText);
+			try {
+				champion.setValues(Integer.parseInt(level));
 			}
-			setCurrentLevel(adBase, adPerLevel, MORE_PRECISE, level, adText);
-			setCurrentLevel(asBase, asPerLevel, PERCENT, level, asText);
-			setCurrentLevel(armorBase, armorPerLevel, MORE_PRECISE, level, armorText);
-			setCurrentLevel(mrBase, mrPerLevel, MID_PRECISE, level, mrText);
+			catch(JSONException e) {
+				Log.e(Debug.TAG, "JSONException in ChampInfoActivity:");
+				Log.e(Debug.TAG, "statUpdate failed");
+				Log.e(Debug.TAG, "Couldnt update values at selected level");
+			}
 		}
 		
 	}
@@ -1447,11 +1405,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			}
 		}
 	}
-	
-	double calcAs(double offset) {
-		return (0.625 / (1 + offset));
-	}
-	
+		
 	void aestheticSetup() {
 		ActionBar actionBar = getActionBar();
 		actionBar.setTitle("Champ Stats");
@@ -1485,7 +1439,8 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			statUpdate(item);
 		}
 		catch (NullPointerException e) {
-			Debug.log(getApplicationContext(), "NullPointerException in statUpdate");
+			Log.e(Debug.TAG, "NullPointerException in statUpdate:");
+			Log.e(Debug.TAG, e.getMessage());
 		}
 		
 	}
