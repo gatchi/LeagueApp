@@ -94,6 +94,19 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 	JSONObject champJson;
 	JSONObject champ;
 	
+	TextView healthText;
+	TextView healthRegenText;
+	TextView resourceText;
+	TextView resourceRegenText;
+	TextView adText;
+	TextView asText;
+	TextView armorText;
+	TextView mrText;
+	TextView resourceTypeText;
+	TextView resourceRegenTypeText;
+	TextView rangeTypeText;
+	TextView rangeText;
+	
 	ArrayList<String> champList = new ArrayList();
 	
 	//--------------- onCreate (main) -----------------//
@@ -139,81 +152,48 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		//------------ Champ Stats --------------//
 		
 
+		// Open JSON
 		/* champJson = loadJson(this, FileOps.CHAMP_DIR, champName + ".json", JSON_OBJECT); */
 		champJson = FileOps.retrieveJson(this, FileOps.CHAMP_DIR, champName);
-		JSONObject champData = champJson.getJSONObject("data");
-		champ = champData.getJSONObject(champName);
-		JSONObject champStats = champ.getJSONObject("stats");
-		ChampStatsModule champStatsMod = new ChampStatsModule(champName, champStats);
-		champStatsMod.configure();
+		JSONObject champStats;
+		try {
+			JSONObject champData = champJson.getJSONObject("data");
+			champ = champData.getJSONObject(champName);
+			champStats = champ.getJSONObject("stats");
+		}
+		catch (JSONException e)
+		{
+			Log.e(Debug.TAG, "JSONException in ChampInfoActivity:");
+			Log.e(Debug.TAG, e.getMessage());
+			finish();
+			return;
+		}
 		
-		TextView healthText = (TextView) findViewById(R.id.health);
-		TextView healthRegenText = (TextView) findViewById(R.id.health_regen);
-		TextView resourceText = (TextView) findViewById(R.id.resource_points);
-		TextView resourceRegenText = (TextView) findViewById(R.id.resource_regen);
-		TextView adText = (TextView) findViewById(R.id.attack_damage);
-		TextView asText = (TextView) findViewById(R.id.attack_speed);
-		TextView armorText = (TextView) findViewById(R.id.armor);
-		TextView mrText = (TextView) findViewById(R.id.magic_resist);
+		// Create module
+		ChampStatsModule champStatMod = new ChampStatsModule(champName, champStats);
+		champStatMod.init();
 		
-		/* // Get stats
-		parType = champ.getString("partype");
-		hpBase = champStats.getDouble("hp");
-		hpPerLevel = champStats.getDouble("hpperlevel");
-		mpBase = champStats.getDouble("mp");
-		mpPerLevel = champStats.getDouble("mpperlevel");
-		moveSpeed = champStats.getDouble("movespeed");
-		armorBase = champStats.getDouble("armor");
-		armorPerLevel = champStats.getDouble("armorperlevel");
-		mrBase = champStats.getDouble("spellblock");
-		mrPerLevel = champStats.getDouble("spellblockperlevel");
-		attackRange = champStats.getDouble("attackrange");
-		hpRegenBase = champStats.getDouble("hpregen");
-		hpRegenPerLevel = champStats.getDouble("hpregenperlevel");
-		mpRegenBase = champStats.getDouble("mpregen");
-		mpRegenPerLevel = champStats.getDouble("mpregenperlevel");
-		adBase = champStats.getDouble("attackdamage");
-		adPerLevel = champStats.getDouble("attackdamageperlevel");
-		asOffset = champStats.getDouble("attackspeedoffset");
-		asPerLevel = champStats.getDouble("attackspeedperlevel");
-		asBase = calcAs(asOffset); */
-
-		// Set resource type on stat page
-		TextView resourceTypeText = (TextView) findViewById(R.id.champ_resource_type);
-		TextView resourceRegenTypeText = (TextView) findViewById(R.id.resource_regen_type);
-			
-			/* if (parType.equals("MP"))
-			{
-				resourceTypeText.setText(R.string.mana);
-				resourceRegenTypeText.setText(R.string.mana_regen);
-			}
-			else if (parType.equals("Energy"))
-			{
-				resourceTypeText.setText(R.string.energy);
-				resourceRegenTypeText.setText(R.string.energy_regen);
-			}
-			else if (champName.equals("Aatrox") || champName.equals("Vladimir") || champName.equals("DrMundo") || champName.equals("Mordekaiser") || champName.equals("Zac"))
-			{
-				resourceTypeText.setText(R.string.uses_health);
-			}
-			else if (champName.equals("Rengar"))
-			{
-				resourceTypeText.setText(R.string.ferocity);
-			}
-			else if (champName.equals("RekSai") || champName.equals("Renekton") || champName.equals("Shyvana") || champName.equals("Tryndamere") || champName.equals("Gnar"))
-			{
-				resourceTypeText.setText(R.string.fury);
-			}
-			else if (champName.equals("Rumble")) {
-				resourceTypeText.setText(R.string.heat);
-			}
-			else {
-				resourceTypeText.setText(R.string.no_resource);
-			} */
+		// Create views
+		healthText = (TextView) findViewById(R.id.health);
+		healthRegenText = (TextView) findViewById(R.id.health_regen);
+		resourceText = (TextView) findViewById(R.id.resource_points);
+		resourceRegenText = (TextView) findViewById(R.id.resource_regen);
+		adText = (TextView) findViewById(R.id.attack_damage);
+		asText = (TextView) findViewById(R.id.attack_speed);
+		armorText = (TextView) findViewById(R.id.armor);
+		mrText = (TextView) findViewById(R.id.magic_resist);
+		resourceTypeText = (TextView) findViewById(R.id.champ_resource_type);
+		resourceRegenTypeText = (TextView) findViewById(R.id.resource_regen_type);
+		rangeTypeText = (TextView) findViewById(R.id.range_type);
+		rangeText = (TextView) findViewById(R.id.range);
+		
+		// Set resource type
+		resourceTypeText.setText(champStatMod.resourceType);
+		resourceRegenTypeText.setText(champStatMod.resourceRegenType);
+		/*
 
 		// Set range on stat page
-		TextView rangeTypeText = (TextView) findViewById(R.id.range_type);
-		TextView rangeText = (TextView) findViewById(R.id.range);
+		
 		
 		if (attackRange < 300)
 		{

@@ -33,7 +33,7 @@ class ChampOps
 	
 	static double calcStat(double base, double growth, int level)
 	{
-		return base + growth x (level - 1) x (0.685 + 0.0175 x level);
+		return base + growth * (level - 1) * (0.685 + 0.0175 * level);
 	}
 	
 	static double calcBaseAs(double offset)
