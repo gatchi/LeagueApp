@@ -87,6 +87,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 	TextView resourceRegenTypeText;
 	TextView rangeTypeText;
 	TextView rangeText;
+	TextView moveSpeedText;
 	
 	ArrayList<String> champList = new ArrayList();
 	
@@ -151,7 +152,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		}
 		
 		// Instantiate module
-		champion = new Champion(champName, statsJson);
+		champion = new Champion(champName, subChampJson);
 		champion.init();
 		
 		// Create views
@@ -167,45 +168,20 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		resourceRegenTypeText = (TextView) findViewById(R.id.resource_regen_type);
 		rangeTypeText = (TextView) findViewById(R.id.range_type);
 		rangeText = (TextView) findViewById(R.id.range);
+		moveSpeedText = (TextView) findViewById(R.id.movespeed);
 		
-		// Set resource type
-		resourceTypeText.setText(champion.resourceType);
-		resourceRegenTypeText.setText(champion.resourceRegenType);
+		// Set view values for the first time
+		updateViews();
+		
 		/*
 
 		// Set range on stat page
 		
-		
-		if (attackRange < 300)
-		{
-			rangeTypeText.setText(R.string.melee);
-		}
-		else if (attackRange >= 300)
-		{
-			rangeTypeText.setText(R.string.ranged);
-		}
 		rangeText.setText(String.format("%.0f", attackRange));
 		
 		// Set movespeed on stat page
 		TextView movespeedText = (TextView) findViewById(R.id.movespeed);
-		movespeedText.setText(String.format("%.0f" ,moveSpeed));
-		
-		/* catch (UnsupportedEncodingException e) {
-			Debug.toast(this, "UnsupportedEncodingException");
-			Debug.logError(this, e);
-			
-		} catch (JSONException e) {
-			Debug.toast(this, "JSONException");
-			Debug.logError(this, e);
-			
-		} catch (IOException e) {
-			Debug.toast(this, "IOException");
-			Debug.logError(this, e);
-			
-		} catch (NullPointerException e) {
-			Debug.toast(this, "NullPointerException");
-			Debug.log(this, "NullPointerException in onCreate on stat set");
-		} */
+		movespeedText.setText(String.format("%.0f" ,moveSpeed)); */
 		
 		// Load skills (champion spells)
 		try
@@ -1347,8 +1323,25 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 				Log.e(Debug.TAG, "statUpdate failed");
 				Log.e(Debug.TAG, "Couldnt update values at selected level");
 			}
+			updateViews();
 		}
 		
+	}
+	
+	void updateViews() {
+		healthText.setText(Double.toString(champion.maxHealth));
+		healthRegenText.setText(Double.toString(champion.healthRegen));
+		if(champion.maxResource > 0) resourceText.setText(Double.toString(champion.maxResource));
+		if(champion.resourceRegen > 0) resourceRegenText.setText(Double.toString(champion.resourceRegen));
+		adText.setText(Double.toString(champion.attackDamage));
+		asText.setText(Double.toString(champion.attackSpeed));
+		armorText.setText(Double.toString(champion.armor));
+		mrText.setText(Double.toString(champion.magicResist));
+		resourceTypeText.setText(champion.resourceType);
+		resourceRegenTypeText.setText(champion.resourceRegenType);
+		rangeTypeText.setText(champion.rangeType);
+		rangeText.setText(Double.toString(champion.range));
+		moveSpeedText.setText(Double.toString(champion.moveSpeed));
 	}
 	
 	void setPerLevel(TextView text, int valueType, double baseValue, double growthValue) {	

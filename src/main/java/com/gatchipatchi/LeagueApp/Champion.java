@@ -14,7 +14,8 @@ class Champion
 	 */
 		
 	String champName;
-	JSONObject champ;
+	JSONObject champion;
+	JSONObject champStats;
 	double maxHealth;
 	double maxResource;
 	double healthRegen;
@@ -27,96 +28,121 @@ class Champion
 	double range;
 	String resourceType;
 	String resourceRegenType;
+	String rangeType;
 	
 	
-	Champion(String champName, JSONObject champ)
+	Champion(String champName, JSONObject champion)
 	{
-		this.champ = champ;
+		this.champion = champion;
 		this.champName = champName;
 		
 		// Set the default values, which will adustable in settings
 		
 	}
 	
-	void init()
-	{
+	void init() {
 		/*
 		 * Sets up the module.
 		 */
 		
 		try {
+			champStats = champion.getJSONObject("stats");
+		}
+		catch(JSONException e) {
+			Log.e(Debug.TAG, "JSONException in Champion:");
+			Log.e(Debug.TAG, "Couldnt obtain stats JSONObject");
+			Log.e(Debug.TAG, e.getMessage());
+		}
+		
+		try {
 			setValues(1);
 		}
-		catch(JSONException e)
-		{
-			Log.e(Debug.TAG, "JSONException in ChampStatModule:");
+		catch(JSONException e) {
+			Log.e(Debug.TAG, "JSONException in Champion:");
 			Log.e(Debug.TAG, "setValues() failed in init()");
+			Log.e(Debug.TAG, e.getMessage());
 		}
 		
 		try {
 			setResource();
 		}
-		catch(JSONException e)
-		{
-			Log.e(Debug.TAG, "JSONException in ChampStatModule:");
+		catch(JSONException e) {
+			Log.e(Debug.TAG, "JSONException in Champion:");
 			Log.e(Debug.TAG, "setResource() failed in init()");
+			Log.e(Debug.TAG, e.getMessage());
 		}
 	}
 	
 	void setValues(int level) throws JSONException
 	{
-		maxHealth = ChampOps.calcStat(champ.getDouble("hp"), champ.getDouble("hpperlevel"), level);
-		maxResource = ChampOps.calcStat(champ.getDouble("mp"), champ.getDouble("mpperlevel"), level);
-		healthRegen = ChampOps.calcStat(champ.getDouble("hpregen"), champ.getDouble("hpregenperlevel"), level);
-		resourceRegen = ChampOps.calcStat(champ.getDouble("mpregen"), champ.getDouble("mpregenperlevel"), level);
-		attackDamage = ChampOps.calcStat(champ.getDouble("ad"), champ.getDouble("adperlevel"), level);
-		attackSpeed = ChampOps.calcStat(ChampOps.calcBaseAs(champ.getDouble("attackspeedoffset")), champ.getDouble("attackspeedperlevel"), level);
-		armor = ChampOps.calcStat(champ.getDouble("armor"), champ.getDouble("armorperlevel"), level);
-		magicResist = ChampOps.calcStat(champ.getDouble("spellblock"), champ.getDouble("spellblockperlevel"), level);
+		maxHealth = ChampOps.calcStat(champStats.getDouble("hp"), champStats.getDouble("hpperlevel"), level);
+		maxResource = ChampOps.calcStat(champStats.getDouble("mp"), champStats.getDouble("mpperlevel"), level);
+		healthRegen = ChampOps.calcStat(champStats.getDouble("hpregen"), champStats.getDouble("hpregenperlevel"), level);
+		resourceRegen = ChampOps.calcStat(champStats.getDouble("mpregen"), champStats.getDouble("mpregenperlevel"), level);
+		attackDamage = ChampOps.calcStat(champStats.getDouble("attackdamage"), champStats.getDouble("attackdamageperlevel"), level);
+		attackSpeed = ChampOps.calcStat(ChampOps.calcBaseAs(champStats.getDouble("attackspeedoffset")), champStats.getDouble("attackspeedperlevel"), level);
+		armor = ChampOps.calcStat(champStats.getDouble("armor"), champStats.getDouble("armorperlevel"), level);
+		magicResist = ChampOps.calcStat(champStats.getDouble("spellblock"), champStats.getDouble("spellblockperlevel"), level);
 		
 		if (champName.equals("Tristana"))
 		{
-			range = ChampOps.calcTristanaRange(champ.getDouble("attackrange"), level);
+			range = ChampOps.calcTristanaRange(champStats.getDouble("attackrange"), level);
 		}
-		else range = champ.getDouble("attackrange");
+		else range = champStats.getDouble("attackrange");
 		
 		if (champName.equals("Cassiopeia"))
 		{
-			moveSpeed = ChampOps.calcCassMoveSpeed(champ.getDouble("movespeed"), level);
+			moveSpeed = ChampOps.calcCassMoveSpeed(champStats.getDouble("movespeed"), level);
 		}
-		else range = champ.getDouble("movespeed");
+		else moveSpeed = champStats.getDouble("movespeed");
+		
+		if (champStats.getDouble("attackrange") < 300)
+		{
+			rangeType = "Melee";
+		}
+		else if (champStats.getDouble("attackrange") >= 300)
+		{
+			rangeType = "Ranged";
+		}
 	}
 	
 	private void setResource() throws JSONException
 	{
-		String parType = champ.getString("partype");
+		String parType = champion.getString("partype");
 		if (parType.equals("MP"))
 		{
 			resourceType = "Mana";
-			resourceRegenType = "Mana regen";
+			resourceRegenType = "Mana regen per 5s";
 		}
 		else if (parType.equals("Energy"))
 		{
 			resourceType = "Energy";
-			resourceRegenType = "Energy regen";
+			resourceRegenType = "Energy regen per 5s";
 		}
 		else if (champName.equals("Aatrox") || champName.equals("Vladimir") || champName.equals("DrMundo") || champName.equals("Mordekaiser") || champName.equals("Zac"))
 		{
 			resourceType = "Uses health";
+			maxResource = 0;	/* This is necessary as some of these have invalid resource numbers */
+			resourceRegen = 0;
 		}
 		else if (champName.equals("Rengar"))
 		{
 			resourceType = "Ferocity";
+			resourceRegen = 0;
 		}
 		else if (champName.equals("RekSai") || champName.equals("Renekton") || champName.equals("Shyvana") || champName.equals("Tryndamere") || champName.equals("Gnar"))
 		{
 			resourceType = "Fury";
+			resourceRegen = 0;
 		}
 		else if (champName.equals("Rumble")) {
 			resourceType = "Heat";
+			resourceRegen = 0;
 		}
 		else {
 			resourceType = "No resource";
+			maxResource = 0;
+			resourceRegen = 0;
 		}
 	}
 }

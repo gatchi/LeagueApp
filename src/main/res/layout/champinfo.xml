@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Landscape Version -->
+<!-- Default Version -->
 <LinearLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent"
@@ -80,7 +80,7 @@
 					android:layout_width="wrap_content">
 
 					<TextView
-						android:text="Health regen"/>
+						android:text="@string/health_regen"/>
 
 					<TextView
 						android:id="@+id/health_regen"

@@ -44,4 +44,3 @@ x view basic stats
 
 Things Done Since Last Commit
 =============================
-o moved champ stat variables to ChampStatModule
