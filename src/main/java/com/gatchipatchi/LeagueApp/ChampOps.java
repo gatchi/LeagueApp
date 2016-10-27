@@ -31,14 +31,26 @@ class ChampOps
 		return range + 7 * (level - 1);
 	}
 	
-	static double calcStat(double base, double growth, int level)
+	static double calcStat(double base, double growthRate, int level)
 	{
-		return base + growth * (level - 1) * (0.685 + 0.0175 * level);
+		return base + growthRate * (level - 1) * (0.685 + 0.0175 * level);
 	}
 	
 	static double calcBaseAs(double offset)
 	{
 		return (0.625 / (1 + offset));
+	}
+	
+	static double calcAsGrowth(double growthRate, int level)
+	{
+		return (growthRate * (7.0/400 * (level*level - 1) + 267.0/400 * (level - 1)) / 100);
+	}
+	
+	static double calcAs(double offset, double growthRate, int level)
+	{
+		double base = calcBaseAs(offset);
+		double growth = calcAsGrowth(growthRate, level);
+		return base + base * growth;
 	}
 	
 	static ArrayList<String> generateChampList(Activity activity, String dirName, String jsonFilename)

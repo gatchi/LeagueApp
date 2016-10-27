@@ -80,7 +80,7 @@ class Champion
 		healthRegen = ChampOps.calcStat(champStats.getDouble("hpregen"), champStats.getDouble("hpregenperlevel"), level);
 		resourceRegen = ChampOps.calcStat(champStats.getDouble("mpregen"), champStats.getDouble("mpregenperlevel"), level);
 		attackDamage = ChampOps.calcStat(champStats.getDouble("attackdamage"), champStats.getDouble("attackdamageperlevel"), level);
-		attackSpeed = ChampOps.calcStat(ChampOps.calcBaseAs(champStats.getDouble("attackspeedoffset")), champStats.getDouble("attackspeedperlevel"), level);
+		attackSpeed = ChampOps.calcAs(champStats.getDouble("attackspeedoffset"), champStats.getDouble("attackspeedperlevel"), level);
 		armor = ChampOps.calcStat(champStats.getDouble("armor"), champStats.getDouble("armorperlevel"), level);
 		magicResist = ChampOps.calcStat(champStats.getDouble("spellblock"), champStats.getDouble("spellblockperlevel"), level);
 		

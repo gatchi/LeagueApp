@@ -155,7 +155,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		champion = new Champion(champName, subChampJson);
 		champion.init();
 		
-		// Create views
+		// Initialize table views
 		healthText = (TextView) findViewById(R.id.health);
 		healthRegenText = (TextView) findViewById(R.id.health_regen);
 		resourceText = (TextView) findViewById(R.id.resource_points);
@@ -170,8 +170,8 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		rangeText = (TextView) findViewById(R.id.range);
 		moveSpeedText = (TextView) findViewById(R.id.movespeed);
 		
-		// Set view values for the first time
-		updateViews();
+		// Throw some numbers on it
+		updateTable();
 		
 		/*
 
@@ -1278,25 +1278,6 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		return "error";
 	}
 	
-	/* static JSONObject loadJson(Context context, String directory, String filename, int type) throws FileNotFoundException, IOException, JSONException {
-		
-		InputStream in = null;
-		File jsonFile = new File(context.getDir(directory, Context.MODE_PRIVATE), filename);
-		in = new BufferedInputStream(new FileInputStream(jsonFile));
-	
-		JSONObject json = null;			
-		BufferedReader streamReader = new BufferedReader(new InputStreamReader(in, "UTF-8"));
-		StringBuilder responseStrBuilder = new StringBuilder();
-		String inputStr;
-		
-		while ((inputStr = streamReader.readLine()) != null) {
-			responseStrBuilder.append(inputStr);
-		}
-		
-		json = new JSONObject(responseStrBuilder.toString());
-		return json;
-	} */
-	
 	private void statUpdate(String level) throws NullPointerException {
 		/* 
 		 * When any level or level range is selected from the spinner,
@@ -1323,25 +1304,30 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 				Log.e(Debug.TAG, "statUpdate failed");
 				Log.e(Debug.TAG, "Couldnt update values at selected level");
 			}
-			updateViews();
+			updateTable();
 		}
 		
 	}
 	
 	void updateViews() {
-		healthText.setText(Double.toString(champion.maxHealth));
-		healthRegenText.setText(Double.toString(champion.healthRegen));
-		if(champion.maxResource > 0) resourceText.setText(Double.toString(champion.maxResource));
-		if(champion.resourceRegen > 0) resourceRegenText.setText(Double.toString(champion.resourceRegen));
-		adText.setText(Double.toString(champion.attackDamage));
-		asText.setText(Double.toString(champion.attackSpeed));
-		armorText.setText(Double.toString(champion.armor));
-		mrText.setText(Double.toString(champion.magicResist));
+		updateTable();
+	}
+	
+	void updateTable() {
+		// Default format is in-game style (low precision)
+		healthText.setText(String.format("%.0f", champion.maxHealth));
+		healthRegenText.setText(String.format("%.1f", champion.healthRegen));
+		if(champion.maxResource > 0) resourceText.setText(String.format("%.0f", champion.maxResource));
+		if(champion.resourceRegen > 0) resourceRegenText.setText(String.format("%.1f", champion.resourceRegen));
+		adText.setText(String.format("%.0f", champion.attackDamage));
+		asText.setText(String.format("%.3f", champion.attackSpeed));
+		armorText.setText(String.format("%.0f", champion.armor));
+		mrText.setText(String.format("%.0f", champion.magicResist));
 		resourceTypeText.setText(champion.resourceType);
 		resourceRegenTypeText.setText(champion.resourceRegenType);
 		rangeTypeText.setText(champion.rangeType);
-		rangeText.setText(Double.toString(champion.range));
-		moveSpeedText.setText(Double.toString(champion.moveSpeed));
+		rangeText.setText(String.format("%.0f", champion.range));
+		moveSpeedText.setText(String.format("%.0f", champion.moveSpeed));
 	}
 	
 	void setPerLevel(TextView text, int valueType, double baseValue, double growthValue) {	
