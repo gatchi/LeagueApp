@@ -33,8 +33,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-public class ChampInfoActivity extends Activity implements OnItemSelectedListener
-{
+public class ChampInfoActivity extends Activity implements OnItemSelectedListener {
 	/*
 	 * ChampInfo Class Info
 	 * 
@@ -94,8 +93,8 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 	//--------------- onCreate (main) -----------------//
 	
     @Override
-    protected void onCreate(Bundle savedInstanceState)
-    {
+    protected void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.champinfo);
 		
@@ -114,8 +113,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		try {
 			champName = champList.get(champId);
 		}
-		catch (NullPointerException e)
-		{
+		catch(NullPointerException e) {
 			Log.e(Debug.TAG, "NullPointerException in ChampInfoActivity onCreate:");
 			Log.e(Debug.TAG, "either champId or champList is null, or champList is incomplete");
 			Debug.toast(this, "Whoops, cant open champ info page");
@@ -125,7 +123,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		
 		// Set and display champ name at the top of the activity
 		TextView champNameView = (TextView) findViewById(R.id.champ_name);
-		if (champName.equals("MonkeyKing")) {
+		if(champName.equals("MonkeyKing")) {
 			champNameView.setText(R.string.wukong);
 		}
 		else {
@@ -143,8 +141,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			subChampJson = dataJson.getJSONObject(champName);
 			statsJson = subChampJson.getJSONObject("stats");
 		}
-		catch (JSONException e)
-		{
+		catch(JSONException e) {
 			Log.e(Debug.TAG, "JSONException in ChampInfoActivity:");
 			Log.e(Debug.TAG, e.getMessage());
 			finish();
@@ -152,7 +149,17 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		}
 		
 		// Instantiate module
-		champion = new Champion(champName, subChampJson);
+		try {
+			champion = new Champion(champName, subChampJson);
+		}
+		catch(JSONException e) {
+			Log.e(Debug.TAG, "JSONException in ChampInfoActivity:");
+			Log.e(Debug.TAG, "Couldnt create Champion object");
+			Log.e(Debug.TAG, e.getMessage());
+			Debug.toast(this, "BUG: Couldnt open champ page. Please report");
+			finish();
+			return;
+		}
 		champion.init();
 		
 		// Initialize table views
@@ -197,7 +204,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		wNameView.setText("w:  " + champion.basicAbility2.name);
 		eNameView.setText("e:  " + champion.basicAbility3.name);
 		rNameView.setText("r:  " + champion.ultimateAbility.name);
-		if (champName.equals("Aatrox")) passiveView.setText(Html.fromHtml("Whenever Aatrox consumes <font color=\"" + COLOR_HEALTH + "\"> a portion of his health</font>, he stores it into his Blood Well. which can hold up to 105 - 870 (based on level) health. The Blood Well depletes by 2% per second if Aatrox hasn't dealt or received damage in the last 5 seconds.<br/><br/>Aatrox gains 0.3 - 0.55 (based on level)% bonus attack speed for every 1% in his Blood Well, up to a maximum of 30 - 55 (based on level)% bonus attack speed.<br/><br/>Upon taking fatal damage, Aatrox is cleansed of all debuffs, enters Stasis icon stasis and drains his Blood Well, healing himself for 35% of Blood Well's maximum capacity over the next 3 seconds for 36.75 - 304.5 (based on level) health (+100% of Blood Well's stored health) up to a maximum of 141.75 - 1174.5 (based on level) health."));
+		if(champName.equals("Aatrox")) passiveView.setText(Html.fromHtml("Whenever Aatrox consumes <font color=\"" + COLOR_HEALTH + "\"> a portion of his health</font>, he stores it into his Blood Well. which can hold up to 105 - 870 (based on level) health. The Blood Well depletes by 2% per second if Aatrox hasn't dealt or received damage in the last 5 seconds.<br/><br/>Aatrox gains 0.3 - 0.55 (based on level)% bonus attack speed for every 1% in his Blood Well, up to a maximum of 30 - 55 (based on level)% bonus attack speed.<br/><br/>Upon taking fatal damage, Aatrox is cleansed of all debuffs, enters Stasis icon stasis and drains his Blood Well, healing himself for 35% of Blood Well's maximum capacity over the next 3 seconds for 36.75 - 304.5 (based on level) health (+100% of Blood Well's stored health) up to a maximum of 141.75 - 1174.5 (based on level) health."));
 		else passiveView.setText(Html.fromHtml(champion.passive.description));
 		passiveNameView.setText("Passive:  " + champion.passive.name);
 	}
@@ -212,17 +219,13 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		 * 
 		 */
 		
-		
-		if (level.equals("n"))
-		{
-			// Some special textview update
+		if (level.equals("n")) {
+			setTableToN();
 		}
-		else if (level.equals("1 – 18"))
-		{
+		else if (level.equals("1 – 18")) {
 			// Set champ to lvl 1, make a copy at lvl 18, and use both for the textview update
 		}
-		else // selected level
-		{
+		else { // selected level
 			try {
 				champion.setValues(Integer.parseInt(level));
 			}
@@ -234,6 +237,22 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			updateStatTable();
 		}
 		
+	}
+	
+	void setTableToN() {
+		healthText.setText(String.format("%.0f", champion.maxHealthGrowthRate));
+		healthRegenText.setText(String.format("%.1f", champion.healthRegenGrowthRate));
+		if(champion.maxResource > 0) resourceText.setText(String.format("%.0f", champion.maxResourceGrowthRate));
+		if(champion.resourceRegen > 0) resourceRegenText.setText(String.format("%.1f", champion.resourceRegenGrowthRate));
+		adText.setText(String.format("%.0f", champion.attackDamageGrowthRate));
+		asText.setText(String.format("%.1f%%", champion.attackSpeedGrowthRate));
+		armorText.setText(String.format("%.0f", champion.armorGrowthRate));
+		mrText.setText(String.format("%.0f", champion.magicResistGrowthRate));
+		resourceTypeText.setText(champion.resourceType);
+		resourceRegenTypeText.setText(champion.resourceRegenType);
+		rangeTypeText.setText(champion.rangeType);
+		rangeText.setText(String.format("%.0f", champion.range));
+		moveSpeedText.setText(String.format("%.0f", champion.moveSpeed));
 	}
 	
 	void updateStatTable() {
@@ -252,7 +271,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		rangeText.setText(String.format("%.0f", champion.range));
 		moveSpeedText.setText(String.format("%.0f", champion.moveSpeed));
 	}
-			
+	
 	void aestheticSetup() {
 		ActionBar actionBar = getActionBar();
 		actionBar.setTitle("Champ Stats");

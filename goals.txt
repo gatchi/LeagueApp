@@ -1,9 +1,14 @@
 Goals for Today
 ===============
+! uses health is showing values again on individual levels again
 o refactor ChampInfoActivity
+	o re-implement 1-18 stat display
+	o re-implement n stat display
+	- code cleanup
 
 Goals for Some Other Day
 ========================
+o add color coding to stats
 o change ratios on abilities to percentages
 + add string resources for MainActivity
 + add old plugins to lenovo npp

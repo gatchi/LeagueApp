@@ -14,7 +14,7 @@ class Champion
 	 *
 	 * Class for displaying base stats and stats per level.
 	 */
-		
+	
 	String champName;
 	JSONObject champion;
 	JSONObject champStats;
@@ -37,9 +37,17 @@ class Champion
 	Spell basicAbility2;
 	Spell basicAbility3;
 	Spell ultimateAbility;
+	final double maxHealthGrowthRate;
+	final double maxResourceGrowthRate;
+	final double healthRegenGrowthRate;
+	final double resourceRegenGrowthRate;
+	final double attackDamageGrowthRate;
+	final double armorGrowthRate;
+	final double magicResistGrowthRate;
+	final double attackSpeedGrowthRate;
 	
 	
-	Champion(String champName, JSONObject champion)
+	Champion(String champName, JSONObject champion) throws JSONException
 	{
 		this.champion = champion;
 		this.champName = champName;
@@ -49,8 +57,16 @@ class Champion
 		this.basicAbility3 = new Spell(3);
 		this.ultimateAbility = new Spell(4);
 		
-		// Set the default values, which will adustable in settings
-		
+		champStats = champion.getJSONObject("stats");
+
+		maxHealthGrowthRate = champStats.getDouble("hpperlevel");
+		maxResourceGrowthRate = champStats.getDouble("mpperlevel");
+		healthRegenGrowthRate = champStats.getDouble("hpregenperlevel");
+		resourceRegenGrowthRate = champStats.getDouble("mpregenperlevel");
+		attackDamageGrowthRate = champStats.getDouble("attackdamageperlevel");
+		attackSpeedGrowthRate = champStats.getDouble("attackspeedperlevel");
+		armorGrowthRate = champStats.getDouble("armorperlevel");
+		magicResistGrowthRate = champStats.getDouble("spellblockperlevel");
 	}
 	
 	void init()
@@ -108,17 +124,17 @@ class Champion
 			Log.e(Debug.TAG, e.getMessage());
 		}
 	}
-	
+		
 	void setValues(int level) throws JSONException
-	{
-		maxHealth = ChampOps.calcStat(champStats.getDouble("hp"), champStats.getDouble("hpperlevel"), level);
-		maxResource = ChampOps.calcStat(champStats.getDouble("mp"), champStats.getDouble("mpperlevel"), level);
-		healthRegen = ChampOps.calcStat(champStats.getDouble("hpregen"), champStats.getDouble("hpregenperlevel"), level);
-		resourceRegen = ChampOps.calcStat(champStats.getDouble("mpregen"), champStats.getDouble("mpregenperlevel"), level);
-		attackDamage = ChampOps.calcStat(champStats.getDouble("attackdamage"), champStats.getDouble("attackdamageperlevel"), level);
-		attackSpeed = ChampOps.calcAs(champStats.getDouble("attackspeedoffset"), champStats.getDouble("attackspeedperlevel"), level);
-		armor = ChampOps.calcStat(champStats.getDouble("armor"), champStats.getDouble("armorperlevel"), level);
-		magicResist = ChampOps.calcStat(champStats.getDouble("spellblock"), champStats.getDouble("spellblockperlevel"), level);
+	{		
+		maxHealth = ChampOps.calcStat(champStats.getDouble("hp"), maxHealthGrowthRate, level);
+		maxResource = ChampOps.calcStat(champStats.getDouble("mp"), maxResourceGrowthRate, level);
+		healthRegen = ChampOps.calcStat(champStats.getDouble("hpregen"), healthRegenGrowthRate, level);
+		resourceRegen = ChampOps.calcStat(champStats.getDouble("mpregen"), resourceRegenGrowthRate, level);
+		attackDamage = ChampOps.calcStat(champStats.getDouble("attackdamage"), attackDamageGrowthRate, level);
+		attackSpeed = ChampOps.calcAs(champStats.getDouble("attackspeedoffset"), attackSpeedGrowthRate, level);
+		armor = ChampOps.calcStat(champStats.getDouble("armor"), armorGrowthRate, level);
+		magicResist = ChampOps.calcStat(champStats.getDouble("spellblock"), magicResistGrowthRate, level);
 		
 		if (champName.equals("Tristana"))
 		{
