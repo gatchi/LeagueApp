@@ -2,6 +2,7 @@ package com.gatchipatchi.LeagueApp;
 
 import android.util.Log;
 import android.widget.TextView;
+import java.io.IOException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,10 +42,10 @@ class Champion
 	{
 		this.champion = champion;
 		this.champName = champName;
-		this.basicAbility1 = new Spell();
-		this.basicAbility2 = new Spell();
-		this.basicAbility3 = new Spell();
-		this.ultimateAbility = new Spell();
+		this.basicAbility1 = new Spell(1);
+		this.basicAbility2 = new Spell(2);
+		this.basicAbility3 = new Spell(3);
+		this.ultimateAbility = new Spell(4);
 		
 		// Set the default values, which will adustable in settings
 		
@@ -184,6 +185,21 @@ class Champion
 		target.name = abilityJson.getString("name");
 		target.costText = abilityJson.getString("costBurn");
 		target.cooldownText = abilityJson.getString("cooldown");
+		target.description = abilityJson.getString("tooltip");
+		
+		// Try to parse the descriptions
+		try
+		{
+			if(champName.equals("Shyvana") && (abilityArrayNum == 2)) target.description = "Shyvana deals 20/32/45//57 <font color=\"#FF8C00\">(+0.2 bonus AD)</font> <font class=\"#99FF99\">(+0.1 AP)</font> magic damage per second to nearby enemies and gains a bonus 30/35/40/45/50% movement speed that decays over 3 seconds.<br><br>While Burnout is active, basic attacks deal 5/8/11.25/14.25/17.5 <font color=\"#FF8C00\">(+0.2 bonus AD)</font> <font color=\"#99FF99\">(+0.1 AP)</font> magic damage to nearby enemies and extend its duration by 1 second.<br><br><font color=\"#FF3300\">Dragon Form: </font>Burnout scorches the earth, continuing to damage enemies that stand on it.<br><br><font color=\"#919191\"><i>Burnout deals +20% damage to monsters.<br>Burnout has a maximum duration of 7 seconds.</i></font>";
+			else target.description = ChampOps.ttParser(champName, target.description, abilityJson, abilityArrayNum);
+		} 
+		catch (IOException e) {
+			Log.w(Debug.TAG, "IOException while parsing spell tooltips");
+			Log.w(Debug.TAG, e.getMessage());
+		} catch (JSONException e) {
+			Log.w(Debug.TAG, "JSONException while translating codes");
+			Log.w(Debug.TAG, e.getMessage());
+		}
 	}
 }
 

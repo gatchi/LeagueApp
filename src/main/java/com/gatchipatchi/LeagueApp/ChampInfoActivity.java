@@ -188,6 +188,19 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		TextView passiveNameView = (TextView)findViewById(R.id.passive_name);
 		TextView passiveView = (TextView)findViewById(R.id.passive);
 		
+		// Write spell text to screen
+		qView.setText(Html.fromHtml(champion.basicAbility1.description));
+		wView.setText(Html.fromHtml(champion.basicAbility2.description));
+		eView.setText(Html.fromHtml(champion.basicAbility3.description));
+		rView.setText(Html.fromHtml(champion.ultimateAbility.description));
+		qNameView.setText("q:  " + champion.basicAbility1.name);
+		wNameView.setText("w:  " + champion.basicAbility2.name);
+		eNameView.setText("e:  " + champion.basicAbility3.name);
+		rNameView.setText("r:  " + champion.ultimateAbility.name);
+		/* if (champName.equals("Aatrox")) passiveView.setText(Html.fromHtml("Whenever Aatrox consumes <font color=\"" + COLOR_HEALTH + "\"> a portion of his health</font>, he stores it into his Blood Well. which can hold up to 105 - 870 (based on level) health. The Blood Well depletes by 2% per second if Aatrox hasn't dealt or received damage in the last 5 seconds.<br/><br/>Aatrox gains 0.3 - 0.55 (based on level)% bonus attack speed for every 1% in his Blood Well, up to a maximum of 30 - 55 (based on level)% bonus attack speed.<br/><br/>Upon taking fatal damage, Aatrox is cleansed of all debuffs, enters Stasis icon stasis and drains his Blood Well, healing himself for 35% of Blood Well's maximum capacity over the next 3 seconds for 36.75 - 304.5 (based on level) health (+100% of Blood Well's stored health) up to a maximum of 141.75 - 1174.5 (based on level) health."));
+		else passiveView.setText(Html.fromHtml(passive.getString("description")));
+		passiveNameView.setText("Passive:  " + passiveName); */
+		
 		try
 		{
 			// Pull spells from JSON
@@ -230,19 +243,6 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 				Debug.log(this, "JSONException while translating codes");
 				Debug.log(this, e.getMessage());
 			}
-			
-			// Write spell text to screen
-			qView.setText(Html.fromHtml(parsedQtt));
-			wView.setText(Html.fromHtml(parsedWtt));
-			eView.setText(Html.fromHtml(parsedEtt));
-			rView.setText(Html.fromHtml(parsedRtt));
-			qNameView.setText("q:  " + qName);
-			wNameView.setText("w:  " + wName);
-			eNameView.setText("e:  " + eName);
-			rNameView.setText("r:  " + rName);
-			if (champName.equals("Aatrox")) passiveView.setText(Html.fromHtml("Whenever Aatrox consumes <font color=\"" + COLOR_HEALTH + "\"> a portion of his health</font>, he stores it into his Blood Well. which can hold up to 105 - 870 (based on level) health. The Blood Well depletes by 2% per second if Aatrox hasn't dealt or received damage in the last 5 seconds.<br/><br/>Aatrox gains 0.3 - 0.55 (based on level)% bonus attack speed for every 1% in his Blood Well, up to a maximum of 30 - 55 (based on level)% bonus attack speed.<br/><br/>Upon taking fatal damage, Aatrox is cleansed of all debuffs, enters Stasis icon stasis and drains his Blood Well, healing himself for 35% of Blood Well's maximum capacity over the next 3 seconds for 36.75 - 304.5 (based on level) health (+100% of Blood Well's stored health) up to a maximum of 141.75 - 1174.5 (based on level) health."));
-			else passiveView.setText(Html.fromHtml(passive.getString("description")));
-			passiveNameView.setText("Passive:  " + passiveName);
 			
 		
 		} catch (JSONException e) {
