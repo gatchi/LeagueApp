@@ -101,6 +101,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		
 		aestheticSetup();
 		
+		
 		//------------- Champ Name ------------//
 		
 		// Get champ ID (button pressed ID)
@@ -131,11 +132,10 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			champNameView.setText(champName);
 		}
 		
-		//------------ Champ Stats --------------//
 		
+		//------------ Champ Stats --------------//
 
 		// Open JSON
-		/* champJson = loadJson(this, FileOps.CHAMP_DIR, champName + ".json", JSON_OBJECT); */
 		champJson = FileOps.retrieveJson(this, FileOps.CHAMP_DIR, champName);
 		JSONObject statsJson;
 		try {
@@ -173,17 +173,21 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		// Throw some numbers on it
 		updateTable();
 		
-		/*
-
-		// Set range on stat page
 		
-		rangeText.setText(String.format("%.0f", attackRange));
+		//------------ Champ Skills -------------//
 		
-		// Set movespeed on stat page
-		TextView movespeedText = (TextView) findViewById(R.id.movespeed);
-		movespeedText.setText(String.format("%.0f" ,moveSpeed)); */
+		// Get TextView handles
+		TextView qNameView = (TextView)findViewById(R.id.q_name);
+		TextView wNameView = (TextView)findViewById(R.id.w_name);
+		TextView eNameView = (TextView)findViewById(R.id.e_name);
+		TextView rNameView = (TextView)findViewById(R.id.r_name);
+		TextView qView = (TextView)findViewById(R.id.q);
+		TextView wView = (TextView)findViewById(R.id.w);
+		TextView eView = (TextView)findViewById(R.id.e);
+		TextView rView = (TextView)findViewById(R.id.r);
+		TextView passiveNameView = (TextView)findViewById(R.id.passive_name);
+		TextView passiveView = (TextView)findViewById(R.id.passive);
 		
-		// Load skills (champion spells)
 		try
 		{
 			// Pull spells from JSON
@@ -193,18 +197,6 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			JSONObject eSpell = (JSONObject)spells.get(2);
 			JSONObject rSpell = (JSONObject)spells.get(3);
 			JSONObject passive = subChampJson.getJSONObject("passive");
-			
-			// Get TextView handles
-			TextView qNameView = (TextView)findViewById(R.id.q_name);
-			TextView wNameView = (TextView)findViewById(R.id.w_name);
-			TextView eNameView = (TextView)findViewById(R.id.e_name);
-			TextView rNameView = (TextView)findViewById(R.id.r_name);
-			TextView qView = (TextView)findViewById(R.id.q);
-			TextView wView = (TextView)findViewById(R.id.w);
-			TextView eView = (TextView)findViewById(R.id.e);
-			TextView rView = (TextView)findViewById(R.id.r);
-			TextView passiveNameView = (TextView)findViewById(R.id.passive_name);
-			TextView passiveView = (TextView)findViewById(R.id.passive);
 			
 			// Grab full raw descriptions from spells
 			String qtt = qSpell.getString("tooltip");
