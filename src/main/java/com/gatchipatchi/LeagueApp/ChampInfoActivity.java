@@ -171,7 +171,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		moveSpeedText = (TextView) findViewById(R.id.movespeed);
 		
 		// Throw some numbers on it
-		updateTable();
+		updateStatTable();
 		
 		
 		//------------ Champ Skills -------------//
@@ -231,16 +231,12 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 				Log.e(Debug.TAG, "statUpdate failed");
 				Log.e(Debug.TAG, "Couldnt update values at selected level");
 			}
-			updateTable();
+			updateStatTable();
 		}
 		
 	}
 	
-	void updateViews() {
-		updateTable();
-	}
-	
-	void updateTable() {
+	void updateStatTable() {
 		// Default format is in-game style (low precision)
 		healthText.setText(String.format("%.0f", champion.maxHealth));
 		healthRegenText.setText(String.format("%.1f", champion.healthRegen));
