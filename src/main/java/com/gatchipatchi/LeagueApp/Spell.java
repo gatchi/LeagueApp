@@ -3,15 +3,19 @@ package com.gatchipatchi.LeagueApp;
 class Spell
 {
 	String name;
+	String costText;
+	String cooldownText;
 	String description;
-	int cost;
-	int cooldown;
+	int[] cost;
+	int[] cooldown;
 	
-	Spell(String name, int cost, int cooldown, String description)
+	Spell() {}
+	
+	Spell(String name, String costText, String cooldownText, String description)
 	{
 		this.name = name;
-		this.cost = cost;
-		this.cooldown = cooldown;
+		this.costText = costText;
+		this.cooldownText = cooldownText;
 		this.description = description;
 	}
 }

@@ -2,6 +2,7 @@ package com.gatchipatchi.LeagueApp;
 
 import android.util.Log;
 import android.widget.TextView;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -16,6 +17,7 @@ class Champion
 	String champName;
 	JSONObject champion;
 	JSONObject champStats;
+	JSONArray champAbilities;
 	double maxHealth;
 	double maxResource;
 	double healthRegen;
@@ -29,18 +31,27 @@ class Champion
 	String resourceType;
 	String resourceRegenType;
 	String rangeType;
+	Spell basicAbility1;
+	Spell basicAbility2;
+	Spell basicAbility3;
+	Spell ultimateAbility;
 	
 	
 	Champion(String champName, JSONObject champion)
 	{
 		this.champion = champion;
 		this.champName = champName;
+		this.basicAbility1 = new Spell();
+		this.basicAbility2 = new Spell();
+		this.basicAbility3 = new Spell();
+		this.ultimateAbility = new Spell();
 		
 		// Set the default values, which will adustable in settings
 		
 	}
 	
-	void init() {
+	void init()
+	{
 		/*
 		 * Sets up the module.
 		 */
@@ -69,6 +80,27 @@ class Champion
 		catch(JSONException e) {
 			Log.e(Debug.TAG, "JSONException in Champion:");
 			Log.e(Debug.TAG, "setResource() failed in init()");
+			Log.e(Debug.TAG, e.getMessage());
+		}
+		
+		try {
+			champAbilities = champion.getJSONArray("spells");
+		}
+		catch(JSONException e) {
+			Log.e(Debug.TAG, "JSONException in Champion:");
+			Log.e(Debug.TAG, "Couldnt obtain abilities JSONObject");
+			Log.e(Debug.TAG, e.getMessage());
+		}
+		
+		try {
+			loadAbility(basicAbility1, 1);
+			loadAbility(basicAbility2, 2);
+			loadAbility(basicAbility3, 3);
+			loadAbility(ultimateAbility, 4);
+		}
+		catch(JSONException e) {
+			Log.e(Debug.TAG, "JSONException in Champion:");
+			Log.e(Debug.TAG, "failed to load abilities in init()");
 			Log.e(Debug.TAG, e.getMessage());
 		}
 	}
@@ -144,6 +176,14 @@ class Champion
 			maxResource = 0;
 			resourceRegen = 0;
 		}
+	}
+
+	private void loadAbility(Spell target, int abilityArrayNum) throws JSONException
+	{
+		JSONObject abilityJson = champAbilities.getJSONObject(abilityArrayNum - 1);
+		target.name = abilityJson.getString("name");
+		target.costText = abilityJson.getString("costBurn");
+		target.cooldownText = abilityJson.getString("cooldown");
 	}
 }
 

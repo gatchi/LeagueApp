@@ -4,7 +4,7 @@ o refactor ChampInfoActivity
 
 Goals for Some Other Day
 ========================
-o test JSONException handling in ChampInfoActivity
+o change ratios on abilities to percentages
 + add string resources for MainActivity
 + add old plugins to lenovo npp
 + implement search
