@@ -252,62 +252,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		rangeText.setText(String.format("%.0f", champion.range));
 		moveSpeedText.setText(String.format("%.0f", champion.moveSpeed));
 	}
-	
-	void setPerLevel(TextView text, int valueType, double baseValue, double growthValue) {	
-		if ((baseValue != 0)) {
-			if (valueType == LESS_PRECISE) {
-				text.setText(String.format("%.1f (+%.0f)", baseValue, growthValue));
-			}
-			else if (valueType == MORE_PRECISE) {
-				text.setText(String.format("%.3f (+%.2f)", baseValue, growthValue));
-			}
-			else if (valueType == PERCENT) {
-				text.setText(String.format("%.3f (+%.1f%%)", baseValue, growthValue));
-			}
-			else if (valueType == MAGIC_RESIST) {
-				text.setText(String.format("%.1f (+%.2f)", baseValue, growthValue));
-			}
-		}
-	}
-	
-	void setCurrentLevel(double base, double growth, int valueType, String level, TextView view) {
-		
-		double levelValue = Double.parseDouble(level);
-		double stat = base + growth * (levelValue - 1);
-		
-		if (stat != 0) {
-			if (valueType == LESS_PRECISE) {
-				view.setText(String.format("%.1f", stat));
-			}
-			else if (valueType == MID_PRECISE) {
-				view.setText(String.format("%.2f", stat));
-			}
-			else if (valueType == MORE_PRECISE) {
-				view.setText(String.format("%.3f", stat));
-			}
-			else if (valueType == PERCENT) {
-				view.setText(String.format("%.3f (+%.1f%%)", base, (growth * (levelValue - 1))));
-			}
-		}
-	}
-	
-	void setRange(double base, double growth, int rangeType, TextView view) {
-		if ((base != 0)) {
-			if (rangeType == LESS_PRECISE) {
-				view.setText(String.format("%.1f – %.1f", base, (base + 17 * growth)));
-			}
-			else if (rangeType == MID_PRECISE) {
-				view.setText(String.format("%.2f – %.2f", base, (base + 17 * growth)));
-			}
-			else if (rangeType == MORE_PRECISE) {
-				view.setText(String.format("%.3f – %.3f", base, (base + 17 * growth)));
-			}
-			else if (rangeType == PERCENT) {
-				view.setText(String.format("%.3f (+0%% – +%.1f%%)", base, (growth * 17)));
-			}
-		}
-	}
-		
+			
 	void aestheticSetup() {
 		ActionBar actionBar = getActionBar();
 		actionBar.setTitle("Champ Stats");
