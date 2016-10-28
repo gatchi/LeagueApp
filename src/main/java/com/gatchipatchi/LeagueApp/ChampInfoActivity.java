@@ -197,58 +197,9 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		wNameView.setText("w:  " + champion.basicAbility2.name);
 		eNameView.setText("e:  " + champion.basicAbility3.name);
 		rNameView.setText("r:  " + champion.ultimateAbility.name);
-		/* if (champName.equals("Aatrox")) passiveView.setText(Html.fromHtml("Whenever Aatrox consumes <font color=\"" + COLOR_HEALTH + "\"> a portion of his health</font>, he stores it into his Blood Well. which can hold up to 105 - 870 (based on level) health. The Blood Well depletes by 2% per second if Aatrox hasn't dealt or received damage in the last 5 seconds.<br/><br/>Aatrox gains 0.3 - 0.55 (based on level)% bonus attack speed for every 1% in his Blood Well, up to a maximum of 30 - 55 (based on level)% bonus attack speed.<br/><br/>Upon taking fatal damage, Aatrox is cleansed of all debuffs, enters Stasis icon stasis and drains his Blood Well, healing himself for 35% of Blood Well's maximum capacity over the next 3 seconds for 36.75 - 304.5 (based on level) health (+100% of Blood Well's stored health) up to a maximum of 141.75 - 1174.5 (based on level) health."));
-		else passiveView.setText(Html.fromHtml(passive.getString("description")));
-		passiveNameView.setText("Passive:  " + passiveName); */
-		
-		try
-		{
-			// Pull spells from JSON
-			JSONArray spells = subChampJson.getJSONArray("spells");
-			JSONObject qSpell = (JSONObject)spells.get(0);
-			JSONObject wSpell = (JSONObject)spells.get(1);
-			JSONObject eSpell = (JSONObject)spells.get(2);
-			JSONObject rSpell = (JSONObject)spells.get(3);
-			JSONObject passive = subChampJson.getJSONObject("passive");
-			
-			// Grab full raw descriptions from spells
-			String qtt = qSpell.getString("tooltip");
-			String wtt = wSpell.getString("tooltip");
-			String ett = eSpell.getString("tooltip");
-			String rtt = rSpell.getString("tooltip");
-			String passiveName = passive.getString("name");
-			String qName = qSpell.getString("name");
-			String wName = wSpell.getString("name");
-			String eName = eSpell.getString("name");
-			String rName = rSpell.getString("name");
-			
-			String parsedQtt = "";
-			String parsedWtt = "";
-			String parsedEtt = "";
-			String parsedRtt = "";
-
-			// Try to parse the descriptions
-			try
-			{
-				parsedQtt = ttParser(qtt, 1);
-				if(champName.equals("Shyvana")) parsedWtt = "Shyvana deals 20/32/45//57 <font color=\"#FF8C00\">(+0.2 bonus AD)</font> <font class=\"#99FF99\">(+0.1 AP)</font> magic damage per second to nearby enemies and gains a bonus 30/35/40/45/50% movement speed that decays over 3 seconds.<br><br>While Burnout is active, basic attacks deal 5/8/11.25/14.25/17.5 <font color=\"#FF8C00\">(+0.2 bonus AD)</font> <font color=\"#99FF99\">(+0.1 AP)</font> magic damage to nearby enemies and extend its duration by 1 second.<br><br><font color=\"#FF3300\">Dragon Form: </font>Burnout scorches the earth, continuing to damage enemies that stand on it.<br><br><font color=\"#919191\"><i>Burnout deals +20% damage to monsters.<br>Burnout has a maximum duration of 7 seconds.</i></font>";
-				else parsedWtt = ttParser(wtt, 2);
-				parsedEtt = ttParser(ett, 3);
-				parsedRtt = ttParser(rtt, 4);
-			} 
-			catch (IOException e) {
-				Debug.log(this, "IOException while parsing spell tooltips");
-				Debug.log(this, e.getMessage());
-			} catch (JSONException e) {
-				Debug.log(this, "JSONException while translating codes");
-				Debug.log(this, e.getMessage());
-			}
-			
-		
-		} catch (JSONException e) {
-			Debug.log(this, "JSONException in Load Skills");
-			Debug.log(this, e.getMessage());
-		}
+		if (champName.equals("Aatrox")) passiveView.setText(Html.fromHtml("Whenever Aatrox consumes <font color=\"" + COLOR_HEALTH + "\"> a portion of his health</font>, he stores it into his Blood Well. which can hold up to 105 - 870 (based on level) health. The Blood Well depletes by 2% per second if Aatrox hasn't dealt or received damage in the last 5 seconds.<br/><br/>Aatrox gains 0.3 - 0.55 (based on level)% bonus attack speed for every 1% in his Blood Well, up to a maximum of 30 - 55 (based on level)% bonus attack speed.<br/><br/>Upon taking fatal damage, Aatrox is cleansed of all debuffs, enters Stasis icon stasis and drains his Blood Well, healing himself for 35% of Blood Well's maximum capacity over the next 3 seconds for 36.75 - 304.5 (based on level) health (+100% of Blood Well's stored health) up to a maximum of 141.75 - 1174.5 (based on level) health."));
+		else passiveView.setText(Html.fromHtml(champion.passive.description));
+		passiveNameView.setText("Passive:  " + champion.passive.name);
 	}
 	
 	

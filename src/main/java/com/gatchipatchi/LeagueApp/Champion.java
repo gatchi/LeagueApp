@@ -32,6 +32,7 @@ class Champion
 	String resourceType;
 	String resourceRegenType;
 	String rangeType;
+	Spell passive;
 	Spell basicAbility1;
 	Spell basicAbility2;
 	Spell basicAbility3;
@@ -42,6 +43,7 @@ class Champion
 	{
 		this.champion = champion;
 		this.champName = champName;
+		this.passive = new Spell();
 		this.basicAbility1 = new Spell(1);
 		this.basicAbility2 = new Spell(2);
 		this.basicAbility3 = new Spell(3);
@@ -94,6 +96,7 @@ class Champion
 		}
 		
 		try {
+			loadPassive(passive);
 			loadAbility(basicAbility1, 1);
 			loadAbility(basicAbility2, 2);
 			loadAbility(basicAbility3, 3);
@@ -179,6 +182,13 @@ class Champion
 		}
 	}
 
+	private void loadPassive(Spell target) throws JSONException
+	{
+		JSONObject passiveJson = champion.getJSONObject("passive");
+		target.name = passiveJson.getString("name");
+		target.description = passiveJson.getString("description");
+	}
+	
 	private void loadAbility(Spell target, int abilityArrayNum) throws JSONException
 	{
 		JSONObject abilityJson = champAbilities.getJSONObject(abilityArrayNum - 1);
