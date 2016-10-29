@@ -259,8 +259,21 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		// Default format is in-game style (low precision)
 		healthText.setText(String.format("%.0f", champion.maxHealth));
 		healthRegenText.setText(String.format("%.1f", champion.healthRegen));
-		if(champion.maxResource > 0) resourceText.setText(String.format("%.0f", champion.maxResource));
-		if(champion.resourceRegen > 0) resourceRegenText.setText(String.format("%.1f", champion.resourceRegen));
+		if(champion.resourceType.equals("Uses health") || champion.resourceType.equals("No resource")) {
+			resourceText.setVisibility(View.INVISIBLE);
+			resourceRegenText.setVisibility(View.INVISIBLE);
+		}
+		else if(champion.resourceType.equals("Fury")) {
+			resourceText.setText(String.format("%.0f", champion.maxResource));
+			resourceText.setVisibility(View.VISIBLE);
+			resourceRegenText.setVisibility(View.INVISIBLE);
+		}
+		else {
+			resourceText.setText(String.format("%.0f", champion.maxResource));
+			resourceRegenText.setText(String.format("%.1f", champion.resourceRegen));
+			resourceText.setVisibility(View.VISIBLE);
+			resourceRegenText.setVisibility(View.VISIBLE);
+		}
 		adText.setText(String.format("%.0f", champion.attackDamage));
 		asText.setText(String.format("%.3f", champion.attackSpeed));
 		armorText.setText(String.format("%.0f", champion.armor));
