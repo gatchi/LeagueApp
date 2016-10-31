@@ -67,14 +67,52 @@ class Champion
 		attackSpeedGrowthRate = champStats.getDouble("attackspeedperlevel");
 		armorGrowthRate = champStats.getDouble("armorperlevel");
 		magicResistGrowthRate = champStats.getDouble("spellblockperlevel");
+		
+		setValues(1);  // Set values to lvl 1
+		setResource(champion.getString("partype"));
+		loadPassive(passive);
+		loadAbility(basicAbility1, 1);
+		loadAbility(basicAbility2, 2);
+		loadAbility(basicAbility3, 3);
+		loadAbility(ultimateAbility, 4);
 	}
 	
-	void init()
+	Champion(Champion champToCopy)
 	{
-		/*
-		 * Sets up the module.
-		 */
-		
+		this.champName = champToCopy.champName;
+		this.champion = champToCopy.champion;
+		this.champStats = champToCopy.champStats;
+		this.champAbilities = champToCopy.champAbilities;
+		this.maxHealth = champToCopy.maxHealth;
+		this.maxResource = champToCopy.maxResource;
+		this.healthRegen = champToCopy.healthRegen;
+		this.resourceRegen = champToCopy.resourceRegen;
+		this.attackDamage = champToCopy.attackDamage;
+		this.armor = champToCopy.armor;
+		this.magicResist = champToCopy.magicResist;
+		this.attackSpeed = champToCopy.attackSpeed;
+		this.moveSpeed = champToCopy.moveSpeed;
+		this.range = champToCopy.range;
+		this.resourceType = champToCopy.resourceType;
+		this.resourceRegenType = champToCopy.resourceRegenType;
+		this.rangeType = champToCopy.rangeType;
+		this.passive = champToCopy.passive;
+		this.basicAbility1 = champToCopy.basicAbility1;
+		this.basicAbility2 = champToCopy.basicAbility2;
+		this.basicAbility3 = champToCopy.basicAbility3;
+		this.ultimateAbility = champToCopy.ultimateAbility;
+		this.maxHealthGrowthRate = champToCopy.maxHealthGrowthRate;
+		this.maxResourceGrowthRate = champToCopy.maxResourceGrowthRate;
+		this.healthRegenGrowthRate = champToCopy.healthRegenGrowthRate;
+		this.resourceRegenGrowthRate = champToCopy.resourceRegenGrowthRate;
+		this.attackDamageGrowthRate = champToCopy.attackDamageGrowthRate;
+		this.armorGrowthRate = champToCopy.armorGrowthRate;
+		this.magicResistGrowthRate = champToCopy.magicResistGrowthRate;
+		this.attackSpeedGrowthRate = champToCopy.attackSpeedGrowthRate;
+	}
+	
+	/* void init()
+	{		
 		try {
 			champStats = champion.getJSONObject("stats");
 		}
@@ -123,8 +161,8 @@ class Champion
 			Log.e(Debug.TAG, "failed to load abilities in init()");
 			Log.e(Debug.TAG, e.getMessage());
 		}
-	}
-		
+	} */
+	
 	void setValues(int level) throws JSONException
 	{		
 		maxHealth = ChampOps.calcStat(champStats.getDouble("hp"), maxHealthGrowthRate, level);
@@ -158,9 +196,8 @@ class Champion
 		}
 	}
 	
-	private void setResource() throws JSONException
+	private void setResource(String parType) throws JSONException
 	{
-		String parType = champion.getString("partype");
 		if (parType.equals("MP"))
 		{
 			resourceType = "Mana";
@@ -207,6 +244,7 @@ class Champion
 	
 	private void loadAbility(Spell target, int abilityArrayNum) throws JSONException
 	{
+		JSONArray champAbilities = champion.getJSONArray("spells");
 		JSONObject abilityJson = champAbilities.getJSONObject(abilityArrayNum - 1);
 		target.name = abilityJson.getString("name");
 		target.costText = abilityJson.getString("costBurn");

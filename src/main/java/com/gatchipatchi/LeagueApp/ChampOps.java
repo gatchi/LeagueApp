@@ -352,7 +352,7 @@ class ChampOps
 						}
 					}
 					else {
-						coeff = "error";
+						coeff = "ERROR";
 					}
 					
 					if(holder.has("link")) type = holder.getString("link");
@@ -417,7 +417,7 @@ class ChampOps
 						coeff = coeff + Double.toString(coeffArray.getDouble(coeffArray.length() - 1));
 					}
 					else {
-						coeff = "error";
+						coeff = "ERROR";
 					}
 					
 					if(holder.has("link")) type = holder.getString("link");
@@ -445,10 +445,8 @@ class ChampOps
 				}
 			}
 			
-			if (result.isEmpty())
-			{
-				// This is the list of missing data and the rules that go with them
-				
+			if (result.isEmpty())  // This is the list of missing data and the rules that go with them
+			{	
 				if (champName.equals("Aatrox"))
 				{
 					if (code.equals("f5")) return "";
@@ -1101,6 +1099,6 @@ class ChampOps
 			Log.wtf(Debug.TAG, "cant find " + code);
 		}
 		
-		return "error";
+		return "ERROR";
 	}
 }

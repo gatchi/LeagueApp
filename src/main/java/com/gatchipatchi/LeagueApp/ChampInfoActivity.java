@@ -71,8 +71,8 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 	int champId;
 	String champName;
 	Champion champion;
+	JSONObject topLevelJson;
 	JSONObject champJson;
-	JSONObject subChampJson;
 	
 	TextView healthText;
 	TextView healthRegenText;
@@ -134,12 +134,12 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		//------------ Champ Stats --------------//
 
 		// Open JSON
-		champJson = FileOps.retrieveJson(this, FileOps.CHAMP_DIR, champName);
+		topLevelJson = FileOps.retrieveJson(this, FileOps.CHAMP_DIR, champName);
 		JSONObject statsJson;
 		try {
-			JSONObject dataJson = champJson.getJSONObject("data");
-			subChampJson = dataJson.getJSONObject(champName);
-			statsJson = subChampJson.getJSONObject("stats");
+			JSONObject dataJson = topLevelJson.getJSONObject("data");
+			champJson = dataJson.getJSONObject(champName);
+			statsJson = champJson.getJSONObject("stats");
 		}
 		catch(JSONException e) {
 			Log.e(Debug.TAG, "JSONException in ChampInfoActivity:");
@@ -150,7 +150,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		
 		// Instantiate module
 		try {
-			champion = new Champion(champName, subChampJson);
+			champion = new Champion(champName, champJson);
 		}
 		catch(JSONException e) {
 			Log.e(Debug.TAG, "JSONException in ChampInfoActivity:");
@@ -160,7 +160,6 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			finish();
 			return;
 		}
-		champion.init();
 		
 		// Initialize table views
 		healthText = (TextView) findViewById(R.id.health);
@@ -223,7 +222,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			setTableToN();
 		}
 		else if (level.equals("1 – 18")) {
-			// Set champ to lvl 1, make a copy at lvl 18, and use both for the textview update
+			setTableToRange();
 		}
 		else { // selected level
 			try {
@@ -237,6 +236,39 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 			updateStatTable();
 		}
 		
+	}
+	
+	void setTableToRange() {
+		try {
+			champion.setValues(1);
+		}
+		catch(JSONException e) {
+			Log.e(Debug.TAG, "JSONException in setTableToRange() (ChampInfoActivity)");
+			Log.e(Debug.TAG, "Couldnt set values for championAt18");
+			Log.e(Debug.TAG, e.getMessage());
+		}
+		Champion championAt18 = new Champion(champion);
+		try {
+			championAt18.setValues(18);
+		}
+		catch(JSONException e) {
+			Log.e(Debug.TAG, "JSONException in setTableToRange() (ChampInfoActivity)");
+			Log.e(Debug.TAG, "Couldnt set values for championAt18");
+			Log.e(Debug.TAG, e.getMessage());
+		}
+		healthText.setText(String.format("%.0f -- %.0f", champion.maxHealth, championAt18.maxHealth));
+		healthRegenText.setText(String.format("%.1f -- %.1f", champion.healthRegen, championAt18.healthRegen));
+		if(champion.maxResource > 0) resourceText.setText(String.format("%.0f -- %.0f", champion.maxResource, championAt18.maxResource));
+		if(champion.resourceRegen > 0) resourceRegenText.setText(String.format("%.1f -- %.1f", champion.resourceRegen, championAt18.resourceRegen));
+		adText.setText(String.format("%.0f -- %.0f", champion.attackDamage, championAt18.attackDamage));
+		asText.setText(String.format("%.3f -- %.3f", champion.attackSpeed, championAt18.attackSpeed));
+		armorText.setText(String.format("%.0f -- %.0f", champion.armor, championAt18.armor));
+		mrText.setText(String.format("%.0f -- %.0f", champion.magicResist, championAt18.magicResist));
+		resourceTypeText.setText(champion.resourceType);
+		resourceRegenTypeText.setText(champion.resourceRegenType);
+		rangeTypeText.setText(champion.rangeType);
+		rangeText.setText(String.format("%.0f -- %.0f", champion.range, championAt18.range));
+		moveSpeedText.setText(String.format("%.0f -- %.0f", champion.moveSpeed, championAt18.moveSpeed));
 	}
 	
 	void setTableToN() {
