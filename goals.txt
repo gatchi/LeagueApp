@@ -1,7 +1,6 @@
 Goals for Today
 ===============
 o refactor ChampInfoActivity
-	o refactor Champion.java
 	o make "n" better, and dont forget about Trist and Cass
 	- code cleanup
 

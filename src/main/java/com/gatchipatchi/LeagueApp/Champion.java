@@ -111,58 +111,6 @@ class Champion
 		this.attackSpeedGrowthRate = champToCopy.attackSpeedGrowthRate;
 	}
 	
-	/* void init()
-	{		
-		try {
-			champStats = champion.getJSONObject("stats");
-		}
-		catch(JSONException e) {
-			Log.e(Debug.TAG, "JSONException in Champion:");
-			Log.e(Debug.TAG, "Couldnt obtain stats JSONObject");
-			Log.e(Debug.TAG, e.getMessage());
-		}
-		
-		try {
-			setValues(1);
-		}
-		catch(JSONException e) {
-			Log.e(Debug.TAG, "JSONException in Champion:");
-			Log.e(Debug.TAG, "setValues() failed in init()");
-			Log.e(Debug.TAG, e.getMessage());
-		}
-		
-		try {
-			setResource();
-		}
-		catch(JSONException e) {
-			Log.e(Debug.TAG, "JSONException in Champion:");
-			Log.e(Debug.TAG, "setResource() failed in init()");
-			Log.e(Debug.TAG, e.getMessage());
-		}
-		
-		try {
-			champAbilities = champion.getJSONArray("spells");
-		}
-		catch(JSONException e) {
-			Log.e(Debug.TAG, "JSONException in Champion:");
-			Log.e(Debug.TAG, "Couldnt obtain abilities JSONObject");
-			Log.e(Debug.TAG, e.getMessage());
-		}
-		
-		try {
-			loadPassive(passive);
-			loadAbility(basicAbility1, 1);
-			loadAbility(basicAbility2, 2);
-			loadAbility(basicAbility3, 3);
-			loadAbility(ultimateAbility, 4);
-		}
-		catch(JSONException e) {
-			Log.e(Debug.TAG, "JSONException in Champion:");
-			Log.e(Debug.TAG, "failed to load abilities in init()");
-			Log.e(Debug.TAG, e.getMessage());
-		}
-	} */
-	
 	void setValues(int level) throws JSONException
 	{		
 		maxHealth = ChampOps.calcStat(champStats.getDouble("hp"), maxHealthGrowthRate, level);

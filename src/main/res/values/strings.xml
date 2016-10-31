@@ -22,7 +22,7 @@
 	
 	<string-array name="champ_level_select">
 		<item>1 – 18</item>
-		<item>n</item>
+		<item>growth</item>
 		<item>1</item>
 		<item>2</item>
 		<item>3</item>

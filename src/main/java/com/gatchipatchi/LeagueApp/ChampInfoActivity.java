@@ -218,7 +218,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		 * 
 		 */
 		
-		if (level.equals("n")) {
+		if (level.equals("growth")) {
 			setTableToN();
 		}
 		else if (level.equals("1 – 18")) {
@@ -239,6 +239,10 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 	}
 	
 	void setTableToRange() {
+		/*
+		 * Uses Champion copying to display level 1 and level 18
+		 * stat values at the same time.
+		 */
 		try {
 			champion.setValues(1);
 		}
@@ -358,7 +362,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 
 	@Override
 	public void onNothingSelected(AdapterView<?> parent) {
-		/* not used but necessary? t*/
+		/* not used but necessary? */
 	}
 	
 	public void stubMethod() {
