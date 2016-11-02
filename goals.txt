@@ -1,7 +1,6 @@
 Goals for Today
 ===============
 o refactor ChampInfoActivity
-	o make "n" better, and dont forget about Trist and Cass
 	- code cleanup
 
 Goals for Some Other Day
@@ -11,6 +10,7 @@ o Corki ???
 o just do a good comb-thru all the champs
 o reformat all the custom text (should be percentages)
 o special shit for Gnar
+o special passives for..... everybody, fuck
 o change ratios on abilities to percentages
 o refactor transalte and ttParser
 + add string resources for MainActivity

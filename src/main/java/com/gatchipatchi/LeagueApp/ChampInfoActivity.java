@@ -278,8 +278,14 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		resourceTypeText.setText(champion.resourceType);
 		resourceRegenTypeText.setText(champion.resourceRegenType);
 		rangeTypeText.setText(champion.rangeType);
-		rangeText.setText(String.format("%.0f", champion.range));
-		moveSpeedText.setText(String.format("%.0f", champion.moveSpeed));
+		if(champName.equals("Tristana")) {
+			rangeText.setText("see passive");
+		}
+		else rangeText.setVisibility(View.INVISIBLE);
+		if(champName.equals("Cassiopeia")) {
+			moveSpeedText.setText("see passive");
+		}
+		else moveSpeedText.setVisibility(View.INVISIBLE);
 	}
 	
 	void updateStatTable() {
