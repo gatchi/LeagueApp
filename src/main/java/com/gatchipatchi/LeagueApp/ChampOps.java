@@ -90,6 +90,30 @@ class ChampOps
 		return champList;
 	}
 	
+	static String coeffDoubleFormatter(JSONObject json) throws JSONException
+	{
+		String coeff = Double.toString(json.getDouble("coeff") * 100) + "%";
+		return coeff;
+	}
+	
+	static String coeffIntegerFormatter(JSONObject json) throws JSONException
+	{
+		String coeff = Integer.toString(json.getInt("coeff"));
+		return coeff;
+	}
+
+	static String coeffJsonObjectFormatter(JSONObject json) throws JSONException
+	{
+		JSONArray coeffArray = json.getJSONArray("coeff");
+		String coeff = "";
+		for(int i=0; i<coeffArray.length()-1; i++)
+		{
+			coeff = coeff + Double.toString(coeffArray.getDouble(i)) + "/";
+		}
+		coeff = coeff + Double.toString(coeffArray.getDouble(coeffArray.length() - 1));
+		return coeff;
+	}
+	
 	static String ttParser(String champName, String input, JSONObject ability, int abilityNum) throws IOException, JSONException {
 		/*
 		 * Spell JSON arrays use codes in their tooltips.
@@ -340,16 +364,11 @@ class ChampOps
 					}
 					else if (holder.get("coeff") instanceof Double)
 					{
-						coeff = Double.toString(holder.getDouble("coeff"));
+						coeff = coeffDoubleFormatter(holder);
 					}
 					else if (holder.get("coeff") instanceof JSONArray)
 					{
-						JSONArray coeffArray = holder.getJSONArray("coeff");
-						coeff = "";
-						for(int i=0; i<coeffArray.length(); i++)
-						{
-							coeff = coeff + Double.toString(coeffArray.getDouble(i)) + "/";
-						}
+						coeff = coeffJsonObjectFormatter(holder);
 					}
 					else {
 						coeff = "ERROR";
@@ -400,21 +419,15 @@ class ChampOps
 					}
 					else if (holder.get("coeff") instanceof Integer)
 					{
-						coeff = Integer.toString(holder.getInt("coeff"));
+						coeff = coeffIntegerFormatter(holder);
 					}
 					else if (holder.get("coeff") instanceof Double)
 					{
-						coeff = Double.toString(holder.getDouble("coeff"));
+						coeff = coeffDoubleFormatter(holder);
 					}
 					else if (holder.get("coeff") instanceof JSONArray)
 					{
-						JSONArray coeffArray = holder.getJSONArray("coeff");
-						coeff = "";
-						for(int i=0; i<coeffArray.length()-1; i++)
-						{
-							coeff = coeff + Double.toString(coeffArray.getDouble(i)) + "/";
-						}
-						coeff = coeff + Double.toString(coeffArray.getDouble(coeffArray.length() - 1));
+						coeff = coeffJsonObjectFormatter(holder);
 					}
 					else {
 						coeff = "ERROR";

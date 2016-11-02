@@ -7,8 +7,11 @@ o refactor ChampInfoActivity
 Goals for Some Other Day
 ========================
 o fix Cass parser error
-o add color coding to stats
+o Corki ???
+o just do a good comb-thru all the champs
+o reformat all the custom text (should be percentages)
 o change ratios on abilities to percentages
+o refactor transalte and ttParser
 + add string resources for MainActivity
 + add old plugins to lenovo npp
 + implement search
