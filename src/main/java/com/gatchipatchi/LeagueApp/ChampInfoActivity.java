@@ -56,7 +56,6 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 	
 	//---------------- Class Objects ------------------//
 	
-	Resources res;
 	int champId;
 	String champName;
 	Champion champion;
@@ -372,11 +371,4 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 	public void onNothingSelected(AdapterView<?> parent) {
 		/* not used but necessary? */
 	}
-	
-	public void stubMethod() {
-		// Simple test method for stubs
-		Toast toast = Toast.makeText(this, "Tada!", Toast.LENGTH_SHORT);
-		toast.show();
-	}
-	
 }
