@@ -147,11 +147,11 @@ class Champion
 		
 		if (champStats.getDouble("attackrange") < 300)
 		{
-			rangeType = "Melee";
+			rangeType = "melee";
 		}
 		else if (champStats.getDouble("attackrange") >= 300)
 		{
-			rangeType = "Ranged";
+			rangeType = "ranged";
 		}
 	}
 	

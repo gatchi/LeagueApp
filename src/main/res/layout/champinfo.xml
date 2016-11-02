@@ -152,7 +152,7 @@
 
 					<TextView
 						android:id="@+id/range_type"
-						android:text="Melee"/>
+						android:text="Range"/>
 
 					<TextView
 						android:id="@+id/range"

@@ -265,7 +265,7 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		moveSpeedText.setText(String.format("%.0f -- %.0f", champion.moveSpeed, championAt18.moveSpeed));
 	}
 	
-	void setTableToN() {
+	void setTableToN() {  // Growth factor table
 		healthText.setText(String.format("%.0f", champion.maxHealthGrowthRate));
 		healthRegenText.setText(String.format("%.1f", champion.healthRegenGrowthRate));
 		formatResources();

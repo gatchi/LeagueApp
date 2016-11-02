@@ -165,18 +165,29 @@
 					
 				</TableRow>
 				
-					<TableRow android:textSize="8sp">
-						
-						<TextView
-						android:id="@+id/range_type"
-						android:text="Melee"/>
-						
-						<TextView
+				<TableRow android:textSize="8sp">
+					
+					<TextView
+						android:text="Range"/>
+					
+					<TextView
 						android:id="@+id/range"
 						android:text="uninitialized"
 						android:gravity="end"/>
-						
-					</TableRow>
+					
+				</TableRow>
+				
+				<TableRow>
+				
+					<TextView
+						android:text="Range type"/>
+				
+					<TextView
+						android:id="@+id/range_type"
+						android:text="uninitialized"
+						android:gravity="end"/>
+				
+				</TableRow>
 
 			</TableLayout>
 
