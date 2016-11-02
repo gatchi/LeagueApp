@@ -16,6 +16,7 @@ import android.view.View;
 import android.view.MenuItem;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.support.v4.content.ContextCompat;
 import java.util.Iterator;
 import java.util.ArrayList;
 import java.lang.String;
@@ -262,8 +263,9 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		}
 		healthText.setText(String.format("%.0f -- %.0f", champion.maxHealth, championAt18.maxHealth));
 		healthRegenText.setText(String.format("%.1f -- %.1f", champion.healthRegen, championAt18.healthRegen));
-		if(champion.maxResource > 0) resourceText.setText(String.format("%.0f -- %.0f", champion.maxResource, championAt18.maxResource));
-		if(champion.resourceRegen > 0) resourceRegenText.setText(String.format("%.1f -- %.1f", champion.resourceRegen, championAt18.resourceRegen));
+		formatResources();
+		resourceText.setText(String.format("%.0f -- %.0f", champion.maxResource, championAt18.maxResource));
+		resourceRegenText.setText(String.format("%.1f -- %.1f", champion.resourceRegen, championAt18.resourceRegen));
 		adText.setText(String.format("%.0f -- %.0f", champion.attackDamage, championAt18.attackDamage));
 		asText.setText(String.format("%.3f -- %.3f", champion.attackSpeed, championAt18.attackSpeed));
 		armorText.setText(String.format("%.0f -- %.0f", champion.armor, championAt18.armor));
@@ -278,8 +280,9 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 	void setTableToN() {
 		healthText.setText(String.format("%.0f", champion.maxHealthGrowthRate));
 		healthRegenText.setText(String.format("%.1f", champion.healthRegenGrowthRate));
-		if(champion.maxResource > 0) resourceText.setText(String.format("%.0f", champion.maxResourceGrowthRate));
-		if(champion.resourceRegen > 0) resourceRegenText.setText(String.format("%.1f", champion.resourceRegenGrowthRate));
+		formatResources();
+		resourceText.setText(String.format("%.0f", champion.maxResourceGrowthRate));
+		resourceRegenText.setText(String.format("%.1f", champion.resourceRegenGrowthRate));
 		adText.setText(String.format("%.0f", champion.attackDamageGrowthRate));
 		asText.setText(String.format("%.1f%%", champion.attackSpeedGrowthRate));
 		armorText.setText(String.format("%.0f", champion.armorGrowthRate));
@@ -295,21 +298,9 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		// Default format is in-game style (low precision)
 		healthText.setText(String.format("%.0f", champion.maxHealth));
 		healthRegenText.setText(String.format("%.1f", champion.healthRegen));
-		if(champion.resourceType.equals("Uses health") || champion.resourceType.equals("No resource")) {
-			resourceText.setVisibility(View.INVISIBLE);
-			resourceRegenText.setVisibility(View.INVISIBLE);
-		}
-		else if(champion.resourceType.equals("Fury")) {
-			resourceText.setText(String.format("%.0f", champion.maxResource));
-			resourceText.setVisibility(View.VISIBLE);
-			resourceRegenText.setVisibility(View.INVISIBLE);
-		}
-		else {
-			resourceText.setText(String.format("%.0f", champion.maxResource));
-			resourceRegenText.setText(String.format("%.1f", champion.resourceRegen));
-			resourceText.setVisibility(View.VISIBLE);
-			resourceRegenText.setVisibility(View.VISIBLE);
-		}
+		formatResources();
+		resourceText.setText(String.format("%.0f", champion.maxResource));
+		resourceRegenText.setText(String.format("%.1f", champion.resourceRegen));
 		adText.setText(String.format("%.0f", champion.attackDamage));
 		asText.setText(String.format("%.3f", champion.attackSpeed));
 		armorText.setText(String.format("%.0f", champion.armor));
@@ -319,6 +310,29 @@ public class ChampInfoActivity extends Activity implements OnItemSelectedListene
 		rangeTypeText.setText(champion.rangeType);
 		rangeText.setText(String.format("%.0f", champion.range));
 		moveSpeedText.setText(String.format("%.0f", champion.moveSpeed));
+	}
+	
+	void formatResources() {
+		if(champion.resourceType.equals("Uses health") || champion.resourceType.equals("No resource")) {
+			resourceText.setVisibility(View.INVISIBLE);
+			resourceRegenText.setVisibility(View.INVISIBLE);
+		}
+		else if(champion.resourceType.equals("Fury")) {
+			resourceText.setVisibility(View.VISIBLE);
+			resourceRegenText.setVisibility(View.INVISIBLE);
+		}
+		else {
+			resourceText.setVisibility(View.VISIBLE);
+			resourceRegenText.setVisibility(View.VISIBLE);
+			if(champion.resourceType.equals("Energy")) {
+				resourceText.setTextColor(ContextCompat.getColor(this, R.color.energy));
+				resourceRegenText.setTextColor(ContextCompat.getColor(this, R.color.energy_regen));
+			}
+			else if(champion.resourceType.equals("Mana")) {
+				resourceText.setTextColor(ContextCompat.getColor(this, R.color.mana));
+				resourceRegenText.setTextColor(ContextCompat.getColor(this, R.color.mana_regen));
+			}
+		}
 	}
 	
 	void aestheticSetup() {

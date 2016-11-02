@@ -15,6 +15,17 @@ class Champion
 	 * Class for displaying base stats and stats per level.
 	 */
 	
+	final static String COLOR_AD = "#FC8A01";
+	final static String COLOR_AP = "#97FC97";
+	final static String COLOR_AS = "#C80000";
+	final static String COLOR_ARMOR = "#EFF002";
+	final static String COLOR_MAGIC_RESIST = "#CA1F7B";
+	final static String COLOR_HEALTH = "#C03300";
+	final static String COLOR_MANA = "#0099CC";
+	final static String COLOR_ENERGY = "#FFFF00";
+	final static String COLOR_CRIT_CHANCE = "#E56013";
+	final static String COLOR_BASE_CRIT = "#944B00";
+	
 	String champName;
 	JSONObject champion;
 	JSONObject champStats;
@@ -202,7 +213,7 @@ class Champion
 		// Try to parse the descriptions
 		try
 		{
-			if(champName.equals("Shyvana") && (abilityArrayNum == 2)) target.description = "Shyvana deals 20/32/45//57 <font color=\"#FF8C00\">(+0.2 bonus AD)</font> <font class=\"#99FF99\">(+0.1 AP)</font> magic damage per second to nearby enemies and gains a bonus 30/35/40/45/50% movement speed that decays over 3 seconds.<br><br>While Burnout is active, basic attacks deal 5/8/11.25/14.25/17.5 <font color=\"#FF8C00\">(+0.2 bonus AD)</font> <font color=\"#99FF99\">(+0.1 AP)</font> magic damage to nearby enemies and extend its duration by 1 second.<br><br><font color=\"#FF3300\">Dragon Form: </font>Burnout scorches the earth, continuing to damage enemies that stand on it.<br><br><font color=\"#919191\"><i>Burnout deals +20% damage to monsters.<br>Burnout has a maximum duration of 7 seconds.</i></font>";
+			if(champName.equals("Shyvana") && (abilityArrayNum == 2)) target.description = "Shyvana deals 20/32/45//57 <font color=\"#FF8C00\">(+0.2 bonus AD)</font> <font color=\"#99FF99\">(+0.1 AP)</font> magic damage per second to nearby enemies and gains a bonus 30/35/40/45/50% movement speed that decays over 3 seconds.<br><br>While Burnout is active, basic attacks deal 5/8/11.25/14.25/17.5 <font color=\"#FF8C00\">(+0.2 bonus AD)</font> <font color=\"#99FF99\">(+0.1 AP)</font> magic damage to nearby enemies and extend its duration by 1 second.<br><br><font color=\"#FF3300\">Dragon Form: </font>Burnout scorches the earth, continuing to damage enemies that stand on it.<br><br><font color=\"#919191\"><i>Burnout deals +20% damage to monsters.<br>Burnout has a maximum duration of 7 seconds.</i></font>";
 			else target.description = ChampOps.ttParser(champName, target.description, abilityJson, abilityArrayNum);
 		} 
 		catch (IOException e) {

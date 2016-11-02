@@ -60,6 +60,7 @@
 
 					<TextView
 						android:id="@+id/health"
+						android:textColor="@color/health"
 						android:text="uninitialized"
 						android:gravity="center"/>
 						
@@ -70,6 +71,7 @@
 
 					<TextView
 						android:id="@+id/attack_damage"
+						android:textColor="@color/attack_damage"
 						android:text="uninitialized"
 						android:gravity="center"/>
 
@@ -84,6 +86,7 @@
 
 					<TextView
 						android:id="@+id/health_regen"
+						android:textColor="@color/health_regen"
 						android:text="uninitialized"
 						android:gravity="center"/>
 						
@@ -94,6 +97,7 @@
 
 					<TextView
 						android:id="@+id/attack_speed"
+						android:textColor="@color/attack_speed"
 						android:text="uninitialized"
 						android:gravity="center"/>
 
@@ -103,7 +107,7 @@
 
 					<TextView
 						android:id="@+id/champ_resource_type"
-						android:text="Uses health"/>
+						android:text="uninitialized"/>
 
 					<TextView
 						android:id="@+id/resource_points"
@@ -116,6 +120,7 @@
 
 					<TextView
 						android:id="@+id/armor"
+						android:textColor="#EFF002"
 						android:text="uninitialized"
 						android:gravity="center"/>
 
@@ -137,6 +142,7 @@
 
 					<TextView
 						android:id="@+id/magic_resist"
+						android:textColor="@color/magic_resist"
 						android:text="uninitialized"
 						android:gravity="center"/>
 
