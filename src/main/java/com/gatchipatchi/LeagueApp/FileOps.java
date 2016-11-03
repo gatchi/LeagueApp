@@ -42,7 +42,7 @@ class FileOps
 		return new BufferedInputStream(new FileInputStream(file));
 	}
 	
-	static JSONObject retrieveJson(Activity activity, String dirName, String filename)
+	static JSONObject retrieveJson(Activity activity, String dirName, String shortFilename)
 	{
 		/*
 		 * retrieveJson Description
@@ -58,7 +58,7 @@ class FileOps
 		File jsonFile;
 		
 		try {
-			jsonFile = FileOps.openFile(activity, dirName, filename);
+			jsonFile = FileOps.openFile(activity, dirName, shortFilename + ".json");
 			in = new BufferedInputStream(new FileInputStream(jsonFile));
 		}
 		catch (FileNotFoundException e)

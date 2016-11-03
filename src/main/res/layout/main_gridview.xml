@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:gravity="center|top"
+	android:orientation="vertical"
+	android:baselineAligned="false">
+
+	<TextView
+		android:text="League App"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"/>
+
+	<EditText
+		android:layout_height="wrap_content"
+		android:ems="10"
+		android:layout_width="wrap_content"
+		android:maxLines="1"
+		android:imeOptions="actionSearch"
+		android:inputType="text"
+		android:id="@+id/search"
+		android:gravity="center_horizontal"
+		android:hint="search"
+		android:layout_gravity="center"
+		android:visibility="visible"/>
+
+	<View
+		android:layout_height="1dp"
+		android:background="?android:attr/dividerVertical"
+		android:layout_width="match_parent"/>
+
+	<LinearLayout
+		android:id="@+id/button_layout"
+		android:layout_width="match_parent"
+		android:layout_height="350dp"
+		android:layout_gravity="center"
+		android:gravity="center">
+		
+		<GridView
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:layout_margin="5dp"
+			android:numColumns="5"
+			android:gravity="center_vertical"
+			android:stretchMode="none"
+			android:id="@+id/icon_grid"
+			android:columnWidth="58dp"
+			android:horizontalSpacing="2dp"
+			android:verticalSpacing="2dp"
+			android:textFilterEnabled="true"/>
+			
+	</LinearLayout>
+	
+	<ProgressBar
+		android:id="@+id/update_progress"
+		style="@android:style/Widget.ProgressBar.Horizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:visibility="gone"/>
+	
+	<LinearLayout
+		android:id="@+id/footer"
+		android:orientation="horizontal"
+		android:layout_height="wrap_content"
+		android:layout_width="match_parent"
+		android:gravity="bottom|center">
+		
+		<!-- android:background="#245675" -->
+		
+	</LinearLayout>
+
+</LinearLayout>
+

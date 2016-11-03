@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="attack_damage">#FC8A01</color>
+	<color name="physical_damage">#FC8A01</color>
+	<color name="ability_power">#97FC97</color>
+	<color name="magic_damage">#97FC97</color>
+	<color name="attack_speed">#C80000</color>
+	<color name="health">#C03300</color>
+	<color name="health_regen">#C03300</color>
+	<color name="mana">#0099CC</color>
+	<color name="mana_regen">#0099CC</color>
+	<color name="energy">#FFFF00</color>
+	<color name="energy_regen">#FFFF00</color>
+	<color name="armor">#EFF002</color>
+	<color name="magic_resist">#CA1F7B</color>
+	<color name="crit_chance">#E56013</color>
+	<color name="base_crit">#944B00</color>
+</resources>

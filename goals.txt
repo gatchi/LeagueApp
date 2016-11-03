@@ -1,10 +1,18 @@
 Goals for Today
 ===============
-
+o refactor ChampInfoActivity
+	- code cleanup
 
 Goals for Some Other Day
 ========================
-o refactor ChampInfoActivity
+o fix Cass parser error
+o Corki ???
+o just do a good comb-thru all the champs
+o reformat all the custom text (should be percentages)
+o special shit for Gnar
+o special passives for..... everybody, fuck
+o change ratios on abilities to percentages
+o refactor transalte and ttParser
 + add string resources for MainActivity
 + add old plugins to lenovo npp
 + implement search
@@ -44,21 +52,3 @@ x view basic stats
 
 Things Done Since Last Commit
 =============================
-o fix shyvana
-- removed data clear button code
-- removed clearDownloads() method from MainActivity
-+ created Updater class
-+ created Setup class
-+ created FileOps class
-+ created ChampOps class
-o renamed ChampInfo activity class to ChampInfoActivity
-o moved around a lot of code
-o move filereading code in MainActivity to FileOps
-o changed DownloadFilesTask to DownloadTask
-o replaced Pack and Queue system with an ArrayList system
-o simplified checkInventory() code (there were redundant "new DownloadTask" lines, moved to end of method)
-- finally deleted all that commented out old code under "Class Methods" in MainActivity.java
-o massive refactor on MainActivity
-o replaced Debug suite with official Android log library
-o tested new logging
-+ added some string resources for MainActivity
