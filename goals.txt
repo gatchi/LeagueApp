@@ -1,42 +1,34 @@
 Goals for Today
 ===============
-o refactor ChampInfoActivity
-	- code cleanup
+o make search bar invisible
+o make clear log button invisible (if its even still implemented)
 
 Goals for Some Other Day
 ========================
 o fix Cass parser error
+o fix Renekton jesus
 o Corki ???
 o just do a good comb-thru all the champs
-o reformat all the custom text (should be percentages)
 o special shit for Gnar
 o special passives for..... everybody, fuck
-o change ratios on abilities to percentages
-o refactor transalte and ttParser
+o refactor translate and ttParser (and incorporate regex)
 + add string resources for MainActivity
-+ add old plugins to lenovo npp
 + implement search
 	o swap out custom icon grid code for GridView and a ListAdapter (so you can use Filterable)
 		! jk, cant uset ListAdapter, must implement Filterable
 			o implement getFilter()
 o fix ImageAdapter
-o maybe combine Updater and ChampOps classes?
 o custom passive text
 + custom rule for Jayce (missing half his skills)
 + custom rule for Elise (missing half her skills)
 + custom rule for Renekton (Q has incorrect hard coded values)
-o fix weird shit on shyvana's page
-o passives are almost all too vague and missing numbers, do something about this
-? what the fuck is dynamic ability power? heimer issues
 + setting: tabbed champinfo pages
 + setting: internet retry
 + get downloads from latest version
 + make it so that runtime reconfigurations (like screen orientation changes) dont fuck up async
-+ dark theme (themes in general eventually, w/ customization)
 + drops unecessary decimal zeroes
 + maybe make it so that decimal attack speed is updated per level
 + on ChampInfo: settings, verbose (more precision) or simple (less precision)
-+ custom colors for spell text syntax highlighting
 + setting: turn off syntax highlighting
 + setting: auto-updating
 o get Wukong to show up in the proper location on the list
