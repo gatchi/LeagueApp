@@ -183,9 +183,7 @@ public class MainActivity extends Activity
 		refreshButton.setOnClickListener(updateButtonListener);
 		
 		// Add log clear button
-		logClearButton = new Button(this);
-		logClearButton.setText("clear log");
-		footer.addView(logClearButton);
+		logClearButton = (Button) findViewById(R.id.log_clear_button);
 		logClearButton.setOnClickListener(logClearButtonListener);
 		
 		// Add listener to search bar
