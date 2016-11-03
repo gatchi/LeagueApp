@@ -15,48 +15,40 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-class ChampOps
-{
+class ChampOps {
 	/*
 	 * ChampOps Class Definition
 	 *
 	 * Class for miscellaneous champ-related operations.
 	 */
 	
-	static double calcCassMoveSpeed(double speed, int level)
-	{
+	static double calcCassMoveSpeed(double speed, int level) {
 		return speed + 4 * level;
 	}
 	
-	static double calcTristanaRange(double range, int level)
-	{
+	static double calcTristanaRange(double range, int level) {
 		return range + 7 * (level - 1);
 	}
 	
-	static double calcStat(double base, double growthRate, int level)
-	{
+	static double calcStat(double base, double growthRate, int level) {
 		return base + growthRate * (level - 1) * (0.685 + 0.0175 * level);
 	}
 	
-	static double calcBaseAs(double offset)
-	{
+	static double calcBaseAs(double offset) {
 		return (0.625 / (1 + offset));
 	}
 	
-	static double calcAsGrowth(double growthRate, int level)
-	{
+	static double calcAsGrowth(double growthRate, int level) {
 		return (growthRate * (7.0/400 * (level*level - 1) + 267.0/400 * (level - 1)) / 100);
 	}
 	
-	static double calcAs(double offset, double growthRate, int level)
-	{
+	static double calcAs(double offset, double growthRate, int level) {
 		double base = calcBaseAs(offset);
 		double growth = calcAsGrowth(growthRate, level);
 		return base + base * growth;
 	}
 	
-	static ArrayList<String> generateChampList(Activity activity, String dirName, String jsonFilename)
-	{
+	static ArrayList<String> generateChampList(Activity activity, String dirName, String jsonFilename) {
 		// Retrieve JSON object from given JSON file
 		JSONObject championJson = FileOps.retrieveJson(activity, dirName, jsonFilename);
 		JSONObject champData;
@@ -90,20 +82,17 @@ class ChampOps
 		return champList;
 	}
 	
-	static String coeffDoubleFormatter(JSONObject json) throws JSONException
-	{
+	static String coeffDoubleFormatter(JSONObject json) throws JSONException {
 		String coeff = Double.toString(json.getDouble("coeff") * 100) + "%";
 		return coeff;
 	}
 	
-	static String coeffIntegerFormatter(JSONObject json) throws JSONException
-	{
+	static String coeffIntegerFormatter(JSONObject json) throws JSONException {
 		String coeff = Integer.toString(json.getInt("coeff"));
 		return coeff;
 	}
 
-	static String coeffJsonObjectFormatter(JSONObject json) throws JSONException
-	{
+	static String coeffJsonObjectFormatter(JSONObject json) throws JSONException {
 		JSONArray coeffArray = json.getJSONArray("coeff");
 		String coeff = "";
 		for(int i=0; i<coeffArray.length()-1; i++)
@@ -289,7 +278,7 @@ class ChampOps
 		{
 			if(spellNum == 4)
 			{
-				if(code.equals("a2")) return "(for every 100AP) 0.06667";
+				if(code.equals("a2")) return "6.667% per 100 AP";
 			}
 		}
 		if(champName.equals("Illaoi"))
@@ -297,7 +286,7 @@ class ChampOps
 			if(spellNum == 2)
 			{
 				if(code.equals("f1")) return "";
-				if(code.equals("f2")) return "0.5";
+				if(code.equals("f2")) return "2";
 			}
 		}
 		if(champName.equals("Jax"))
@@ -319,7 +308,7 @@ class ChampOps
 		{
 			if(spellNum == 1)
 			{
-				if(code.equals("f1")) return "0.4/0.55/0.7/0.85/1.0 AD";
+				if(code.equals("f1")) return "40/55/70/85/100% AD";
 			}
 		}
 		if(champName.equals("Ziggs"))
@@ -397,7 +386,7 @@ class ChampOps
 			Log.e(Debug.TAG, "something fucky happened with the coeff");
 			Log.e(Debug.TAG, "cant find " + code);
 		}
-		else if (alpha == 'f')
+		else if (alpha == 'f')  // Custom values are here
 		{
 			JSONArray vars = selSpell.getJSONArray("vars");
 			
@@ -467,7 +456,9 @@ class ChampOps
 				}
 				if (champName.equals("Ahri"))
 				{
-					if (code.equals("f1")) return "1.60 damage";
+					if(spellNum == 2) {
+						if (code.equals("f1")) return "160% damage";
+					}
 				}
 				if (champName.equals("Anivia"))
 				{
@@ -475,16 +466,16 @@ class ChampOps
 				}
 				if (champName.equals("Annie"))
 				{
-					if (code.equals("f1")) return ".15 AP";
+					if (code.equals("f1")) return "15% AP";
 				}
 				if (champName.equals("Ashe"))
 				{
-					if (code.equals("f1")) return "1.15/1.20/1.25/1.30/1.35 AD";
+					if (code.equals("f1")) return "115/120/125/130/135% AD";
 				}
 				if (champName.equals("AurelionSol"))
 				{
 					if (code.equals("f1")) return "30-145.5 (based on level) (+15/30/45/60//75)";
-					if (code.equals("f2")) return "(+0.27-0.525 (based on level) AP)";
+					if (code.equals("f2")) return "(+27-52.5% (based on level) AP)";
 				}
 				if (champName.equals("Azir"))
 				{
@@ -511,32 +502,32 @@ class ChampOps
 				{
 					if (spellNum == 1)
 					{
-						if (code.equals("f1")) return "1.30/1.40/1.50/1.60/1.70 AD";
+						if (code.equals("f1")) return "130/140/150/160/170% AD";
 					}
 					if (spellNum == 2)
 					{
-						if (code.equals("f1")) return "0.7 AD";
+						if (code.equals("f1")) return "70% AD";
 					}
 				}
 				if (champName.equals("Cassiopeia"))
 				{
-					if (code.equals("f2")) return "0.1 AP";
+					if (code.equals("f2")) return "10% AP";
 				}
 				if (champName.equals("Corki"))
 				{
 					if (spellNum == 1)
 					{
-						if (code.equals("f1")) return "0.5 AD";
+						if (code.equals("f1")) return "50% AD";
 					}
 					if (spellNum == 2)
 					{
 						if (code.equals("f1")) return "60/90/120/150/180";
-						if (code.equals("f2")) return "0.2 AP";
+						if (code.equals("f2")) return "20% AP";
 					}
 				}
 				if (champName.equals("Darius"))
 				{
-					if (code.equals("f1")) return "0.4 AD bonus";
+					if (code.equals("f1")) return "40% AD bonus";
 				}
 				if (champName.equals("DrMundo"))
 				{
@@ -552,17 +543,17 @@ class ChampOps
 				}
 				if (champName.equals("Evelynn"))
 				{
-					if (code.equals("f2")) return "0.35/0.4/0.45/0.5/0.55 AP";
+					if (code.equals("f2")) return "35/40/45/50/55% AP";
 				}
 				if (champName.equals("Ezreal"))
 				{
 					if (spellNum == 1)
 					{
-						if (code.equals("f3")) return "1.1 AD";
+						if (code.equals("f3")) return "110% AD";
 					}
 					if (spellNum == 3)
 					{
-						if (code.equals("f1")) return "0.5 bonus AD";
+						if (code.equals("f1")) return "50 bonus AD";
 					}
 				}
 				if (champName.equals("FiddleSticks"))
@@ -570,20 +561,19 @@ class ChampOps
 					if (spellNum == 2)
 					{
 						if (code.equals("f1")) return "300/450/600/750/900";
-						if (code.equals("f2")) return "2.25 AP";
+						if (code.equals("f2")) return "225% AP";
 					}
 					if (spellNum == 4)
 					{
 						if(code.equals("f1")) return "625/1125/1625";
-						if(code.equals("f2")) return "2.25 AP";
+						if(code.equals("f2")) return "225% AP";
 					}
 				}
 				if(champName.equals("Fiora"))
 				{
 					if(spellNum == 2)
 					{
-						if(code.equals("f1")) return "1.0 AP";
-						
+						if(code.equals("f1")) return "100% AP";
 					}
 					if(spellNum == 3)
 					{
@@ -594,7 +584,7 @@ class ChampOps
 					{
 						if(code.equals("f8")) return "bonus (8 + 18 per 100 bonus AD)";
 						if(code.equals("f6")) return "20/30/40/50";
-						if(code.equals("f9")) return "0.6 bonus AD";
+						if(code.equals("f9")) return "60% bonus AD";
 					}
 				}
 				if(champName.equals("Gangplank"))
@@ -646,12 +636,12 @@ class ChampOps
 					if(spellNum == 1)
 					{
 						if(code.equals("f1")) return "0.75 bonus AD";
-						if(code.equals("f2")) return "0.4/0.6/0.8/1.0/1.2 bonus AD";
+						if(code.equals("f2")) return "40/60/80/100/120% bonus AD";
 					}
 					if(spellNum == 4)
 					{
-						if(code.equals("f1")) return "1.5 bonus AD";
-						if(code.equals("f2")) return "1.2 bonus AD";
+						if(code.equals("f1")) return "150% bonus AD";
+						if(code.equals("f2")) return "120% bonus AD";
 					}
 				}
 				if(champName.equals("Illaoi"))
@@ -668,7 +658,7 @@ class ChampOps
 				}
 				if(champName.equals("Irelia"))
 				{
-					if(code.equals("f1")) return "1.2 AD";
+					if(code.equals("f1")) return "120% AD";
 				}
 				if(champName.equals("Jayce"))
 				{
@@ -678,7 +668,7 @@ class ChampOps
 				{
 					if(spellNum == 1)
 					{
-						if(code.equals("f1")) return "0.3/0.35/0.4/0.45/0.5 AD";
+						if(code.equals("f1")) return "30/35/40/45/50% AD";
 					}
 					if(spellNum == 3)
 					{
@@ -718,27 +708,27 @@ class ChampOps
 				{
 					if(code.equals("f2")) return "2% maximum mana";
 					if(code.equals("f1")) return "1% maximum mana";
-					if(code.equals("f3")) return "0.1 AP";
+					if(code.equals("f3")) return "10% AP";
 				}
 				if(champName.equals("Khazix"))
 				{
 					if(code.equals("f3")) return "(based on level) 10-180";
-					if(code.equals("f2")) return "1.04 AD";
+					if(code.equals("f2")) return "104% AD";
 				}
 				if(champName.equals("Kindred"))
 				{
 					if(spellNum == 1)
 					{
 						if(code.equals("f2")) return "55/75/95/115/135 + 5 damage per stack of Mark of the Kindred";
-						if(code.equals("f1")) return "0.2 AD";
+						if(code.equals("f1")) return "20% AD";
 					}
 					if(spellNum == 2)
 					{
-						if(code.equals("f2")) return "0.4 AD";
+						if(code.equals("f2")) return "40% AD";
 					}
 					if(spellNum == 3)
 					{
-						if(code.equals("f1")) return "0.2 AD";
+						if(code.equals("f1")) return "20% AD";
 					}
 				}
 				if(champName.equals("KogMaw"))
@@ -749,18 +739,18 @@ class ChampOps
 					}
 					if(spellNum == 4)
 					{
-						if(code.equals("f3")) return "1.3 AD";
-						if(code.equals("f2")) return "0.5 AP";
+						if(code.equals("f3")) return "130% AD";
+						if(code.equals("f2")) return "50% AP";
 						if(code.equals("f4")) return "210/330/450";
-						if(code.equals("f6")) return "1.95 AD";
-						if(code.equals("f5")) return "0.75 AP";
+						if(code.equals("f6")) return "195% AD";
+						if(code.equals("f5")) return "75% AP";
 					}
 				}
 				if(champName.equals("Lulu"))
 				{
 					if(code.equals("f4")) return "56/87.5/119/150.5/182";
-					if(code.equals("f5")) return "0.35 AP";
-					if(code.equals("f6")) return "80/125/170/215/260 +0.5 AP";
+					if(code.equals("f5")) return "35% AP";
+					if(code.equals("f6")) return "80/125/170/215/260 +50% AP";
 				}
 				if(champName.equals("Malphite"))
 				{
@@ -771,7 +761,7 @@ class ChampOps
 				{
 					if(spellNum == 2)
 					{
-						if(code.equals("f1")) return "0.3/0.325/0.35/0.375/0.40 AD";
+						if(code.equals("f1")) return "30/32.5/35/37.5/40% AD";
 					}
 					if(spellNum == 3)
 					{
@@ -786,8 +776,8 @@ class ChampOps
 				{
 					if(spellNum == 1)
 					{
-						if(code.equals("f1")) return "0.85 AD";
-						if(code.equals("f2")) return "1.0 AD";
+						if(code.equals("f1")) return "85% AD";
+						if(code.equals("f2")) return "100% AD";
 					}
 					if(spellNum == 2)
 					{
@@ -804,8 +794,8 @@ class ChampOps
 					if(spellNum == 1)
 					{
 						if(code.equals("f5")) return "20/40/60/80/100";
-						if(code.equals("f3")) return "2.0/2.4/2.8/3.2/3.6 AD";
-						if(code.equals("f4")) return "2.4 AP";
+						if(code.equals("f3")) return "200/240/280/320/360% AD";
+						if(code.equals("f4")) return "240% AP";
 					}
 					if(spellNum == 2)
 					{
@@ -819,7 +809,7 @@ class ChampOps
 				}
 				if(champName.equals("Nami"))
 				{
-					if(code.equals("f1")) return "85 (+0.075 AP)";
+					if(code.equals("f1")) return "85 (+7.5% AP)";
 				}
 				if(champName.equals("Nunu"))
 				{
@@ -831,7 +821,7 @@ class ChampOps
 					}
 					if(spellNum == 4)
 					{
-						if(code.equals("f2")) return "78.1/109.4/140.6 (+0.3125 AP)";
+						if(code.equals("f2")) return "78.1/109.4/140.6 (+31.25% AP)";
 					}
 				}
 				if(champName.equals("Poppy"))
@@ -841,7 +831,7 @@ class ChampOps
 				}
 				if(champName.equals("Quinn"))
 				{
-					if(code.equals("f2")) return "0.8/0.9/1.0/1.1/1.2 AD";
+					if(code.equals("f2")) return "80/90/100/110/120% AD";
 				}
 				if(champName.equals("RekSai"))
 				{
@@ -851,8 +841,8 @@ class ChampOps
 					}
 					if(spellNum == 3)
 					{
-						if(code.equals("f1")) return "0.8/0.9/1.0/1.1/1.2 AD";
-						if(code.equals("f2")) return "1.6/1.8/2.0/2.2/2.4 AD";
+						if(code.equals("f1")) return "80/90/100/110/120% AD";
+						if(code.equals("f2")) return "160/180/200/220/240% AD";
 					}
 				}
 				if(champName.equals("Renekton"))
@@ -866,14 +856,14 @@ class ChampOps
 					}
 					if(spellNum == 2)
 					{
-						if(code.equals("f3")) return "2.25 AD";
+						if(code.equals("f3")) return "225% AD";
 					}
 				}
 				if(champName.equals("Rengar"))
 				{
 					if(spellNum == 1)
 					{
-						if(code.equals("f3")) return "0/0.5/0.1/0.15/0.2 AD";
+						if(code.equals("f3")) return "0/5/10/15/20% AD";
 						if(code.equals("f2")) return "30-240";
 						if(code.equals("f4")) return "50-102";
 					}
@@ -919,7 +909,7 @@ class ChampOps
 				}
 				if(champName.equals("Shyvana"))
 				{
-					if(code.equals("f2")) return "1.0 AD";
+					if(code.equals("f2")) return "100% AD";
 				}
 				if(champName.equals("Sion"))
 				{
@@ -933,7 +923,7 @@ class ChampOps
 				{
 					if(spellNum == 1)
 					{
-						if(code.equals("f1")) return "0.05 AP";
+						if(code.equals("f1")) return "5% AP";
 					}
 					if(spellNum == 2)
 					{
@@ -946,9 +936,9 @@ class ChampOps
 					{
 						if(code.equals("f1")) return "60/96/130/166/200";
 						if(code.equals("f2")) return "120/190/260/330/400";
-						if(code.equals("f3")) return "1.2 AP";
+						if(code.equals("f3")) return "120% AP";
 						if(code.equals("f4")) return "240/380/520/660/800";
-						if(code.equals("f5")) return "2.4 AP";
+						if(code.equals("f5")) return "240% AP";
 					}
 					if(spellNum == 4)
 					{
@@ -971,7 +961,7 @@ class ChampOps
 					{
 						if(code.equals("f2")) return "(20 + 4 per 100 AP)";
 						if(code.equals("f3")) return "40/52.5/65/77.5/90";
-						if(code.equals("f1")) return "0.2 AP";
+						if(code.equals("f1")) return "20% AP";
 						if(code.equals("f4")) return "15";
 					}
 					
@@ -1009,32 +999,32 @@ class ChampOps
 					if(spellNum == 3)
 					{
 						if(code.equals("f3")) return "# of collected souls";
-						if(code.equals("f2")) return "8.0/1.1/1.4/1.7/2.0 AD";
+						if(code.equals("f2")) return "00/110/140/170/200% AD";
 					}
 				}
 				if(champName.equals("Tristana"))
 				{
 					if(spellNum == 3)
 					{
-						if(code.equals("f1")) return "0.5/0.65/0.8/0.95/1.1 AD";
+						if(code.equals("f1")) return "50/65/80/95/110% AD";
 					}
 				}
 				if(champName.equals("Tryndamere"))
 				{
 					if(spellNum == 1)
 					{
-						if(code.equals("f2")) return "0.012 AP";
+						if(code.equals("f2")) return "1.2% AP";
 					}
 					if(spellNum == 3)
 					{
-						if(code.equals("f1")) return "1.2 bonus AD";
+						if(code.equals("f1")) return "120% bonus AD";
 					}
 				}
 				if(champName.equals("Twitch"))
 				{
 					if(spellNum == 3)
 					{
-						if(code.equals("f1")) return "0.25 bonus AD";
+						if(code.equals("f1")) return "25% bonus AD";
 					}
 				}
 				if(champName.equals("Urgot"))
@@ -1049,7 +1039,7 @@ class ChampOps
 					if(spellNum == 1)
 					{
 						if(code.equals("f1")) return "8% maximum mana";
-						if(code.equals("f2")) return "0.15 AP";
+						if(code.equals("f2")) return "15% AP";
 					}
 				}
 				if(champName.equals("Vladimir"))
@@ -1067,7 +1057,7 @@ class ChampOps
 					if(spellNum == 4)
 					{
 						if(code.equals("f4")) return "150/250/350";
-						if(code.equals("f3")) return "0.7 AP";
+						if(code.equals("f3")) return "70% AP";
 					}
 				}
 				if(champName.equals("Xerath"))
@@ -1075,21 +1065,21 @@ class ChampOps
 					if(spellNum == 2)
 					{
 						if(code.equals("f1")) return "90/135/180/225/270";
-						if(code.equals("f2")) return "0.9 AP";
+						if(code.equals("f2")) return "90% AP";
 					}
 				}
 				if(champName.equals("XinZhao"))
 				{
 					if(spellNum == 2)
 					{
-						if(code.equals("f1")) return "0.20 bonus AD";
+						if(code.equals("f1")) return "20% bonus AD";
 					}
 				}
 				if(champName.equals("Zed"))
 				{
 					if(spellNum == 2)
 					{
-						if(code.equals("f3")) return "0.04/0.08/0.12/0.16/0.2 bonus AD";
+						if(code.equals("f3")) return "4/8/12/16/20% bonus AD";
 					}
 				}
 				if(champName.equals("Zyra"))
