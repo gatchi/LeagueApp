@@ -20,6 +20,8 @@
 	<string name="health_regen">Health regen per 5s</string>
 	<string name="health_regen_port">Health regen per 5s</string>
 	
+	<string name="champ_compare">Champ Compare</string>
+	
 	<string-array name="champ_level_select">
 		<item>1 – 18</item>
 		<item>growth</item>

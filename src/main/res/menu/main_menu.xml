@@ -1,0 +1,5 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+	<item
+		android:title="@string/champ_compare"
+		android:id="@+id/champ_compare"/>
+</menu>

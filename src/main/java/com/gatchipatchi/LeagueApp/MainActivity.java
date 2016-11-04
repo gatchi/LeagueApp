@@ -12,6 +12,8 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.ImageView.ScaleType;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.inputmethod.EditorInfo;
 import android.view.KeyEvent;
 import android.view.View;
@@ -189,6 +191,13 @@ public class MainActivity extends Activity
 		// Add listener to search bar
 		editText = (EditText) findViewById(R.id.search);
 		editText.setOnEditorActionListener(searchListener);
+	}
+	
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.main_menu, menu);
+		return true;
 	}
 	
 	
