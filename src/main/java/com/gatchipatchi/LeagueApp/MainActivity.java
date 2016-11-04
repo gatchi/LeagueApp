@@ -14,6 +14,7 @@ import android.widget.TableLayout;
 import android.widget.ImageView.ScaleType;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.view.KeyEvent;
 import android.view.View;
@@ -193,6 +194,7 @@ public class MainActivity extends Activity
 		editText.setOnEditorActionListener(searchListener);
 	}
 	
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		MenuInflater inflater = getMenuInflater();
@@ -200,6 +202,13 @@ public class MainActivity extends Activity
 		return true;
 	}
 	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		Intent intent = new Intent(this, ChampCompareSetupActivity.class);
+		startActivity(intent);
+		return false;
+	}
 	
 	//----------------- Listeners ---------------------//
 	
