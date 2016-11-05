@@ -48,6 +48,8 @@
 		<item>18</item>
 	</string-array>
 	
+	<string-array name="compare_options_1">	</string-array>
+	
 	<!--
 	<string-array name="champ_names">
 		<item>Aatrox</item>

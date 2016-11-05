@@ -18,7 +18,9 @@
 		android:layout_margin="5dp"/>
 		
 	<Spinner
-		android:layout_width="wrap_content"
+		android:id="@+id/compare_options_1"
+		android:gravity="center_horizontal"
+		android:layout_width="150sp"
 		android:layout_height="wrap_content"/>
 		
 	<TextView
@@ -28,6 +30,7 @@
 		android:layout_margin="5dp"/>
 		
 	<Spinner
+		android:id="@+id/compare_options_2"
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content"/>
 		
