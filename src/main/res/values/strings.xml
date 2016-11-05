@@ -22,6 +22,8 @@
 	
 	<string name="champ_compare">Compare champs</string>
 	<string name="champ_compare_welcome_string">Select your options</string>
+	<string name="compare_option_1">Compare:</string>
+	<string name="compare_option_2">with:</string>
 	
 	<string-array name="champ_level_select">
 		<item>1 – 18</item>
